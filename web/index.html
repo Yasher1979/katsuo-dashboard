@@ -17,10 +17,23 @@
     <link rel="apple-touch-icon" href="marucyou_mark.png">
 </head>
 
-<body>
+<body class="theme-dark"> <!-- デフォルトはダークモード -->
+    <!-- スプラッシュ画面 -->
+    <div id="splash-screen" class="splash-screen">
+        <div class="splash-content">
+            <img src="marucyou_mark.png" alt="Marucyou Logo" class="splash-logo">
+            <div class="loader"></div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
-            <h1>(有)マルチョウ　専用　鰹節原料(B巻網)相場グラフ</h1>
+            <div class="theme-switcher">
+                <button class="btn-theme active" data-theme="dark">Dark</button>
+                <button class="btn-theme" data-theme="light">Light</button>
+                <button class="btn-theme" data-theme="ocean">Ocean</button>
+            </div>
+            <h1>鰹相場グラフ</h1>
             <p class="description">枕崎・焼津・山川におけるサイズ別(1.8+/2.5+/4.5+)相場推移</p>
 
             <div class="filter-controls">
