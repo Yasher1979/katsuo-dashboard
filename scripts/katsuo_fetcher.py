@@ -14,7 +14,11 @@ class KatsuoDataFetcher:
             os.makedirs(data_dir)
             
         self.ports = ["焼津", "枕崎", "山川"]
-        self.sizes = ["1.8kg上", "2.5kg上", "4.5kg上"]
+        # 画像に基づいた全サイズリスト (かつお)
+        self.sizes = [
+            "10.0kg上", "8.0kg上", "6.0kg上", "4.5kg上", "2.5kg上", "1.8kg上", "1.8kg下", "0.5kg下",
+            "B品2.5kg上", "B品2.5kg下", "PS", "1.5kg下"
+        ]
         
     def generate_sample_data(self, years=5):
         """
@@ -27,28 +31,26 @@ class KatsuoDataFetcher:
         
         current_date = start_date
         
-        # 拠点ごとの基準価格（円/kg）
-        base_prices = {
-            "焼津": {"1.8kg上": 220, "2.5kg上": 240, "4.5kg上": 210},
-            "枕崎": {"1.8kg上": 230, "2.5kg上": 250, "4.5kg上": 220},
-            "山川": {"1.8kg上": 225, "2.5kg上": 245, "4.5kg上": 215},
+        # 拠点ごとの基準価格（円/kg） - 画像データに基づき補完
+        default_base = {
+            "10.0kg上": 200, "8.0kg上": 205, "6.0kg上": 215, "4.5kg上": 240, 
+            "2.5kg上": 245, "1.8kg上": 240, "1.8kg下": 235, "0.5kg下": 220,
+            "B品2.5kg上": 210, "B品2.5kg下": 215, "PS": 180, "1.5kg下": 190
         }
         
         while current_date <= end_date:
-            # 土日は市場が休みの場合が多いが、統計としては月次/週次で扱うこともある
-            # ここでは日次で季節性のあるランダムデータを生成
-            
-            # 季節性（夏から秋にかけて高く、冬に低くなる等のシミュレーション）
             month = current_date.month
-            season_factor = 1.0 + 0.2 * (abs(month - 7) / 6.0) # 7月から離れるほど変動
+            season_factor = 1.0 + 0.1 * (abs(month - 7) / 6.0)
             
             for port in self.ports:
                 for size in self.sizes:
-                    base = base_prices[port][size]
-                    # ランダム変動 + 季節性
-                    price = base * season_factor + random.uniform(-20, 20)
-                    # 数量（トン）
-                    volume = random.uniform(50, 500)
+                    base = default_base.get(size, 200)
+                    # 拠点ごとの微調整
+                    if port == "枕崎": base += 5
+                    if port == "山川": base -= 5
+                    
+                    price = base * season_factor + random.uniform(-15, 15)
+                    volume = random.uniform(5, 100)
                     
                     data.append({
                         "date": current_date.strftime("%Y-%m-%d"),

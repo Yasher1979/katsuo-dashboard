@@ -1,6 +1,6 @@
 const ports = ["枕崎", "焼津", "山川"];
 const mainSizesForSummary = ["1.8kg下", "2.5kg上", "4.5kg上"];
-const mainSizesForCharts = ["1.8kg上", "2.5kg上", "4.5kg上"];
+const mainSizesForCharts = ["1.8kg下", "2.5kg上", "4.5kg上"];
 
 // テーマごとの配色設定
 const themes = {
