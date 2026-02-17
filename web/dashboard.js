@@ -466,32 +466,171 @@ function setupThemeSwitcher() {
     });
 }
 
+// --- データ駆動型 AI風分析ロジック ---
+
 function updateInsights() {
     const insightContent = document.getElementById('insight-content');
     if (!currentData || !insightContent) return;
 
-    const yaizuData = currentData["焼津"];
-    const keySize = "4.5kg上";
-    const data = yaizuData[keySize];
-    if (!data || data.length < 2) return;
+    // 全ての分析を実行してインサイト候補を収集
+    let insights = [];
+    insights = insights.concat(analyzeVolatility(currentData));
+    insights = insights.concat(analyzeSupplyDemand(currentData));
+    insights = insights.concat(analyzePortSpread(currentData));
+    insights = insights.concat(analyzeSizeTrend(currentData));
 
-    const latest = data[data.length - 1];
-    const prev = data[data.length - 2];
-
-    let trend = "";
-    if (latest.price > prev.price) {
-        trend = "📈 **上昇傾向**: 直近の水揚量減少に伴い、単価が反発しています。";
-    } else if (latest.price < prev.price) {
-        trend = "📉 **下落傾向**: 水揚が安定しており、単価は落ち着いた動きを見せています。";
-    } else {
-        trend = "➡️ **横ばい**: 相場は拮抗しており、現状維持の展開が予想されます。";
+    // インサイトがない場合のデフォルトメッセージ
+    if (insights.length === 0) {
+        insights.push({
+            title: "市場概況",
+            text: "➡️ **横ばい**: 目立った価格変動は見られず、全般的に様子見ムードが漂っています。次回の水揚げ情報が待たれます。",
+            memo: "特筆すべき変動なし"
+        });
     }
 
+    // ランダムに1つ選択して表示
+    const selected = insights[Math.floor(Math.random() * insights.length)];
+
     insightContent.innerHTML = `
-        <p><strong>現在の市場概況 (焼津魚市場市況 ${keySize}):</strong></p>
-        <p>${trend}</p>
-        <p>💡 <strong>今後の予想に向けたメモ:</strong> 現在${latest.date}時点のデータまで反映済み。</p>
+        <p><strong>💡 AIアナリストの視点 (${selected.title}):</strong></p>
+        <p class="insight-text">${selected.text}</p>
+        <p class="insight-memo">Memo: ${selected.memo}</p>
     `;
+}
+
+// 1. 急騰・急落アラート（前日比 ±10円以上）
+function analyzeVolatility(data) {
+    const results = [];
+    ports.forEach(port => {
+        const portData = data[port];
+        if (!portData) return;
+        Object.keys(portData).forEach(size => {
+            const arr = portData[size];
+            if (arr.length < 2) return;
+            const latest = arr[arr.length - 1];
+            const prev = arr[arr.length - 2];
+            const diff = latest.price - prev.price;
+
+            if (diff >= 10) {
+                results.push({
+                    title: "急騰アラート",
+                    text: `📈 **${port} ${size}** が前日比 <span class="diff-up">+${diff.toFixed(1)}円</span> の急騰！供給不足により買い注文が殺到している可能性があります。`,
+                    memo: `${latest.date}時点`
+                });
+            } else if (diff <= -10) {
+                results.push({
+                    title: "急落アラート",
+                    text: `📉 **${port} ${size}** が前日比 <span class="diff-down">${diff.toFixed(1)}円</span> の急落。まとまった水揚げにより相場が一時的に崩れています。`,
+                    memo: `${latest.date}時点`
+                });
+            }
+        });
+    });
+    return results;
+}
+
+// 2. 需給ギャップ分析（水揚げ増なのに価格上昇、またはその逆）
+function analyzeSupplyDemand(data) {
+    const results = [];
+    ports.forEach(port => {
+        const portData = data[port];
+        if (!portData) return;
+        Object.keys(portData).forEach(size => {
+            const arr = portData[size];
+            if (arr.length < 2) return;
+            const latest = arr[arr.length - 1];
+            const prev = arr[arr.length - 2];
+            const priceDiff = latest.price - prev.price;
+            const volDiff = latest.volume - prev.volume;
+
+            // 水揚げ増 (+20t以上) なのに 価格上昇 (+2円以上)
+            if (volDiff >= 20 && priceDiff >= 2) {
+                results.push({
+                    title: "需給ギャップ（強気）",
+                    text: `🔥 **${port} ${size}** は水揚げが増加（+${volDiff.toFixed(0)}t）したにも関わらず、単価が上昇しています。実需が非常に強く、相場は底堅い動きです。`,
+                    memo: "供給増を吸収する強い需要あり"
+                });
+            }
+            // 水揚げ減 (-20t以下) なのに 価格下落 (-2円以上)
+            if (volDiff <= -20 && priceDiff <= -2) {
+                results.push({
+                    title: "需給ギャップ（弱気）",
+                    text: `❄️ **${port} ${size}** は水揚げが減少しましたが、単価は下落しました。買い気が薄く、市場の関心が低下している恐れがあります。`,
+                    memo: "供給減でも買われない展開"
+                });
+            }
+        });
+    });
+    return results;
+}
+
+// 3. 港間スプレッド分析（同サイズの価格差が20円以上）
+function analyzePortSpread(data) {
+    const results = [];
+    const targetSizes = ["4.5kg上", "2.5kg上", "1.8kg上"];
+
+    // 焼津 vs 枕崎
+    targetSizes.forEach(size => {
+        const p1 = getLatestData(data, "焼津", size);
+        const p2 = getLatestData(data, "枕崎", size);
+        if (!p1 || !p2 || p1.date !== p2.date) return; // 日付がズレている場合は除外
+
+        const spread = p1.price - p2.price;
+        if (spread >= 20) {
+            results.push({
+                title: "港間格差（焼津高・枕崎安）",
+                text: `⚖️ **${size}** において、焼津が枕崎より <span class="diff-up">${spread.toFixed(1)}円</span> 高くなっています。枕崎での仕入れに割安感が出ています。`,
+                memo: `焼津:${p1.price}円 vs 枕崎:${p2.price}円`
+            });
+        } else if (spread <= -20) {
+            results.push({
+                title: "港間格差（枕崎高・焼津安）",
+                text: `⚖️ **${size}** において、枕崎が焼津より <span class="diff-up">${Math.abs(spread).toFixed(1)}円</span> 高値をつけています。焼津相場の出遅れ感が意識される展開です。`,
+                memo: `枕崎:${p2.price}円 vs 焼津:${p1.price}円`
+            });
+        }
+    });
+    return results;
+}
+
+// 4. サイズ別トレンド分析（大型 vs 小型）
+function analyzeSizeTrend(data) {
+    const results = [];
+    ports.forEach(port => {
+        const large = getLatestData(data, port, "4.5kg上");
+        const small = getLatestData(data, port, "1.8kg下");
+        if (!large || !small || large.date !== small.date) return;
+
+        // 前日比が取得できるか確認
+        const largePrev = getPrevData(data, port, "4.5kg上");
+        const smallPrev = getPrevData(data, port, "1.8kg下");
+        if (!largePrev || !smallPrev) return;
+
+        const largeDiff = large.price - largePrev.price;
+        const smallDiff = small.price - smallPrev.price;
+
+        // 大型が上がって(+5以上)、小型が下がったor変わらず(0以下)
+        if (largeDiff >= 5 && smallDiff <= 0) {
+            results.push({
+                title: "サイズ選別（大型高）",
+                text: `📏 **${port}** では大型魚（4.5kg上）に人気が集中し独歩高となっています。小型魚との価格差が拡大しており、サイズによる二極化が進行中です。`,
+                memo: `大型:+${largeDiff}円 / 小型:${smallDiff}円`
+            });
+        }
+    });
+    return results;
+}
+
+function getLatestData(data, port, size) {
+    if (!data[port] || !data[port][size]) return null;
+    const arr = data[port][size];
+    return arr.length > 0 ? arr[arr.length - 1] : null;
+}
+
+function getPrevData(data, port, size) {
+    if (!data[port] || !data[port][size]) return null;
+    const arr = data[port][size];
+    return arr.length > 1 ? arr[arr.length - 2] : null;
 }
 
 document.addEventListener('DOMContentLoaded', initDashboard);
