@@ -178,6 +178,15 @@ function setupFilters() {
             renderDashboard();
         });
     });
+
+    // 更新ボタンの設定
+    const refreshBtn = document.getElementById('btn-refresh');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', () => {
+            refreshBtn.textContent = '🔄 更新中...';
+            location.reload();
+        });
+    }
 }
 
 function updateInsights() {

@@ -66,6 +66,25 @@ h1 {
     border-color: var(--accent-color);
 }
 
+.btn-refresh {
+    background: rgba(88, 166, 255, 0.2);
+    border: 1px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-left: 20px;
+    /* フィルターと少し離す */
+    transition: all 0.2s;
+}
+
+.btn-refresh:active {
+    transform: scale(0.95);
+    background: var(--accent-color);
+    color: white;
+}
+
 .insight-section {
     margin-bottom: 30px;
 }
