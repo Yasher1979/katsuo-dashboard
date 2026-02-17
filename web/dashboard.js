@@ -1,6 +1,5 @@
 const ports = ["枕崎", "焼津", "山川"];
 const mainSizesForSummary = ["1.8kg下", "1.8kg上", "2.5kg上", "4.5kg上"];
-const mainSizesForCharts = ["1.8kg下", "1.8kg上", "2.5kg上", "4.5kg上"];
 
 // テーマごとの配色設定
 const themes = {
@@ -279,12 +278,33 @@ function calculateMovingAverage(data, windowSize = 5) {
     });
 }
 
-function getPriceColor(size, index) {
-    if (size.includes("1.8")) return baseColors[0];
-    if (size.includes("2.5")) return baseColors[1];
-    if (size.includes("4.5")) return baseColors[2];
-    return baseColors[index % baseColors.length];
+// 単純移動平均 (SMA) を計算する関数
+function calculateSimpleMovingAverage(data, windowSize) {
+    if (!data || data.length < windowSize) return data.map(d => ({ x: d.date, y: null }));
+
+    let smaData = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < windowSize - 1) {
+            smaData.push({ x: data[i].date, y: null });
+            continue;
+        }
+        let sum = 0;
+        for (let j = 0; j < windowSize; j++) {
+            sum += data[i - j].price;
+        }
+        smaData.push({ x: data[i].date, y: sum / windowSize });
+    }
+    return smaData;
 }
+
+const mainSizesForCharts = ['1.8kg下', '1.8kg上', '2.5kg上', '4.5kg上'];
+
+const chartColors = {
+    '1.8kg下': { border: 'rgb(255, 99, 132)', bg: 'rgba(255, 99, 132, 0.5)' }, // 赤
+    '1.8kg上': { border: 'rgb(54, 162, 235)', bg: 'rgba(54, 162, 235, 0.5)' }, // 青
+    '2.5kg上': { border: 'rgb(255, 206, 86)', bg: 'rgba(255, 206, 86, 0.5)' }, // 黄
+    '4.5kg上': { border: 'rgb(75, 192, 192)', bg: 'rgba(75, 192, 192, 0.5)' }  // 緑
+};
 
 function updateOrCreateChart(port, portData) {
     const canvasId = `chart-${port}`;
@@ -294,53 +314,56 @@ function updateOrCreateChart(port, portData) {
     const datasets = [];
     const theme = themes[currentTheme];
 
-    if (portData) {
-        // グラフは主要3サイズに限定
-        mainSizesForCharts.forEach((size, idx) => {
-            const sizeData = portData[size];
-            if (!sizeData || sizeData.length === 0) return;
+    // データセット構築
+    // mainSizesForCharts（上で定義）を使って4サイズのみループ
+    mainSizesForCharts.forEach(size => {
+        const dataArr = portData[size];
+        if (!dataArr || dataArr.length === 0) return;
 
-            const pricePoints = sizeData.map(d => ({ x: d.date, y: d.price }));
-            const baseColor = getPriceColor(size, idx);
+        const color = chartColors[size] || { border: '#999', bg: '#999' };
 
-            datasets.push({
-                label: `${size} 5日役MA`,
-                data: calculateMovingAverage(pricePoints, 5),
-                borderColor: baseColor,
-                borderDash: [5, 5],
-                borderWidth: 1.5,
-                pointRadius: 0,
-                fill: false,
-                tension: 0.4,
-                yAxisID: 'y',
-                type: 'line'
-            });
-
-            datasets.push({
-                label: `${size} 単価`,
-                data: pricePoints,
-                borderColor: baseColor,
-                backgroundColor: 'transparent',
-                tension: 0.3,
-                borderWidth: 2.5,
-                yAxisID: 'y',
-                type: 'line',
-                pointRadius: 3,
-                pointHoverRadius: 5
-            });
-
-            datasets.push({
-                label: `${size} 水揚量`,
-                data: sizeData.map(d => ({ x: d.date, y: d.volume })),
-                backgroundColor: baseColor.replace('1)', currentTheme === 'light' ? '0.4)' : '0.2)'),
-                borderColor: baseColor.replace('1)', '0.5)'),
-                borderWidth: 1,
-                yAxisID: 'yVolume',
-                type: 'bar',
-                hidden: idx > 0
-            });
+        // 1. 価格推移（折れ線）
+        datasets.push({
+            type: 'line',
+            label: `${size} 価格`,
+            data: dataArr.map(d => ({ x: d.date, y: d.price })),
+            borderColor: color.border,
+            backgroundColor: color.border,
+            borderWidth: 2,
+            tension: 0.1,
+            yAxisID: 'y',
+            pointRadius: 6, // データが1点でも目立つように点を大きく
+            pointHoverRadius: 8,
+            fill: false
         });
-    }
+
+        // 2. 5日移動平均（点線）
+        const smaData = calculateSimpleMovingAverage(dataArr, 5);
+        datasets.push({
+            type: 'line',
+            label: `${size} 5日平均`,
+            data: smaData,
+            borderColor: color.border,
+            borderWidth: 1,
+            borderDash: [5, 5],
+            pointRadius: 0,
+            yAxisID: 'y',
+            fill: false,
+            hidden: false // データがあれば表示
+        });
+
+        // 3. 水揚げ量（棒グラフ）
+        datasets.push({
+            type: 'bar',
+            label: `${size} 水揚量`,
+            data: dataArr.map(d => ({ x: d.date, y: d.volume })),
+            backgroundColor: color.bg,
+            borderColor: 'transparent',
+            yAxisID: 'yVolume',
+            barPercentage: 0.5,
+            hidden: true // デフォルトでは非表示
+        });
+    });
 
     const chartOptions = {
         responsive: true,
@@ -367,78 +390,222 @@ function updateOrCreateChart(port, portData) {
         }
     };
 
-    if (charts[port]) {
-        charts[port].data.datasets = datasets;
-        charts[port].options = chartOptions;
-        charts[port].update();
-    } else {
-        charts[port] = new Chart(ctx, { data: { datasets }, options: chartOptions });
-    }
-}
+    // 単純移動平均 (SMA) を計算する関数
+    function calculateSimpleMovingAverage(data, windowSize) {
+        if (!data || data.length < windowSize) return data.map(d => ({ x: d.date, y: null }));
 
-function setupFilters() {
-    const buttons = document.querySelectorAll('.btn-filter');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            currentRange = btn.dataset.range;
-            renderDashboard();
-        });
-    });
-
-    const refreshBtn = document.getElementById('btn-refresh');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            refreshBtn.textContent = '🔄 更新中...';
-            location.reload();
-        });
-    }
-}
-
-function setupThemeSwitcher() {
-    const buttons = document.querySelectorAll('.btn-theme');
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const theme = btn.dataset.theme;
-            buttons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            document.body.className = `theme-${theme}`;
-            currentTheme = theme;
-
-            renderDashboard();
-            renderSummary();
-        });
-    });
-}
-
-function updateInsights() {
-    const insightContent = document.getElementById('insight-content');
-    if (!currentData || !insightContent) return;
-
-    const yaizuData = currentData["焼津"];
-    const keySize = "4.5kg上";
-    const data = yaizuData[keySize];
-    if (!data || data.length < 2) return;
-
-    const latest = data[data.length - 1];
-    const prev = data[data.length - 2];
-
-    let trend = "";
-    if (latest.price > prev.price) {
-        trend = "📈 **上昇傾向**: 直近の水揚量減少に伴い、単価が反発しています。";
-    } else if (latest.price < prev.price) {
-        trend = "📉 **下落傾向**: 水揚が安定しており、単価は落ち着いた動きを見せています。";
-    } else {
-        trend = "➡️ **横ばい**: 相場は拮抗しており、現状維持の展開が予想されます。";
+        let smaData = [];
+        for (let i = 0; i < data.length; i++) {
+            if (i < windowSize - 1) {
+                smaData.push({ x: data[i].date, y: null });
+                continue;
+            }
+            let sum = 0;
+            for (let j = 0; j < windowSize; j++) {
+                sum += data[i - j].price;
+            }
+            smaData.push({ x: data[i].date, y: sum / windowSize });
+        }
+        return smaData;
     }
 
-    insightContent.innerHTML = `
+    const mainSizesForCharts = ['1.8kg下', '1.8kg上', '2.5kg上', '4.5kg上'];
+
+    const chartColors = {
+        '1.8kg下': { border: 'rgb(255, 99, 132)', bg: 'rgba(255, 99, 132, 0.5)' }, // 赤
+        '1.8kg上': { border: 'rgb(54, 162, 235)', bg: 'rgba(54, 162, 235, 0.5)' }, // 青
+        '2.5kg上': { border: 'rgb(255, 206, 86)', bg: 'rgba(255, 206, 86, 0.5)' }, // 黄
+        '4.5kg上': { border: 'rgb(75, 192, 192)', bg: 'rgba(75, 192, 192, 0.5)' }  // 緑
+    };
+
+    function updateOrCreateChart(port, portData) {
+        const ctx = document.getElementById(`chart-${port}`);
+        if (!ctx) return;
+
+        const datasets = [];
+
+        mainSizesForCharts.forEach(size => {
+            const dataArr = portData[size];
+            if (!dataArr || dataArr.length === 0) return;
+
+            const color = chartColors[size] || { border: '#999', bg: '#999' };
+
+            // 1. 価格推移（折れ線）
+            datasets.push({
+                type: 'line',
+                label: `${size} 価格`,
+                data: dataArr.map(d => ({ x: d.date, y: d.price })),
+                borderColor: color.border,
+                backgroundColor: color.border,
+                borderWidth: 2,
+                tension: 0.1,
+                yAxisID: 'y',
+                pointRadius: 6, // データ1点でも見えるように
+                pointHoverRadius: 8,
+                fill: false
+            });
+
+            // 2. 5日移動平均（点線）
+            const smaData = calculateSimpleMovingAverage(dataArr, 5);
+            datasets.push({
+                type: 'line',
+                label: `${size} 5日平均`,
+                data: smaData,
+                borderColor: color.border,
+                borderWidth: 1,
+                borderDash: [5, 5],
+                pointRadius: 0,
+                yAxisID: 'y',
+                fill: false,
+                hidden: false
+            });
+
+            // 3. 水揚げ量（棒グラフ）
+            datasets.push({
+                type: 'bar',
+                label: `${size} 水揚量`,
+                data: dataArr.map(d => ({ x: d.date, y: d.volume })),
+                backgroundColor: color.bg,
+                borderColor: 'transparent',
+                yAxisID: 'yVolume',
+                barPercentage: 0.5,
+                hidden: true // デフォルトは非表示
+            });
+        });
+
+        const theme = themes[currentTheme];
+        const chartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        color: theme.text,
+                        boxWidth: 12,
+                        font: { size: 10 },
+                        filter: function (item, chart) {
+                            return true;
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: theme.tooltipBg,
+                    padding: 10,
+                    callbacks: {
+                        label: (context) => {
+                            const label = context.dataset.label || '';
+                            const val = context.parsed.y !== null ? context.parsed.y.toFixed(1) : '-';
+                            if (label.includes('価格') || label.includes('平均')) {
+                                return `${label}: ${val} 円`;
+                            } else {
+                                return `${label}: ${val} t`;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: { unit: 'day', displayFormats: { day: 'MM/DD' } },
+                    grid: { color: theme.grid },
+                    ticks: { color: theme.text }
+                },
+                y: {
+                    title: { display: true, text: '単価 (円)', color: theme.text },
+                    grid: { color: theme.grid },
+                    ticks: { color: theme.text },
+                    position: 'left',
+                    suggestedMin: 100
+                },
+                yVolume: {
+                    title: { display: true, text: '水揚量 (t)', color: theme.text },
+                    grid: { display: false },
+                    ticks: { color: theme.text },
+                    position: 'right',
+                    beginAtZero: true,
+                    suggestedMax: 1000 // 棒グラフが価格線と被らないように調整
+                }
+            }
+        };
+
+        if (charts[port]) {
+            charts[port].data.datasets = datasets;
+            charts[port].options = chartOptions;
+            charts[port].update();
+        } else {
+            charts[port] = new Chart(ctx, { data: { datasets }, options: chartOptions });
+        }
+    }
+
+    function setupFilters() {
+        const buttons = document.querySelectorAll('.btn-filter');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentRange = btn.dataset.range;
+                renderDashboard();
+            });
+        });
+
+        const refreshBtn = document.getElementById('btn-refresh');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', () => {
+                refreshBtn.textContent = '🔄 更新中...';
+                location.reload();
+            });
+        }
+    }
+
+    function setupThemeSwitcher() {
+        const buttons = document.querySelectorAll('.btn-theme');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                buttons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                document.body.className = `theme-${theme}`;
+                currentTheme = theme;
+
+                renderDashboard();
+                renderSummary();
+            });
+        });
+    }
+
+    function updateInsights() {
+        const insightContent = document.getElementById('insight-content');
+        if (!currentData || !insightContent) return;
+
+        const yaizuData = currentData["焼津"];
+        const keySize = "4.5kg上";
+        const data = yaizuData[keySize];
+        if (!data || data.length < 2) return;
+
+        const latest = data[data.length - 1];
+        const prev = data[data.length - 2];
+
+        let trend = "";
+        if (latest.price > prev.price) {
+            trend = "📈 **上昇傾向**: 直近の水揚量減少に伴い、単価が反発しています。";
+        } else if (latest.price < prev.price) {
+            trend = "📉 **下落傾向**: 水揚が安定しており、単価は落ち着いた動きを見せています。";
+        } else {
+            trend = "➡️ **横ばい**: 相場は拮抗しており、現状維持の展開が予想されます。";
+        }
+
+        insightContent.innerHTML = `
         <p><strong>現在の市場概況 (焼津魚市場市況 ${keySize}):</strong></p>
         <p>${trend}</p>
         <p>💡 <strong>今後の予想に向けたメモ:</strong> 現在${latest.date}時点のデータまで反映済み。</p>
     `;
-}
+    }
 
-document.addEventListener('DOMContentLoaded', initDashboard);
+    document.addEventListener('DOMContentLoaded', initDashboard);
