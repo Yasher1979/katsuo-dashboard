@@ -65,6 +65,19 @@ async function initDashboard() {
             document.getElementById('splash-screen').classList.add('fade-out');
         }, delay);
 
+        // --- グラフ外タップでツールチップを消す処理 ---
+        document.addEventListener('click', (e) => {
+            // クリックされた要素がCanvasでなければ
+            if (e.target.tagName !== 'CANVAS') {
+                Object.values(charts).forEach(chart => {
+                    if (chart.tooltip.getActiveElements().length > 0) {
+                        chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+                        chart.update();
+                    }
+                });
+            }
+        });
+
     } catch (error) {
         console.error('Error initializing dashboard:', error);
         document.getElementById('splash-screen').classList.add('fade-out');
