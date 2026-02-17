@@ -122,9 +122,8 @@ if __name__ == "__main__":
         df_real['price'] = df_real['price'].astype(float)
         df_real['volume'] = df_real['volume'].astype(float)
         
-        # 安全策: 異常値フィルタリング（ユーザー指摘の275.8円等は本来ないはずだが、念のため300円超をカット）
-        # また、極端に安い値（30円以下など）もカット
-        df_real = df_real[(df_real['price'] < 300) & (df_real['price'] > 50)]
+        # 安全策: 異常値フィルタリング（範囲を拡大：10円〜600円）
+        df_real = df_real[(df_real['price'] < 600) & (df_real['price'] > 10)]
         
         # 日付でソートして時系列を保証
         df_real['date'] = pd.to_datetime(df_real['date'])

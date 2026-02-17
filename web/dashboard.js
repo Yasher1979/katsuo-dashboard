@@ -354,7 +354,7 @@ function updateOrCreateChart(port, portData) {
             borderColor: 'transparent',
             yAxisID: 'yVolume',
             barPercentage: 0.5,
-            hidden: true // デフォルトでは非表示
+            hidden: false // デフォルトで表示
         });
     });
 
@@ -406,7 +406,8 @@ function updateOrCreateChart(port, portData) {
                 grid: { color: theme.grid },
                 ticks: { color: theme.text },
                 position: 'left',
-                suggestedMin: 100
+                min: 190,
+                suggestedMax: 270
             },
             yVolume: {
                 title: { display: true, text: '水揚量 (t)', color: theme.text },
@@ -414,7 +415,7 @@ function updateOrCreateChart(port, portData) {
                 ticks: { color: theme.text },
                 position: 'right',
                 beginAtZero: true,
-                suggestedMax: 1000
+                max: 600
             }
         }
     };
