@@ -113,13 +113,27 @@ class KatsuoDataFetcher:
 if __name__ == "__main__":
     fetcher = KatsuoDataFetcher()
     
-    # 1. まずCSVからの実データ読み込みを試行
-    df = fetcher.load_from_csv()
+    # 1. ベースとなるサンプルデータを生成（全拠点・全期間）
+    # これにより、実データがない期間や拠点もデータが埋まる
+    print("Generating base sample data...")
+    df_sample = fetcher.generate_sample_data(years=5)
     
-    # 2. 実データがない場合はサンプルを生成（デモ用）
-    if df is None or len(df) == 0:
-        print("Generating 5 years of prototype data (Sample)...")
-        df = fetcher.generate_sample_data(years=5)
+    # 2. CSVからの実データ読み込み
+    df_real = fetcher.load_from_csv()
     
-    fetcher.save_to_json(df)
+    if df_real is not None and len(df_real) > 0:
+        print("Merging real data with sample data...")
+        # サンプルデータと実データを結合
+        # 実データを後ろに結合し、重複（日付・拠点・サイズ）がある場合は実データを優先（keep='last'）
+        df_combined = pd.concat([df_sample, df_real])
+        # dateは文字列型で統一されている前提
+        df_final = df_combined.drop_duplicates(subset=['date', 'port', 'size'], keep='last')
+    else:
+        df_final = df_sample
+    
+    # データ型を調整（念のため）
+    df_final['price'] = df_final['price'].astype(float)
+    df_final['volume'] = df_final['volume'].astype(float)
+
+    fetcher.save_to_json(df_final)
     print("Done.")

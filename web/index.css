@@ -396,53 +396,76 @@ h1 {
     padding-bottom: 12px;
 }
 
-.summary-row {
+/* サマリー行のグリッドレイアウト化 */
+.summary-rows-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.summary-row {
+    display: grid;
+    /* ラベル(サイズ名) | 数値エリア | 前日比 */
+    grid-template-columns: 80px 1fr auto;
     align-items: center;
-    margin-bottom: 18px;
+    gap: 15px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--grid-color);
 }
 
 .summary-row:last-child {
-    margin-bottom: 0;
+    border-bottom: none;
 }
 
 .summary-label {
     font-size: 1rem;
     font-weight: 600;
+    color: var(--text-color);
+    white-space: nowrap;
 }
 
+/* 数値エリア（単価と水揚量） */
 .summary-values {
-    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
 }
 
 .price-vol-group {
     display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    margin-right: 15px;
-}
-
-.now-volume {
-    font-size: 0.9rem;
-    color: var(--text-muted);
+    align-items: baseline;
+    gap: 8px;
 }
 
 .now-price {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 800;
+    color: var(--accent-color);
+    line-height: 1;
+}
+
+.now-volume {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
 }
 
 .currency {
-    font-size: 0.8rem;
-    margin-top: 4px;
-    display: block;
+    font-size: 0.75rem;
+    margin-left: 2px;
+    color: var(--text-muted);
 }
 
+/* 前日比 */
 .price-diff {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin-top: 4px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    min-width: 60px;
+    text-align: right;
+    padding: 4px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .diff-up {
@@ -455,6 +478,19 @@ h1 {
 
 .diff-equal {
     color: var(--text-muted);
+}
+
+/* モーダル内の調整 */
+.modal-content .summary-row {
+    grid-template-columns: 100px 1fr auto;
+    /* ラベル幅を少し広めに */
+}
+
+.modal-content .summary-rows-container {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 5px;
+    /* スクロールバー用余白 */
 }
 
 footer {

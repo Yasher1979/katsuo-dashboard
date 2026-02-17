@@ -133,11 +133,15 @@ function renderSummary() {
             rowsHtml += `
                 <div class="summary-row">
                     <div class="summary-label">${size}</div>
+                    
                     <div class="summary-values">
                         <div class="price-vol-group">
-                            <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
-                            <div class="now-volume">${volHtml}<span class="currency">t</span></div>
+                            <span class="now-price">${priceHtml}<span class="currency">円</span></span>
                         </div>
+                        <div class="now-volume">${volHtml}<span class="currency">t</span></div>
+                    </div>
+
+                    <div class="diff-area">
                         ${diffHtml}
                     </div>
                 </div>
@@ -190,11 +194,15 @@ function showDetail(port, portData, latestDateStr) {
         rowsHtml += `
             <div class="summary-row">
                 <div class="summary-label">${size}</div>
+                
                 <div class="summary-values">
                     <div class="price-vol-group">
-                        <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
-                        <div class="now-volume">${volHtml}<span class="currency">t</span></div>
+                        <span class="now-price">${priceHtml}<span class="currency">円</span></span>
                     </div>
+                    <div class="now-volume">${volHtml}<span class="currency">t</span></div>
+                </div>
+
+                <div class="diff-area">
                     ${diffHtml}
                 </div>
             </div>
