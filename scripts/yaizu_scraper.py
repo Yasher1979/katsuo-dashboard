@@ -51,11 +51,8 @@ def scrape_yaizu_current():
                         low_price_raw = cols[2].text.strip()
                         volume_raw = cols[3].text.strip()
                         
-                        # サイズ判定
-                        size = ""
-                        if "4.5" in size_raw: size = "4.5kg上"
-                        elif "2.5" in size_raw: size = "2.5kg上"
-                        elif "1.8" in size_raw: size = "1.8kg上"
+                        # サイズ判定：ハードコードを廃止し、取得した文字列をそのまま利用
+                        size = size_raw.replace(' ', '').replace('\u3000', '')
                         
                         if size:
                             # 数値抽出 (数値以外を除去)

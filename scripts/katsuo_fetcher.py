@@ -95,7 +95,9 @@ class KatsuoDataFetcher:
         for port in self.ports:
             port_data = df[df['port'] == port]
             output[port] = {}
-            for size in self.sizes:
+            # その拠点のデータに含まれるユニークなサイズを取得
+            available_sizes = port_data['size'].unique()
+            for size in available_sizes:
                 size_data = port_data[port_data['size'] == size]
                 # 日付順にソート
                 size_data = size_data.sort_values('date')

@@ -1,5 +1,4 @@
 const ports = ["枕崎", "焼津", "山川"];
-const sizes = ["1.8kg上", "2.5kg上", "4.5kg上"];
 
 // テーマごとの配色設定
 const themes = {
@@ -20,11 +19,17 @@ const themes = {
     }
 };
 
-const colors = {
-    "1.8kg上": { price: "rgba(75, 192, 192, 1)", vol: "rgba(75, 192, 192, 0.2)" },
-    "2.5kg上": { price: "rgba(255, 159, 64, 1)", vol: "rgba(255, 159, 64, 0.2)" },
-    "4.5kg上": { price: "rgba(153, 102, 255, 1)", vol: "rgba(153, 102, 255, 0.2)" }
-};
+// 基本の配色（定義外のサイズが来たらランダムまたは生成）
+const baseColors = [
+    "rgba(75, 192, 192, 1)",   // 1.8kg相当
+    "rgba(255, 159, 64, 1)",   // 2.5kg相当
+    "rgba(153, 102, 255, 1)",  // 4.5kg相当
+    "rgba(255, 99, 132, 1)",
+    "rgba(54, 162, 235, 1)",
+    "rgba(255, 206, 86, 1)",
+    "rgba(231, 76, 60, 1)",
+    "rgba(46, 204, 113, 1)"
+];
 
 let currentData = null;
 let currentRange = 'all';
@@ -83,8 +88,9 @@ function renderSummary() {
         if (!portData) return;
 
         // 全サイズの中から最も新しい取引日を探す
+        const availableSizes = Object.keys(portData);
         let latestDateStr = "";
-        sizes.forEach(size => {
+        availableSizes.forEach(size => {
             if (portData[size] && portData[size].length > 0) {
                 const date = portData[size][portData[size].length - 1].date;
                 if (!latestDateStr || date > latestDateStr) latestDateStr = date;
@@ -97,7 +103,8 @@ function renderSummary() {
         card.className = 'summary-card';
 
         let rowsHtml = '';
-        sizes.forEach(size => {
+        // JSONに含まれるすべてのサイズをループ
+        availableSizes.forEach(size => {
             const dataArr = portData[size] || [];
             const latestEntry = dataArr.find(v => v.date === latestDateStr);
             const prevEntry = dataArr.length > 1 ? (latestEntry ? dataArr[dataArr.length - 2] : dataArr[dataArr.length - 1]) : null;
@@ -170,7 +177,8 @@ function filterDataByRange(portData, range) {
     if (!portData || range === 'all') return portData;
     const now = moment();
     const result = {};
-    sizes.forEach(size => {
+    const availableSizes = Object.keys(portData);
+    availableSizes.forEach(size => {
         if (portData[size]) {
             result[size] = portData[size].filter(d => {
                 const date = moment(d.date);
@@ -190,6 +198,15 @@ function calculateMovingAverage(data, windowSize = 5) {
     });
 }
 
+function getPriceColor(size, index) {
+    // 特定のキーワードがあれば固定色
+    if (size.includes("1.8")) return baseColors[0];
+    if (size.includes("2.5")) return baseColors[1];
+    if (size.includes("4.5")) return baseColors[2];
+    // それ以外はインデックスで回す
+    return baseColors[index % baseColors.length];
+}
+
 function updateOrCreateChart(port, portData) {
     const canvasId = `chart-${port}`;
     const target = document.getElementById(canvasId);
@@ -198,15 +215,19 @@ function updateOrCreateChart(port, portData) {
     const datasets = [];
     const theme = themes[currentTheme];
 
-    sizes.forEach(size => {
-        if (portData && portData[size]) {
+    if (portData) {
+        const availableSizes = Object.keys(portData);
+        availableSizes.forEach((size, idx) => {
             const sizeData = portData[size];
+            if (sizeData.length === 0) return;
+
             const pricePoints = sizeData.map(d => ({ x: d.date, y: d.price }));
+            const baseColor = getPriceColor(size, idx);
 
             datasets.push({
                 label: `${size} 5日移動平均`,
                 data: calculateMovingAverage(pricePoints, 5),
-                borderColor: colors[size].price,
+                borderColor: baseColor,
                 borderDash: [5, 5],
                 borderWidth: 2,
                 pointRadius: 0,
@@ -219,7 +240,7 @@ function updateOrCreateChart(port, portData) {
             datasets.push({
                 label: `${size} 単価`,
                 data: pricePoints,
-                borderColor: colors[size].price,
+                borderColor: baseColor,
                 backgroundColor: 'transparent',
                 tension: 0.3,
                 borderWidth: 3,
@@ -232,15 +253,15 @@ function updateOrCreateChart(port, portData) {
             datasets.push({
                 label: `${size} 水揚量`,
                 data: sizeData.map(d => ({ x: d.date, y: d.volume })),
-                backgroundColor: colors[size].vol.replace('0.2', currentTheme === 'light' ? '0.4' : '0.2'),
-                borderColor: colors[size].vol.replace('0.2', '0.5'),
+                backgroundColor: baseColor.replace('1)', currentTheme === 'light' ? '0.4)' : '0.2)'),
+                borderColor: baseColor.replace('1)', '0.5)'),
                 borderWidth: 1,
                 yAxisID: 'yVolume',
                 type: 'bar',
-                hidden: false
+                hidden: idx > 0 // 初期の煩雑さを避けるため最初のサイズ以外は非表示
             });
-        }
-    });
+        });
+    }
 
     const chartOptions = {
         responsive: true,
@@ -330,7 +351,7 @@ function setupThemeSwitcher() {
             currentTheme = theme;
 
             renderDashboard();
-            renderSummary(); // テーマに合わせてサマリーも再描画
+            renderSummary();
         });
     });
 }
@@ -339,11 +360,14 @@ function updateInsights() {
     const insightContent = document.getElementById('insight-content');
     if (!currentData || !insightContent) return;
 
-    const yaizu45 = currentData["焼津"]["4.5kg上"];
-    if (!yaizu45 || yaizu45.length < 2) return;
+    // 分析は主要な拠点の代表的なサイズで行う
+    const yaizu = currentData["焼津"];
+    const keySize = Object.keys(yaizu)[0] || "4.5kg上";
+    const data = yaizu[keySize];
+    if (!data || data.length < 2) return;
 
-    const latest = yaizu45[yaizu45.length - 1];
-    const prev = yaizu45[yaizu45.length - 2];
+    const latest = data[data.length - 1];
+    const prev = data[data.length - 2];
 
     let trend = "";
     if (latest.price > prev.price) {
@@ -355,7 +379,7 @@ function updateInsights() {
     }
 
     insightContent.innerHTML = `
-        <p><strong>現在の市場概況:</strong></p>
+        <p><strong>現在の市場概況 (${keySize}):</strong></p>
         <p>${trend}</p>
         <p>💡 <strong>今後の予想に向けたメモ:</strong> 現在${latest.date}時点のデータまで反映済み。移動平均線（点線）を上抜けるかどうかに注目です。</p>
     `;
