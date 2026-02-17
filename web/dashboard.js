@@ -447,6 +447,15 @@ function setupFilters() {
             location.reload();
         });
     }
+
+    const reloadInsightBtn = document.getElementById('btn-reload-insight');
+    if (reloadInsightBtn) {
+        reloadInsightBtn.addEventListener('click', () => {
+            // ボタンを回転させるアニメーションクラスを一瞬付与（CSSでrotate定義済みならクラス切り替えもありだが、今回はtransformで対応済み）
+            // 再度 updateInsights を呼び出す
+            updateInsights();
+        });
+    }
 }
 
 function setupThemeSwitcher() {
