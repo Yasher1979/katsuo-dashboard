@@ -1,4 +1,4 @@
-const ports = ["焼津", "枕崎", "山川"];
+const ports = ["枕崎", "焼津", "山川"];
 const sizes = ["1.8kg上", "2.5kg上", "4.5kg上"];
 
 // テーマごとの配色設定
@@ -29,7 +29,7 @@ const colors = {
 let currentData = null;
 let currentRange = 'all';
 let currentTheme = 'dark';
-let activeTab = 'charts';
+let activeTab = 'summary';
 let charts = {};
 
 async function initDashboard() {

@@ -45,12 +45,20 @@
         </header>
 
         <nav class="main-tabs">
-            <button class="tab-item active" data-tab="charts">📈 グラフ推移</button>
-            <button class="tab-item" data-tab="summary">📋 最新相場一覧</button>
+            <button class="tab-item active" data-tab="summary">📋 最新相場一覧</button>
+            <button class="tab-item" data-tab="charts">📈 グラフ推移</button>
         </nav>
 
+        <!-- 最新一覧サマリービュー（初期表示） -->
+        <div id="view-summary" class="tab-view active">
+            <div id="summary-container" class="summary-grid">
+                <!-- ここにJSでカードが生成されます -->
+                <p>最新データを分析中...</p>
+            </div>
+        </div>
+
         <!-- グラフ表示ビュー -->
-        <div id="view-charts" class="tab-view active">
+        <div id="view-charts" class="tab-view">
             <div class="insight-section">
                 <div class="insight-card">
                     <h3>🔍 相場トレンド・分析</h3>
@@ -63,19 +71,19 @@
             <div class="dashboard-grid">
                 <div class="chart-card">
                     <div class="chart-header">
-                        <span class="port-title">焼津 (Yaizu)</span>
+                        <span class="port-title">枕崎 (Makurazaki)</span>
                     </div>
                     <div class="chart-container">
-                        <canvas id="chart-焼津"></canvas>
+                        <canvas id="chart-枕崎"></canvas>
                     </div>
                 </div>
 
                 <div class="chart-card">
                     <div class="chart-header">
-                        <span class="port-title">枕崎 (Makurazaki)</span>
+                        <span class="port-title">焼津 (Yaizu)</span>
                     </div>
                     <div class="chart-container">
-                        <canvas id="chart-枕崎"></canvas>
+                        <canvas id="chart-焼津"></canvas>
                     </div>
                 </div>
 
@@ -87,14 +95,6 @@
                         <canvas id="chart-山川"></canvas>
                     </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- 最新一覧サマリービュー -->
-        <div id="view-summary" class="tab-view">
-            <div id="summary-container" class="summary-grid">
-                <!-- ここにJSでカードが生成されます -->
-                <p>最新データを分析中...</p>
             </div>
         </div>
 
