@@ -1,4 +1,6 @@
 const ports = ["枕崎", "焼津", "山川"];
+const mainSizesForSummary = ["1.8kg下", "2.5kg上", "4.5kg上"];
+const mainSizesForCharts = ["1.8kg上", "2.5kg上", "4.5kg上"];
 
 // テーマごとの配色設定
 const themes = {
@@ -19,11 +21,10 @@ const themes = {
     }
 };
 
-// 基本の配色（定義外のサイズが来たらランダムまたは生成）
 const baseColors = [
-    "rgba(75, 192, 192, 1)",   // 1.8kg相当
-    "rgba(255, 159, 64, 1)",   // 2.5kg相当
-    "rgba(153, 102, 255, 1)",  // 4.5kg相当
+    "rgba(75, 192, 192, 1)",
+    "rgba(255, 159, 64, 1)",
+    "rgba(153, 102, 255, 1)",
     "rgba(255, 99, 132, 1)",
     "rgba(54, 162, 235, 1)",
     "rgba(255, 206, 86, 1)",
@@ -51,11 +52,12 @@ async function initDashboard() {
         }
 
         renderDashboard();
-        renderSummary(); // 最新一覧の描画
+        renderSummary();
         updateInsights();
         setupFilters();
         setupThemeSwitcher();
         setupTabs();
+        setupModal();
 
         const elapsed = Date.now() - startTime;
         const delay = Math.max(0, 1500 - elapsed);
@@ -76,7 +78,6 @@ function renderDashboard() {
     });
 }
 
-// 三拠点の最新相場一覧（サマリー）を描画する関数
 function renderSummary() {
     const container = document.getElementById('summary-container');
     if (!container || !currentData) return;
@@ -101,10 +102,11 @@ function renderSummary() {
 
         const card = document.createElement('div');
         card.className = 'summary-card';
+        card.onclick = () => showDetail(port, portData, latestDateStr);
 
         let rowsHtml = '';
-        // JSONに含まれるすべてのサイズをループ
-        availableSizes.forEach(size => {
+        // 概要版では主要3サイズのみ表示
+        mainSizesForSummary.forEach(size => {
             const dataArr = portData[size] || [];
             const latestEntry = dataArr.find(v => v.date === latestDateStr);
             const prevEntry = dataArr.length > 1 ? (latestEntry ? dataArr[dataArr.length - 2] : dataArr[dataArr.length - 1]) : null;
@@ -113,7 +115,7 @@ function renderSummary() {
             let diffHtml = '';
 
             if (latestEntry) {
-                priceHtml = `${latestEntry.price}`;
+                priceHtml = `${latestEntry.price.toFixed(1)}`; // 小数点以下を1桁に制限
                 if (prevEntry) {
                     const diff = latestEntry.price - prevEntry.price;
                     if (diff > 0) {
@@ -148,6 +150,70 @@ function renderSummary() {
     });
 }
 
+function showDetail(port, portData, latestDateStr) {
+    const modal = document.getElementById('detail-modal');
+    const modalBody = document.getElementById('modal-body');
+    if (!modal || !modalBody) return;
+
+    let rowsHtml = '';
+    const allSizes = Object.keys(portData);
+
+    allSizes.forEach(size => {
+        const dataArr = portData[size] || [];
+        const latestEntry = dataArr.find(v => v.date === latestDateStr);
+        const prevEntry = dataArr.length > 1 ? (latestEntry ? dataArr[dataArr.length - 2] : dataArr[dataArr.length - 1]) : null;
+
+        let priceHtml = '-';
+        let diffHtml = '';
+
+        if (latestEntry) {
+            priceHtml = `${latestEntry.price.toFixed(1)}`;
+            if (prevEntry) {
+                const diff = latestEntry.price - prevEntry.price;
+                if (diff > 0) {
+                    diffHtml = `<span class="price-diff diff-up">▲${diff.toFixed(1)}</span>`;
+                } else if (diff < 0) {
+                    diffHtml = `<span class="price-diff diff-down">▼${Math.abs(diff).toFixed(1)}</span>`;
+                } else {
+                    diffHtml = `<span class="price-diff diff-equal">±0</span>`;
+                }
+            }
+        }
+
+        rowsHtml += `
+            <div class="summary-row">
+                <div class="summary-label">${size}</div>
+                <div class="summary-values">
+                    <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
+                    ${diffHtml}
+                </div>
+            </div>
+        `;
+    });
+
+    modalBody.innerHTML = `
+        <div class="summary-port">${port} 全サイズ一覧</div>
+        <div class="summary-date">取引日: ${latestDateStr}</div>
+        <div class="summary-rows-container">
+            ${rowsHtml}
+        </div>
+    `;
+
+    modal.classList.add('active');
+}
+
+function setupModal() {
+    const modal = document.getElementById('detail-modal');
+    const closeBtn = document.getElementById('modal-close');
+
+    if (closeBtn && modal) {
+        closeBtn.onclick = () => modal.classList.remove('active');
+        modal.onclick = (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        };
+    }
+}
+
 function setupTabs() {
     const tabButtons = document.querySelectorAll('.tab-item');
     tabButtons.forEach(btn => {
@@ -155,17 +221,14 @@ function setupTabs() {
             const tabId = btn.dataset.tab;
             if (tabId === activeTab) return;
 
-            // ボタンの装飾
             tabButtons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // 表示の切り替え
             document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
             document.getElementById(`view-${tabId}`).classList.add('active');
 
             activeTab = tabId;
 
-            // グラフタブに戻った場合は再描画（サイズ調整のため）
             if (tabId === 'charts') {
                 renderDashboard();
             }
@@ -199,11 +262,9 @@ function calculateMovingAverage(data, windowSize = 5) {
 }
 
 function getPriceColor(size, index) {
-    // 特定のキーワードがあれば固定色
     if (size.includes("1.8")) return baseColors[0];
     if (size.includes("2.5")) return baseColors[1];
     if (size.includes("4.5")) return baseColors[2];
-    // それ以外はインデックスで回す
     return baseColors[index % baseColors.length];
 }
 
@@ -216,20 +277,20 @@ function updateOrCreateChart(port, portData) {
     const theme = themes[currentTheme];
 
     if (portData) {
-        const availableSizes = Object.keys(portData);
-        availableSizes.forEach((size, idx) => {
+        // グラフは主要3サイズに限定
+        mainSizesForCharts.forEach((size, idx) => {
             const sizeData = portData[size];
-            if (sizeData.length === 0) return;
+            if (!sizeData || sizeData.length === 0) return;
 
             const pricePoints = sizeData.map(d => ({ x: d.date, y: d.price }));
             const baseColor = getPriceColor(size, idx);
 
             datasets.push({
-                label: `${size} 5日移動平均`,
+                label: `${size} 5日役MA`,
                 data: calculateMovingAverage(pricePoints, 5),
                 borderColor: baseColor,
                 borderDash: [5, 5],
-                borderWidth: 2,
+                borderWidth: 1.5,
                 pointRadius: 0,
                 fill: false,
                 tension: 0.4,
@@ -243,11 +304,11 @@ function updateOrCreateChart(port, portData) {
                 borderColor: baseColor,
                 backgroundColor: 'transparent',
                 tension: 0.3,
-                borderWidth: 3,
+                borderWidth: 2.5,
                 yAxisID: 'y',
                 type: 'line',
-                pointRadius: 4,
-                pointHoverRadius: 6
+                pointRadius: 3,
+                pointHoverRadius: 5
             });
 
             datasets.push({
@@ -258,7 +319,7 @@ function updateOrCreateChart(port, portData) {
                 borderWidth: 1,
                 yAxisID: 'yVolume',
                 type: 'bar',
-                hidden: idx > 0 // 初期の煩雑さを避けるため最初のサイズ以外は非表示
+                hidden: idx > 0
             });
         });
     }
@@ -268,45 +329,23 @@ function updateOrCreateChart(port, portData) {
         maintainAspectRatio: false,
         interaction: { mode: 'index', intersect: false },
         plugins: {
-            legend: { position: 'top', labels: { color: theme.text, font: { family: "'Inter', sans-serif" } } },
+            legend: { position: 'top', labels: { color: theme.text, boxWidth: 12, font: { size: 11 } } },
             tooltip: {
                 backgroundColor: theme.tooltipBg,
-                titleColor: currentTheme === 'light' ? '#000' : '#58a6ff',
-                bodyColor: currentTheme === 'light' ? '#333' : '#e6edf3',
-                borderColor: theme.text,
-                borderWidth: 1,
+                padding: 10,
                 callbacks: {
-                    label: function (context) {
-                        let label = context.dataset.label || '';
-                        if (context.dataset.type === 'line') {
-                            return label + ': ' + context.parsed.y + ' 円/kg';
-                        } else {
-                            return label + ': ' + context.parsed.y + ' t';
-                        }
+                    label: (context) => {
+                        const label = context.dataset.label || '';
+                        const val = context.parsed.y.toFixed(1);
+                        return context.dataset.type === 'line' ? `${label}: ${val} 円/kg` : `${label}: ${val} t`;
                     }
                 }
             }
         },
         scales: {
-            x: {
-                type: 'time',
-                time: { unit: 'day', displayFormats: { day: 'MM/DD' } },
-                grid: { color: theme.grid },
-                ticks: { color: theme.text }
-            },
-            y: {
-                title: { display: true, text: '単価 (円/kg)', color: theme.text },
-                grid: { color: theme.grid },
-                ticks: { color: theme.text },
-                position: 'left'
-            },
-            yVolume: {
-                title: { display: true, text: '水揚量 (t)', color: theme.text },
-                grid: { display: false },
-                ticks: { color: theme.text },
-                position: 'right',
-                beginAtZero: true
-            }
+            x: { type: 'time', time: { unit: 'day', displayFormats: { day: 'MM/DD' } }, grid: { color: theme.grid }, ticks: { color: theme.text } },
+            y: { title: { display: true, text: '単価', color: theme.text }, grid: { color: theme.grid }, ticks: { color: theme.text }, position: 'left' },
+            yVolume: { title: { display: true, text: '量', color: theme.text }, grid: { display: false }, ticks: { color: theme.text }, position: 'right', beginAtZero: true }
         }
     };
 
@@ -360,9 +399,8 @@ function updateInsights() {
     const insightContent = document.getElementById('insight-content');
     if (!currentData || !insightContent) return;
 
-    // 分析は主要な拠点の代表的なサイズで行う
     const yaizu = currentData["焼津"];
-    const keySize = Object.keys(yaizu)[0] || "4.5kg上";
+    const keySize = "4.5kg上";
     const data = yaizu[keySize];
     if (!data || data.length < 2) return;
 
@@ -381,7 +419,7 @@ function updateInsights() {
     insightContent.innerHTML = `
         <p><strong>現在の市場概況 (${keySize}):</strong></p>
         <p>${trend}</p>
-        <p>💡 <strong>今後の予想に向けたメモ:</strong> 現在${latest.date}時点のデータまで反映済み。移動平均線（点線）を上抜けるかどうかに注目です。</p>
+        <p>💡 <strong>今後の予想に向けたメモ:</strong> 現在${latest.date}時点のデータまで反映済み。</p>
     `;
 }
 
