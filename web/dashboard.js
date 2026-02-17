@@ -66,17 +66,21 @@ async function initDashboard() {
         }, delay);
 
         // --- グラフ外タップでツールチップを消す処理 ---
-        document.addEventListener('click', (e) => {
-            // クリックされた要素がCanvasでなければ
+        const hideTooltips = (e) => {
+            // タップされた要素がCanvasでない場合、またはCanvasであってもチャート領域外の場合
+            // (今回は単純にCanvasタグでない場合のみを対象とする)
             if (e.target.tagName !== 'CANVAS') {
                 Object.values(charts).forEach(chart => {
-                    if (chart.tooltip.getActiveElements().length > 0) {
+                    if (chart.tooltip && chart.tooltip.getActiveElements().length > 0) {
                         chart.tooltip.setActiveElements([], { x: 0, y: 0 });
                         chart.update();
                     }
                 });
             }
-        });
+        };
+
+        document.addEventListener('click', hideTooltips);
+        document.addEventListener('touchstart', hideTooltips, { passive: true });
 
     } catch (error) {
         console.error('Error initializing dashboard:', error);
