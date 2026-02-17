@@ -28,43 +28,45 @@ def scrape_yaizu_current():
         
         # 2. すべてのテーブルを走査してかつお情報を探す
         tables = soup.find_all('table')
+        print(f"Found {len(tables)} tables.")
         for table in tables:
             # テーブルの直前にある見出し（船名や魚種）を確認
-            prev_node = table.find_parent().find_previous_sibling(['h3', 'h4', 'div'])
+            prev_node = table.find_previous_sibling(['h3', 'h4', 'div', 'p'])
             context_text = prev_node.get_text() if prev_node else ""
             
-            # 「旋網冷凍かつお」が含まれるか、テーブル内のテキストを確認
-            # ただし「一本釣」などが含まれる場合は除外
+            # 「かつお」が含まれるか、テーブル内のテキストを確認
             table_text = table.get_text()
-            exclude_keywords = ["一本釣", "南方一本釣り", "遠方一本釣"]
+            include_keywords = ["旋網冷凍かつお", "釣冷凍かつお"]
+            exclude_keywords = ["ビンナガ", "トンボ", "キハダ", "メバチ"] # 他の魚種は除外
             
-            is_valid_context = "旋網冷凍かつお" in context_text or "旋網冷凍かつお" in table_text
-            is_excluded = any(kw in context_text or kw in table_text for kw in exclude_keywords)
+            is_valid_context = any(kw in context_text or kw in table_text for kw in include_keywords)
+            is_excluded = any(kw in context_text for kw in exclude_keywords)
 
             if is_valid_context and not is_excluded:
+                print(f"Processing valid table: {context_text[:50]}...")
                 rows = table.find_all('tr')
                 for row in rows:
                     cols = row.find_all('td')
                     if len(cols) >= 4:
                         size_raw = cols[0].text.strip()
-                        high_price_raw = cols[1].text.strip()
-                        low_price_raw = cols[2].text.strip()
-                        volume_raw = cols[3].text.strip()
                         
-                        # サイズ判定：ハードコードを廃止し、取得した文字列をそのまま利用
+                        # サイズ表記の正規化 (例: "4.5上" -> "4.5kg上", "1.8下" -> "1.8kg下")
                         size = size_raw.replace(' ', '').replace('\u3000', '')
+                        # 数字+「上」または「下」の形式を「kg」入りに統一
+                        size = re.sub(r'(\d+\.?\d*)([上下])', r'\1kg\2', size)
                         
                         if size:
                             # 数値抽出 (数値以外を除去)
                             def to_float(s):
+                                s = re.sub(r'[^\d.]', '', s)
                                 try:
-                                    return float(re.sub(r'[^\d.]', '', s))
+                                    return float(s) if s else 0.0
                                 except:
                                     return 0.0
                             
-                            p_high = to_float(high_price_raw)
-                            p_low = to_float(low_price_raw)
-                            vol = to_float(volume_raw)
+                            p_high = to_float(cols[1].text.strip())
+                            p_low = to_float(cols[2].text.strip())
+                            vol = to_float(cols[3].text.strip())
                             
                             # 平均価格
                             avg_p = (p_high + p_low) / 2 if p_high > 0 and p_low > 0 else (p_high if p_high > 0 else p_low)
