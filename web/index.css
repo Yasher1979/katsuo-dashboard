@@ -33,11 +33,59 @@ h1 {
     margin-bottom: 10px;
     background: linear-gradient(90deg, #58a6ff, #bc8cff);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
 }
 
 .description {
     color: #8b949e;
+    margin-bottom: 20px;
+}
+
+.filter-controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.btn-filter {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.btn-filter.active {
+    background: var(--accent-color);
+    color: white;
+    border-color: var(--accent-color);
+}
+
+.insight-section {
+    margin-bottom: 30px;
+}
+
+.insight-card {
+    background: linear-gradient(135deg, rgba(88, 166, 255, 0.1), rgba(188, 140, 255, 0.1));
+    border: 1px solid var(--accent-color);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.insight-card h3 {
+    margin-top: 0;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+}
+
+.insight-content {
+    line-height: 1.6;
+    font-size: 0.95rem;
 }
 
 .dashboard-grid {
@@ -117,6 +165,25 @@ h1 {
 .chart-container {
     height: 400px;
     position: relative;
+    min-width: 600px;
+    /* 横長を維持 */
+}
+
+.chart-card {
+    overflow-x: auto;
+    /* モバイルで横スクロール可能に */
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-color) transparent;
+}
+
+/* スクロールバーのデザイン(Chrome, Safari) */
+.chart-card::-webkit-scrollbar {
+    height: 6px;
+}
+
+.chart-card::-webkit-scrollbar-thumb {
+    background-color: var(--border-color);
+    border-radius: 10px;
 }
 
 footer {

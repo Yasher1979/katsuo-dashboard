@@ -34,8 +34,14 @@ def scrape_yaizu_current():
             context_text = prev_node.get_text() if prev_node else ""
             
             # 「旋網冷凍かつお」が含まれるか、テーブル内のテキストを確認
+            # ただし「一本釣」などが含まれる場合は除外
             table_text = table.get_text()
-            if "旋網冷凍かつお" in context_text or "旋網冷凍かつお" in table_text:
+            exclude_keywords = ["一本釣", "南方一本釣り", "遠方一本釣"]
+            
+            is_valid_context = "旋網冷凍かつお" in context_text or "旋網冷凍かつお" in table_text
+            is_excluded = any(kw in context_text or kw in table_text for kw in exclude_keywords)
+
+            if is_valid_context and not is_excluded:
                 rows = table.find_all('tr')
                 for row in rows:
                     cols = row.find_all('td')
