@@ -41,9 +41,10 @@ async function initDashboard() {
     try {
         const startTime = Date.now();
 
-        const response = await fetch('../data/katsuo_market_data.json');
+        // キャッシュ回避のためにタイムスタンプを付与
+        const response = await fetch(`../data/katsuo_market_data.json?v=${Date.now()}`);
         if (!response.ok) {
-            const fallbackResponse = await fetch('/data/katsuo_market_data.json');
+            const fallbackResponse = await fetch(`/data/katsuo_market_data.json?v=${Date.now()}`);
             if (!fallbackResponse.ok) throw new Error('Data not found');
             currentData = await fallbackResponse.json();
         } else {
@@ -269,14 +270,6 @@ function filterDataByRange(portData, range) {
     return result;
 }
 
-function calculateMovingAverage(data, windowSize = 5) {
-    return data.map((val, index, array) => {
-        const start = Math.max(0, index - windowSize + 1);
-        const sub = array.slice(start, index + 1);
-        const sum = sub.reduce((a, b) => a + b.y, 0);
-        return { x: val.x, y: Math.round(sum / sub.length) };
-    });
-}
 
 
 // 単純移動平均 (SMA) を計算する関数
