@@ -1,0 +1,121 @@
+import os
+import json
+import pandas as pd
+from datetime import datetime, timedelta
+import random
+
+class KatsuoDataFetcher:
+    """
+    鰹節原料（B巻網）の相場データを取得・管理するクラス
+    """
+    def __init__(self, data_dir="data"):
+        self.data_dir = data_dir
+        if not os.path.exists(data_dir):
+            os.makedirs(data_dir)
+            
+        self.ports = ["焼津", "枕崎", "山川"]
+        self.sizes = ["1.8kg上", "2.5kg上", "4.5kg上"]
+        
+    def generate_sample_data(self, years=5):
+        """
+        過去5年分のサンプルデータを生成する（プロトタイプ用）
+        実際の運用時はJAFICや各漁協のデータソースに差し替える
+        """
+        data = []
+        end_date = datetime.now()
+        start_date = end_date - timedelta(days=365 * years)
+        
+        current_date = start_date
+        
+        # 拠点ごとの基準価格（円/kg）
+        base_prices = {
+            "焼津": {"1.8kg上": 220, "2.5kg上": 240, "4.5kg上": 210},
+            "枕崎": {"1.8kg上": 230, "2.5kg上": 250, "4.5kg上": 220},
+            "山川": {"1.8kg上": 225, "2.5kg上": 245, "4.5kg上": 215},
+        }
+        
+        while current_date <= end_date:
+            # 土日は市場が休みの場合が多いが、統計としては月次/週次で扱うこともある
+            # ここでは日次で季節性のあるランダムデータを生成
+            
+            # 季節性（夏から秋にかけて高く、冬に低くなる等のシミュレーション）
+            month = current_date.month
+            season_factor = 1.0 + 0.2 * (abs(month - 7) / 6.0) # 7月から離れるほど変動
+            
+            for port in self.ports:
+                for size in self.sizes:
+                    base = base_prices[port][size]
+                    # ランダム変動 + 季節性
+                    price = base * season_factor + random.uniform(-20, 20)
+                    # 数量（トン）
+                    volume = random.uniform(50, 500)
+                    
+                    data.append({
+                        "date": current_date.strftime("%Y-%m-%d"),
+                        "port": port,
+                        "size": size,
+                        "price": round(price, 1),
+                        "volume": round(volume, 1)
+                    })
+            
+            current_date += timedelta(days=1)
+            
+        return pd.DataFrame(data)
+
+    def load_from_csv(self):
+        """
+        data/market_input.csv から実データを読み込む
+        """
+        csv_path = os.path.join(self.data_dir, "market_input.csv")
+        if os.path.exists(csv_path):
+            try:
+                # 日本語(cp932/shift_jis)が含まれる可能性を考慮し、encodingを指定
+                df = pd.read_csv(csv_path, encoding='utf-8')
+                print(f"Loaded real data from {csv_path}")
+                return df
+            except Exception as e:
+                print(f"Error loading CSV: {e}")
+                # utf-8で失敗した場合は、日本語環境で一般的な cp932 を試す
+                try:
+                    df = pd.read_csv(csv_path, encoding='cp932')
+                    return df
+                except:
+                    return None
+        return None
+
+    def save_to_json(self, df):
+        """
+        データをJSON形式で保存（Web可視化用）
+        """
+        if df is None or len(df) == 0:
+            print("No data to save.")
+            return
+
+        output = {}
+        for port in self.ports:
+            port_data = df[df['port'] == port]
+            output[port] = {}
+            for size in self.sizes:
+                size_data = port_data[port_data['size'] == size]
+                # 日付順にソート
+                size_data = size_data.sort_values('date')
+                output[port][size] = size_data[['date', 'price', 'volume']].to_dict(orient='records')
+                
+        file_path = os.path.join(self.data_dir, "katsuo_market_data.json")
+        with open(file_path, 'w', encoding='utf-8') as f:
+            json.dump(output, f, ensure_ascii=False, indent=2)
+        print(f"Data saved to {file_path}")
+
+if __name__ == "__main__":
+    fetcher = KatsuoDataFetcher()
+    
+    # 1. まずCSVからの実データ読み込みを試行
+    df = fetcher.load_from_csv()
+    
+    # 2. 実データがない場合はサンプルを生成（デモ用）
+    if df is None or len(df) == 0:
+        print("Generating 5 years of prototype data (Sample)...")
+        df = fetcher.generate_sample_data(years=5)
+    
+    fetcher.save_to_json(df)
+    print("Done.")

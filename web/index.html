@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>(有)マルチョウ 専用 鰹節原料(B巻網)相場グラフ</title>
+    <link rel="stylesheet" href="index.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1"></script>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>(有)マルチョウ　専用　鰹節原料(B巻網)相場グラフ</h1>
+            <p class="description">枕崎・焼津・山川におけるサイズ別(1.8+/2.5+/4.5+)相場推移</p>
+        </header>
+
+        <div class="dashboard-grid">
+            <!-- 枕崎 -->
+            <div class="chart-card makurazaki">
+                <div class="chart-header">
+                    <div class="port-title">枕崎市漁業協同組合市況</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-枕崎"></canvas>
+                </div>
+            </div>
+
+            <!-- 焼津 -->
+            <div class="chart-card yaizu">
+                <div class="chart-header">
+                    <div class="port-title">焼津魚市場相場・市況</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-焼津"></canvas>
+                </div>
+            </div>
+
+            <!-- 山川 -->
+            <div class="chart-card yamagawa">
+                <div class="chart-header">
+                    <div class="port-title">山川町漁業協同組合市況</div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="chart-山川"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Data Source: 各市況データ</p>
+            <p>&copy; 2026 Marucyou Skipjack Analytics</p>
+        </footer>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+
+</html>

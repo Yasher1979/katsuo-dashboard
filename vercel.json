@@ -1,0 +1,34 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "api/auth.py",
+            "use": "@vercel/python"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/web/(.*)",
+            "dest": "/web/$1"
+        },
+        {
+            "src": "/data/(.*)",
+            "dest": "/data/$1"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/api/auth.py"
+        }
+    ],
+    "headers": [
+        {
+            "source": "/(.*)",
+            "headers": [
+                {
+                    "key": "Cache-Control",
+                    "value": "public, max-age=0, must-revalidate"
+                }
+            ]
+        }
+    ]
+}
