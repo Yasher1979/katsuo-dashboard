@@ -399,9 +399,9 @@ function updateInsights() {
     const insightContent = document.getElementById('insight-content');
     if (!currentData || !insightContent) return;
 
-    const yaizu = currentData["焼津"];
+    const yaizuData = currentData["焼津"];
     const keySize = "4.5kg上";
-    const data = yaizu[keySize];
+    const data = yaizuData[keySize];
     if (!data || data.length < 2) return;
 
     const latest = data[data.length - 1];
@@ -417,7 +417,7 @@ function updateInsights() {
     }
 
     insightContent.innerHTML = `
-        <p><strong>現在の市場概況 (${keySize}):</strong></p>
+        <p><strong>現在の市場概況 (焼津魚市場市況 ${keySize}):</strong></p>
         <p>${trend}</p>
         <p>💡 <strong>今後の予想に向けたメモ:</strong> 現在${latest.date}時点のデータまで反映済み。</p>
     `;
