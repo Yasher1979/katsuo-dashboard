@@ -1,6 +1,6 @@
 const ports = ["枕崎", "焼津", "山川"];
-const mainSizesForSummary = ["1.8kg下", "2.5kg上", "4.5kg上"];
-const mainSizesForCharts = ["1.8kg下", "2.5kg上", "4.5kg上"];
+const mainSizesForSummary = ["1.8kg下", "1.8kg上", "2.5kg上", "4.5kg上"];
+const mainSizesForCharts = ["1.8kg下", "1.8kg上", "2.5kg上", "4.5kg上"];
 
 // テーマごとの配色設定
 const themes = {
@@ -112,10 +112,12 @@ function renderSummary() {
             const prevEntry = dataArr.length > 1 ? (latestEntry ? dataArr[dataArr.length - 2] : dataArr[dataArr.length - 1]) : null;
 
             let priceHtml = '-';
+            let volHtml = '-';
             let diffHtml = '';
 
             if (latestEntry) {
-                priceHtml = `${latestEntry.price.toFixed(1)}`; // 小数点以下を1桁に制限
+                priceHtml = `${latestEntry.price.toFixed(1)}`;
+                volHtml = `${latestEntry.volume.toFixed(1)}`;
                 if (prevEntry) {
                     const diff = latestEntry.price - prevEntry.price;
                     if (diff > 0) {
@@ -132,7 +134,10 @@ function renderSummary() {
                 <div class="summary-row">
                     <div class="summary-label">${size}</div>
                     <div class="summary-values">
-                        <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
+                        <div class="price-vol-group">
+                            <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
+                            <div class="now-volume">${volHtml}<span class="currency">t</span></div>
+                        </div>
                         ${diffHtml}
                     </div>
                 </div>
@@ -164,10 +169,12 @@ function showDetail(port, portData, latestDateStr) {
         const prevEntry = dataArr.length > 1 ? (latestEntry ? dataArr[dataArr.length - 2] : dataArr[dataArr.length - 1]) : null;
 
         let priceHtml = '-';
+        let volHtml = '-';
         let diffHtml = '';
 
         if (latestEntry) {
             priceHtml = `${latestEntry.price.toFixed(1)}`;
+            volHtml = `${latestEntry.volume.toFixed(1)}`;
             if (prevEntry) {
                 const diff = latestEntry.price - prevEntry.price;
                 if (diff > 0) {
@@ -184,7 +191,10 @@ function showDetail(port, portData, latestDateStr) {
             <div class="summary-row">
                 <div class="summary-label">${size}</div>
                 <div class="summary-values">
-                    <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
+                    <div class="price-vol-group">
+                        <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
+                        <div class="now-volume">${volHtml}<span class="currency">t</span></div>
+                    </div>
                     ${diffHtml}
                 </div>
             </div>
