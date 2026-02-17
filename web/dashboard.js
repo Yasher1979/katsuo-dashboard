@@ -320,9 +320,10 @@ function updateOrCreateChart(port, portData) {
             borderColor: color.border,
             backgroundColor: color.border,
             borderWidth: 2,
-            tension: 0.1,
+            tension: 0.4, // 滑らかな曲線に
+            spanGaps: true, // データがない期間も線でつなぐ
             yAxisID: 'y',
-            pointRadius: 6,
+            pointRadius: 5,
             pointHoverRadius: 8,
             fill: false
         });
@@ -336,6 +337,8 @@ function updateOrCreateChart(port, portData) {
             borderColor: color.border,
             borderWidth: 1,
             borderDash: [5, 5],
+            tension: 0.4, // 滑らかに
+            spanGaps: true,
             pointRadius: 0,
             yAxisID: 'y',
             fill: false,
