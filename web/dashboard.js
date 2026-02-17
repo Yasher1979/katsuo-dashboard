@@ -65,21 +65,11 @@ async function initDashboard() {
             document.getElementById('splash-screen').classList.add('fade-out');
         }, delay);
 
-        // --- グラフ外タップ、またはグラフ内空白タップでツールチップを消す処理 ---
+        // --- グラフ外タップでツールチップを消す処理 ---
         const hideTooltips = (e) => {
-            if (e.target.tagName === 'CANVAS') {
-                // グラフ内タップの場合:
-                // "点の上"を直接タップしていない限り消す (intersect: true で判定)
-                const chart = Object.values(charts).find(c => c.canvas === e.target);
-                if (chart) {
-                    const activePoints = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-                    if (activePoints.length === 0) {
-                        chart.tooltip.setActiveElements([], { x: 0, y: 0 });
-                        chart.update();
-                    }
-                }
-            } else {
-                // グラフ外タップの場合: 全チャートのツールチップを消す
+            // Canvas以外の場所をタップした場合のみ、全チャートのツールチップを消す
+            // (Canvas内のタップは chartOptions.onClick で処理されるため除外)
+            if (e.target.tagName !== 'CANVAS') {
                 Object.values(charts).forEach(chart => {
                     if (chart.tooltip && chart.tooltip.getActiveElements().length > 0) {
                         chart.tooltip.setActiveElements([], { x: 0, y: 0 });
@@ -90,8 +80,6 @@ async function initDashboard() {
         };
 
         document.addEventListener('click', hideTooltips);
-        // touchstart は passive: false にしないと preventDefault できないが、ここでは読み取り専用なので passive: true でOK
-        // ただし Chart.js のイベント発火順序との兼ね合いで click 推奨だが、即応性重視で touchstart も維持
         document.addEventListener('touchstart', hideTooltips, { passive: true });
 
     } catch (error) {
@@ -424,6 +412,17 @@ function updateOrCreateChart(port, portData) {
         interaction: {
             mode: 'index',
             intersect: false,
+        },
+        // グラフ内タップ時の挙動を制御
+        onClick: (e, activeElements, chart) => {
+            // intersect: true で厳密に点の上をクリックしたか判定
+            const points = chart.getElementsAtEventForMode(e.native, 'nearest', { intersect: true }, true);
+
+            if (points.length === 0) {
+                // 点の上でなければツールチップを隠す
+                chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+                chart.update();
+            }
         },
         plugins: {
             legend: {
