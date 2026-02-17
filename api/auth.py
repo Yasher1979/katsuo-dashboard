@@ -5,8 +5,8 @@ import os
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
         # 環境変数から認証情報を取得
-        auth_user = os.environ.get('AUTH_USER', 'admin')
-        auth_pass = os.environ.get('AUTH_PASS', 'password')
+        auth_user = os.environ.get('AUTH_USER', 'admin').strip()
+        auth_pass = os.environ.get('AUTH_PASS', 'password').strip()
         
         # Basic認証のチェック
         auth_header = self.headers.get('Authorization')
@@ -17,7 +17,14 @@ class handler(BaseHTTPRequestHandler):
         
         try:
             auth_decoded = base64.b64decode(auth_header.split(' ')[1]).decode('utf-8')
-            username, password = auth_decoded.split(':')
+            # ユーザー名とパスワードを分割（パスワード内のコロンを許容するため最大1回分割）
+            parts = auth_decoded.split(':', 1)
+            if len(parts) != 2:
+                self.send_auth_required()
+                return
+                
+            username = parts[0].strip()
+            password = parts[1].strip()
             
             if username == auth_user and password == auth_pass:
                 # 認証成功 - index.htmlにリダイレクト
