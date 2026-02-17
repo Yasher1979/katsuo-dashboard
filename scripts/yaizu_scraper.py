@@ -36,11 +36,12 @@ def scrape_yaizu_current():
             
             # 「かつお」が含まれるか、テーブル内のテキストを確認
             table_text = table.get_text()
-            include_keywords = ["旋網冷凍かつお", "釣冷凍かつお"]
-            exclude_keywords = ["ビンナガ", "トンボ", "キハダ", "メバチ"] # 他の魚種は除外
+            # 「旋網冷凍かつお」が含まれるか確認（「一本釣」は除外）
+            include_keywords = ["旋網冷凍かつお"]
+            exclude_keywords = ["一本釣", "一本つり", "南方一本釣り", "遠方一本釣", "ビンナガ", "トンボ", "キハダ", "メバチ"]
             
             is_valid_context = any(kw in context_text or kw in table_text for kw in include_keywords)
-            is_excluded = any(kw in context_text for kw in exclude_keywords)
+            is_excluded = any(kw in context_text or kw in table_text for kw in exclude_keywords)
 
             if is_valid_context and not is_excluded:
                 print(f"Processing valid table: {context_text[:50]}...")
