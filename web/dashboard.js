@@ -358,6 +358,36 @@ function updateOrCreateChart(port, portData) {
         });
     });
 
+    // --- 自動スケーリング計算 ---
+    let minPrice = Infinity;
+    let maxPrice = -Infinity;
+    let maxVolume = 0;
+
+    datasets.forEach(ds => {
+        if (ds.yAxisID === 'y' && !ds.hidden) {
+            ds.data.forEach(p => {
+                if (p.y !== null) {
+                    if (p.y < minPrice) minPrice = p.y;
+                    if (p.y > maxPrice) maxPrice = p.y;
+                }
+            });
+        }
+        if (ds.yAxisID === 'yVolume' && !ds.hidden) {
+            ds.data.forEach(p => {
+                if (p.y !== null && p.y > maxVolume) maxVolume = p.y;
+            });
+        }
+    });
+
+    // データがない場合のデフォルト
+    if (minPrice === Infinity) { minPrice = 200; maxPrice = 250; }
+    if (maxVolume === 0) maxVolume = 100;
+
+    // マージン設定 (価格: ±10円程度, 水揚: +20%)
+    const suggestedMinPrice = Math.floor(minPrice - 10);
+    const suggestedMaxPrice = Math.ceil(maxPrice + 10);
+    const suggestedMaxVolume = Math.ceil(maxVolume * 1.2);
+
     const theme = themes[currentTheme];
     const chartOptions = {
         responsive: true,
@@ -406,8 +436,9 @@ function updateOrCreateChart(port, portData) {
                 grid: { color: theme.grid },
                 ticks: { color: theme.text },
                 position: 'left',
-                min: 190,
-                suggestedMax: 270
+                // 自動計算した範囲を適用
+                min: suggestedMinPrice,
+                max: suggestedMaxPrice
             },
             yVolume: {
                 title: { display: true, text: '水揚量 (t)', color: theme.text },
@@ -415,7 +446,8 @@ function updateOrCreateChart(port, portData) {
                 ticks: { color: theme.text },
                 position: 'right',
                 beginAtZero: true,
-                max: 600
+                // 自動計算した最大値を適用
+                max: suggestedMaxVolume
             }
         }
     };
