@@ -113,27 +113,28 @@ class KatsuoDataFetcher:
 if __name__ == "__main__":
     fetcher = KatsuoDataFetcher()
     
-    # 1. ベースとなるサンプルデータを生成（全拠点・全期間）
-    # これにより、実データがない期間や拠点もデータが埋まる
-    print("Generating base sample data...")
-    df_sample = fetcher.generate_sample_data(years=5)
-    
-    # 2. CSVからの実データ読み込み
+    # 1. CSVからの実データ読み込み
+    print("Loading real data from CSV...")
     df_real = fetcher.load_from_csv()
     
     if df_real is not None and len(df_real) > 0:
-        print("Merging real data with sample data...")
-        # サンプルデータと実データを結合
-        # 実データを後ろに結合し、重複（日付・拠点・サイズ）がある場合は実データを優先（keep='last'）
-        df_combined = pd.concat([df_sample, df_real])
-        # dateは文字列型で統一されている前提
-        df_final = df_combined.drop_duplicates(subset=['date', 'port', 'size'], keep='last')
+        # データ型を調整
+        df_real['price'] = df_real['price'].astype(float)
+        df_real['volume'] = df_real['volume'].astype(float)
+        
+        # 安全策: 異常値フィルタリング（ユーザー指摘の275.8円等は本来ないはずだが、念のため300円超をカット）
+        # また、極端に安い値（30円以下など）もカット
+        df_real = df_real[(df_real['price'] < 300) & (df_real['price'] > 50)]
+        
+        # 日付でソートして時系列を保証
+        df_real['date'] = pd.to_datetime(df_real['date'])
+        df_real = df_real.sort_values(by=['date', 'port', 'size'])
+        # JSONには文字列の日付が必要
+        df_real['date'] = df_real['date'].dt.strftime('%Y-%m-%d')
+        
+        # JSON保存
+        fetcher.save_to_json(df_real)
     else:
-        df_final = df_sample
-    
-    # データ型を調整（念のため）
-    df_final['price'] = df_final['price'].astype(float)
-    df_final['volume'] = df_final['volume'].astype(float)
-
-    fetcher.save_to_json(df_final)
+        print("No real data found in CSV. Please ensure data/market_input.csv exists.")
+        
     print("Done.")
