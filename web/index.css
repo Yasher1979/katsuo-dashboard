@@ -9,6 +9,8 @@
     --grid-color: rgba(48, 54, 61, 0.3);
     --header-gradient: linear-gradient(90deg, #58a6ff, #bc8cff);
     --btn-bg: rgba(22, 27, 34, 1);
+    --diff-up: #ff6b6b;
+    --diff-down: #51cf66;
 }
 
 .theme-light {
@@ -42,9 +44,10 @@ body {
     margin: 0;
     padding: 20px;
     transition: background-color 0.4s, color 0.4s;
+    overflow-x: hidden;
 }
 
-/* スプラッシュ画面 */
+/* スプラッシュ画面（透かし演出） */
 .splash-screen {
     position: fixed;
     top: 0;
@@ -59,41 +62,47 @@ body {
     transition: opacity 0.8s ease, visibility 0.8s;
 }
 
+.splash-content {
+    text-align: center;
+}
+
+.splash-logo {
+    width: 180px;
+    height: 180px;
+    opacity: 0.15;
+    /* 透かし（ウォーターマーク）効果 */
+    filter: brightness(1.5) contrast(1.2);
+    margin-bottom: 30px;
+    animation: pulseWatermark 3s infinite ease-in-out;
+}
+
 .splash-screen.fade-out {
     opacity: 0;
     visibility: hidden;
 }
 
-.splash-logo {
-    width: 150px;
-    height: 150px;
-    margin-bottom: 20px;
-    animation: pulse 2s infinite ease-in-out;
-}
-
 .loader {
-    width: 48px;
-    height: 48px;
-    border: 5px solid var(--accent-color);
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--accent-color);
     border-bottom-color: transparent;
     border-radius: 50%;
-    display: block;
     margin: 0 auto;
-    box-sizing: border-box;
     animation: rotation 1s linear infinite;
+    opacity: 0.6;
 }
 
-@keyframes pulse {
+@keyframes pulseWatermark {
 
     0%,
     100% {
         transform: scale(1);
-        opacity: 0.8;
+        opacity: 0.1;
     }
 
     50% {
-        transform: scale(1.1);
-        opacity: 1;
+        transform: scale(1.05);
+        opacity: 0.25;
     }
 }
 
@@ -114,7 +123,7 @@ body {
 
 header {
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
 }
 
 .theme-switcher {
@@ -128,10 +137,11 @@ header {
     background: var(--btn-bg);
     border: 1px solid var(--border-color);
     color: var(--text-color);
-    padding: 4px 10px;
+    padding: 4px 12px;
     border-radius: 15px;
     font-size: 0.75rem;
     cursor: pointer;
+    transition: all 0.2s;
 }
 
 .btn-theme.active {
@@ -141,9 +151,9 @@ header {
 }
 
 h1 {
-    font-size: 2.2rem;
+    font-size: 2rem;
     font-weight: 700;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
     background: var(--header-gradient);
     -webkit-background-clip: text;
     background-clip: text;
@@ -152,7 +162,60 @@ h1 {
 
 .description {
     color: var(--text-muted);
+    font-size: 0.9rem;
     margin-bottom: 20px;
+}
+
+/* メインタブ */
+.main-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 25px;
+    background: var(--border-color);
+    padding: 4px;
+    border-radius: 12px;
+}
+
+.tab-item {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    padding: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: all 0.3s;
+}
+
+.tab-item.active {
+    background: var(--bg-color);
+    color: var(--accent-color);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* ビューの切り替え */
+.tab-view {
+    display: none;
+    animation: tabFadeIn 0.4s ease;
+}
+
+.tab-view.active {
+    display: block;
+}
+
+@keyframes tabFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .filter-controls {
@@ -170,7 +233,7 @@ h1 {
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: all 0.2s;
 }
 
@@ -187,7 +250,7 @@ h1 {
     padding: 8px 16px;
     border-radius: 20px;
     cursor: pointer;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: all 0.2s;
 }
 
@@ -229,17 +292,14 @@ h1 {
 }
 
 .chart-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
     margin-bottom: 20px;
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 10px;
 }
 
 .port-title {
-    font-size: 1.3rem;
-    font-weight: 600;
+    font-size: 1.2rem;
+    font-weight: 700;
 }
 
 .chart-container {
@@ -248,8 +308,88 @@ h1 {
     min-width: 650px;
 }
 
+/* サマリーグリッド */
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 20px;
+}
+
+.summary-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.summary-port {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 5px;
+    color: var(--accent-color);
+}
+
+.summary-date {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.summary-row:last-child {
+    margin-bottom: 0;
+}
+
+.summary-label {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.summary-values {
+    text-align: right;
+}
+
+.now-price {
+    font-size: 1.3rem;
+    font-weight: 800;
+}
+
+.currency {
+    font-size: 0.8rem;
+    margin-top: 4px;
+    display: block;
+}
+
+.price-diff {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-top: 4px;
+}
+
+.diff-up {
+    color: var(--diff-up);
+}
+
+.diff-down {
+    color: var(--diff-down);
+}
+
+.diff-equal {
+    color: var(--text-muted);
+}
+
 footer {
     margin-top: 50px;
+    padding-bottom: 30px;
     text-align: center;
     color: var(--text-muted);
     font-size: 0.8rem;
@@ -257,7 +397,7 @@ footer {
 
 @media (max-width: 600px) {
     body {
-        padding: 10px;
+        padding: 15px;
     }
 
     h1 {
@@ -266,5 +406,14 @@ footer {
 
     .chart-card {
         padding: 15px;
+    }
+
+    .main-tabs {
+        margin-bottom: 20px;
+    }
+
+    .tab-item {
+        padding: 10px;
+        font-size: 0.85rem;
     }
 }

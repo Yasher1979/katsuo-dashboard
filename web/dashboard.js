@@ -29,11 +29,11 @@ const colors = {
 let currentData = null;
 let currentRange = 'all';
 let currentTheme = 'dark';
+let activeTab = 'charts';
 let charts = {};
 
 async function initDashboard() {
     try {
-        // スプラッシュ画面の演出（最低1.5秒表示）
         const startTime = Date.now();
 
         const response = await fetch('../data/katsuo_market_data.json');
@@ -46,11 +46,12 @@ async function initDashboard() {
         }
 
         renderDashboard();
+        renderSummary(); // 最新一覧の描画
         updateInsights();
         setupFilters();
         setupThemeSwitcher();
+        setupTabs();
 
-        // 読み込み完了後、スプラッシュ画面を消す
         const elapsed = Date.now() - startTime;
         const delay = Math.max(0, 1500 - elapsed);
         setTimeout(() => {
@@ -67,6 +68,101 @@ function renderDashboard() {
     ports.forEach(port => {
         const filteredPortData = filterDataByRange(currentData[port], currentRange);
         updateOrCreateChart(port, filteredPortData);
+    });
+}
+
+// 三拠点の最新相場一覧（サマリー）を描画する関数
+function renderSummary() {
+    const container = document.getElementById('summary-container');
+    if (!container || !currentData) return;
+
+    container.innerHTML = '';
+
+    ports.forEach(port => {
+        const portData = currentData[port];
+        if (!portData) return;
+
+        // 全サイズの中から最も新しい取引日を探す
+        let latestDateStr = "";
+        sizes.forEach(size => {
+            if (portData[size] && portData[size].length > 0) {
+                const date = portData[size][portData[size].length - 1].date;
+                if (!latestDateStr || date > latestDateStr) latestDateStr = date;
+            }
+        });
+
+        if (!latestDateStr) return;
+
+        const card = document.createElement('div');
+        card.className = 'summary-card';
+
+        let rowsHtml = '';
+        sizes.forEach(size => {
+            const dataArr = portData[size] || [];
+            const latestEntry = dataArr.find(v => v.date === latestDateStr);
+            const prevEntry = dataArr.length > 1 ? (latestEntry ? dataArr[dataArr.length - 2] : dataArr[dataArr.length - 1]) : null;
+
+            let priceHtml = '-';
+            let diffHtml = '';
+
+            if (latestEntry) {
+                priceHtml = `${latestEntry.price}`;
+                if (prevEntry) {
+                    const diff = latestEntry.price - prevEntry.price;
+                    if (diff > 0) {
+                        diffHtml = `<span class="price-diff diff-up">▲${diff.toFixed(1)}</span>`;
+                    } else if (diff < 0) {
+                        diffHtml = `<span class="price-diff diff-down">▼${Math.abs(diff).toFixed(1)}</span>`;
+                    } else {
+                        diffHtml = `<span class="price-diff diff-equal">±0</span>`;
+                    }
+                }
+            }
+
+            rowsHtml += `
+                <div class="summary-row">
+                    <div class="summary-label">${size}</div>
+                    <div class="summary-values">
+                        <div class="now-price">${priceHtml}<span class="currency">円/kg</span></div>
+                        ${diffHtml}
+                    </div>
+                </div>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="summary-port">${port}</div>
+            <div class="summary-date">最新取引日: ${latestDateStr}</div>
+            <div class="summary-rows-container">
+                ${rowsHtml}
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function setupTabs() {
+    const tabButtons = document.querySelectorAll('.tab-item');
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+            if (tabId === activeTab) return;
+
+            // ボタンの装飾
+            tabButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // 表示の切り替え
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
+            document.getElementById(`view-${tabId}`).classList.add('active');
+
+            activeTab = tabId;
+
+            // グラフタブに戻った場合は再描画（サイズ調整のため）
+            if (tabId === 'charts') {
+                renderDashboard();
+            }
+        });
     });
 }
 
@@ -96,7 +192,9 @@ function calculateMovingAverage(data, windowSize = 5) {
 
 function updateOrCreateChart(port, portData) {
     const canvasId = `chart-${port}`;
-    const ctx = document.getElementById(canvasId).getContext('2d');
+    const target = document.getElementById(canvasId);
+    if (!target) return;
+    const ctx = target.getContext('2d');
     const datasets = [];
     const theme = themes[currentTheme];
 
@@ -228,12 +326,11 @@ function setupThemeSwitcher() {
             buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
 
-            // Bodyのクラスを入れ替え
             document.body.className = `theme-${theme}`;
             currentTheme = theme;
 
-            // グラフを再描画して色を反映
             renderDashboard();
+            renderSummary(); // テーマに合わせてサマリーも再描画
         });
     });
 }

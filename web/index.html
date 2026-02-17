@@ -44,45 +44,57 @@
             </div>
         </header>
 
-        <!-- 相場分析セクション -->
-        <div class="insight-section" id="market-insight">
-            <div class="insight-card">
-                <h3>📊 直近の相場トレンド・分析</h3>
-                <div id="insight-content" class="insight-content">
-                    データを読み込み中...
+        <nav class="main-tabs">
+            <button class="tab-item active" data-tab="charts">📈 グラフ推移</button>
+            <button class="tab-item" data-tab="summary">📋 最新相場一覧</button>
+        </nav>
+
+        <!-- グラフ表示ビュー -->
+        <div id="view-charts" class="tab-view active">
+            <div class="insight-section">
+                <div class="insight-card">
+                    <h3>🔍 相場トレンド・分析</h3>
+                    <div id="insight-content" class="insight-content">
+                        <p>データを読み込み中...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="port-title">焼津 (Yaizu)</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-焼津"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="port-title">枕崎 (Makurazaki)</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-枕崎"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <span class="port-title">山川 (Yamagawa)</span>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="chart-山川"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="dashboard-grid">
-            <!-- 枕崎 -->
-            <div class="chart-card makurazaki">
-                <div class="chart-header">
-                    <div class="port-title">枕崎市漁業協同組合市況</div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chart-枕崎"></canvas>
-                </div>
-            </div>
-
-            <!-- 焼津 -->
-            <div class="chart-card yaizu">
-                <div class="chart-header">
-                    <div class="port-title">焼津魚市場相場・市況</div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chart-焼津"></canvas>
-                </div>
-            </div>
-
-            <!-- 山川 -->
-            <div class="chart-card yamagawa">
-                <div class="chart-header">
-                    <div class="port-title">山川町漁業協同組合市況</div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="chart-山川"></canvas>
-                </div>
+        <!-- 最新一覧サマリービュー -->
+        <div id="view-summary" class="tab-view">
+            <div id="summary-container" class="summary-grid">
+                <!-- ここにJSでカードが生成されます -->
+                <p>最新データを分析中...</p>
             </div>
         </div>
 
