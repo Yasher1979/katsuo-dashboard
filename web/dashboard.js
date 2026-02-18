@@ -37,34 +37,6 @@ let currentTheme = 'dark';
 let activeTab = 'summary';
 let charts = {};
 
-// --- Chart.js カスタムプラグイン ---
-// グラフ内の空白部分をタップした時に確実にツールチップを消すためのプラグイン
-const touchBackgroundToDismissPlugin = {
-    id: 'touchBackgroundToDismiss',
-    beforeEvent: (chart, args, options) => {
-        // click または touchstart イベントを監視
-        if (args.event.type === 'click' || args.event.type === 'touchstart') {
-            // intersect: true (点の上のみ) で要素判定
-            const elements = chart.getElementsAtEventForMode(args.event, 'nearest', { intersect: true }, true);
-
-            // 何もヒットしない（＝空白部分）場合
-            if (elements.length === 0) {
-                // ツールチップが表示されていたら消す
-                if (chart.tooltip._active && chart.tooltip._active.length > 0) {
-                    chart.tooltip.setActiveElements([], { x: 0, y: 0 });
-                    chart.update();
-                }
-                // 重要: ここで処理を中断させ、Chart.jsによる再描画やツールチップ表示を防ぐ
-                args.changed = true;
-                return false;
-            }
-        }
-    }
-};
-
-// プラグインを登録
-Chart.register(touchBackgroundToDismissPlugin);
-
 async function initDashboard() {
     try {
         const startTime = Date.now();
@@ -94,7 +66,7 @@ async function initDashboard() {
         }, delay);
 
         // --- グラフ外タップでツールチップを消す処理 ---
-        // (グラフ内は touchBackgroundToDismissPlugin で処理されるため、外側だけ監視)
+        // グラフ内のタップは Chart.js の onClick で処理するため、ここではCanvas以外を対象にする
         const hideTooltips = (e) => {
             if (e.target.tagName !== 'CANVAS') {
                 Object.values(charts).forEach(chart => {
@@ -108,7 +80,7 @@ async function initDashboard() {
 
         // click イベントで制御
         document.addEventListener('click', hideTooltips);
-        // タッチデバイスでの即応性向上のため touchstart も追加 (passive: true)
+        // タッチデバイス対策
         document.addEventListener('touchstart', hideTooltips, { passive: true });
 
     } catch (error) {
@@ -440,7 +412,15 @@ function updateOrCreateChart(port, portData) {
         maintainAspectRatio: false,
         interaction: {
             mode: 'index',
-            intersect: true, // 点に直接触れた時のみ表示 (空白タップで消えるようにする)
+            intersect: true, // 点に直接触れた時のみ表示
+        },
+        onClick: (e, activeElements, chart) => {
+            // intersect: true なので、空白部分をクリックすると activeElements は空になる
+            if (activeElements.length === 0) {
+                // ツールチップを非表示にする
+                chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+                chart.update();
+            }
         },
         elements: {
             point: {
