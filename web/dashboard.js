@@ -37,6 +37,34 @@ let currentTheme = 'dark';
 let activeTab = 'summary';
 let charts = {};
 
+// --- Chart.js カスタムプラグイン ---
+// グラフ内の空白部分をタップした時に確実にツールチップを消すためのプラグイン
+const touchBackgroundToDismissPlugin = {
+    id: 'touchBackgroundToDismiss',
+    beforeEvent: (chart, args, options) => {
+        // click または touchstart イベントを監視
+        if (args.event.type === 'click' || args.event.type === 'touchstart') {
+            // intersect: true (点の上のみ) で要素判定
+            const elements = chart.getElementsAtEventForMode(args.event, 'nearest', { intersect: true }, true);
+
+            // 何もヒットしない（＝空白部分）場合
+            if (elements.length === 0) {
+                // ツールチップが表示されていたら消す
+                if (chart.tooltip._active && chart.tooltip._active.length > 0) {
+                    chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+                    chart.update();
+                }
+                // 重要: ここで処理を中断させ、Chart.jsによる再描画やツールチップ表示を防ぐ
+                args.changed = true;
+                return false;
+            }
+        }
+    }
+};
+
+// プラグインを登録
+Chart.register(touchBackgroundToDismissPlugin);
+
 async function initDashboard() {
     try {
         const startTime = Date.now();
@@ -65,24 +93,10 @@ async function initDashboard() {
             document.getElementById('splash-screen').classList.add('fade-out');
         }, delay);
 
-        // --- グラフ外タップ、またはグラフ内空白タップでツールチップを消す処理 ---
+        // --- グラフ外タップでツールチップを消す処理 ---
+        // (グラフ内は touchBackgroundToDismissPlugin で処理されるため、外側だけ監視)
         const hideTooltips = (e) => {
-            if (e.target.tagName === 'CANVAS') {
-                // グラフ内タップの場合:
-                // "点の上"を直接タップしていない限り消す (intersect: true で厳密判定)
-                const chart = Object.values(charts).find(c => c.canvas === e.target);
-                if (chart) {
-                    // ここでのポイント: intersect: true にすることで「点の上」だけを検出
-                    const activePoints = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
-
-                    if (activePoints.length === 0) {
-                        // 点の上でなければ非表示にする
-                        chart.tooltip.setActiveElements([], { x: 0, y: 0 });
-                        chart.update();
-                    }
-                }
-            } else {
-                // グラフ外タップの場合: 全チャートのツールチップを消す
+            if (e.target.tagName !== 'CANVAS') {
                 Object.values(charts).forEach(chart => {
                     if (chart.tooltip && chart.tooltip.getActiveElements().length > 0) {
                         chart.tooltip.setActiveElements([], { x: 0, y: 0 });
