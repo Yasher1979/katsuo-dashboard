@@ -34,7 +34,7 @@ const baseColors = [
 let currentData = null;
 let currentData2024 = null; // 2024年データ用
 let currentVesselInfo = null; // 船舶情報用
-let currentRange = 'all';
+let currentRange = '30'; // デフォルトを1ヶ月に変更
 let currentTheme = 'dark';
 let activeTab = 'summary';
 let charts = {};
@@ -54,6 +54,7 @@ async function initDashboard() {
         }
 
         // --- 2024年データ取得 (昨対比用) ---
+        /* ユーザー要望により一時停止 (2025/02/18)
         try {
             const response2024 = await fetch(`../data/katsuo_market_data_2024.json?v=${Date.now()}`);
             if (response2024.ok) {
@@ -65,6 +66,7 @@ async function initDashboard() {
         } catch (e) {
             console.warn("2024年データの読み込みに失敗しました:", e);
         }
+        */
 
         // --- 船舶情報取得 ---
         try {
@@ -405,6 +407,7 @@ function updateOrCreateChart(port, portData) {
         });
 
         // 4. 昨対比 (2024年データ)
+        // データが存在する場合のみ表示 (現在は読み込み停止中)
         if (currentData2024 && currentData2024[port] && currentData2024[port][size]) {
             const dataArr2024 = currentData2024[port][size];
             if (dataArr2024.length > 0) {
