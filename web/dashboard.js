@@ -747,7 +747,7 @@ function getPrevData(data, port, size) {
 // 船舶情報表示関数は削除されました
 
 // ============================================================
-// 週報PDF生成
+// 週報PDF生成 (html2canvas スクリーンショット方式)
 // ============================================================
 async function generateWeeklyReport() {
     const btn = document.getElementById('btn-pdf');
@@ -755,146 +755,107 @@ async function generateWeeklyReport() {
 
     try {
         const { jsPDF } = window.jspdf;
-        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
 
-        const today = moment().format('YYYY年MM月DD日');
-        const weekStart = moment().subtract(7, 'days').format('MM/DD');
-        const weekEnd = moment().format('MM/DD');
         const pageW = 210;
-        const margin = 15;
-        let y = 20;
+        const pageH = 297;
+        const margin = 10;
+        const contentW = pageW - margin * 2;
 
-        // ヘッダー
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(18);
-        doc.setTextColor(88, 166, 255);
-        doc.text('\u9c5a相場週報', margin, y);
-        y += 8;
-        doc.setFontSize(10);
-        doc.setTextColor(139, 148, 158);
-        doc.text(`対象期間: ${weekStart} 〜 ${weekEnd}  発行日: ${today}`, margin, y);
-        y += 3;
-        doc.setDrawColor(88, 166, 255);
-        doc.setLineWidth(0.5);
-        doc.line(margin, y, pageW - margin, y);
-        y += 8;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        let isFirstPage = true;
 
-        // 各港の最新相場表
-        const mainSizes = ['1.8kg下', '1.8kg上', '2.5kg上', '4.5kg上'];
-
-        ports.forEach(port => {
-            if (!currentData[port]) return;
-            const portData = currentData[port];
-
-            // 最新日付を取得
-            let latestDate = '';
-            Object.keys(portData).forEach(size => {
-                if (portData[size] && portData[size].length > 0) {
-                    const d = portData[size][portData[size].length - 1].date;
-                    if (!latestDate || d > latestDate) latestDate = d;
-                }
+        // --- ① サマリーセクションをキャプチャ ---
+        const summaryContainer = document.getElementById('summary-container');
+        if (summaryContainer) {
+            const canvas = await html2canvas(summaryContainer, {
+                scale: 2,
+                backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg-color').trim() || '#0d1117',
+                useCORS: true,
+                logging: false
             });
+            const imgData = canvas.toDataURL('image/png');
+            const imgH = contentW * (canvas.height / canvas.width);
 
-            // 港名ヘッダー
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(12);
-            doc.setTextColor(88, 166, 255);
-            doc.text(port, margin, y);
-            doc.setFontSize(8);
-            doc.setTextColor(139, 148, 158);
-            doc.text(`最新: ${latestDate}`, margin + 25, y);
-            y += 5;
+            // 長い場合は複数ページに分割
+            let srcY = 0;
+            const srcH = canvas.height;
+            const pageImgH = srcH * (contentW / (canvas.width / 2)); // mm換算
 
-            // テーブルヘッダー
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(100, 100, 100);
-            doc.text('サイズ', margin, y);
-            doc.text('単価(円)', margin + 35, y);
-            doc.text('水揚(t)', margin + 65, y);
-            doc.text('前日比', margin + 90, y);
-            y += 4;
-            doc.setDrawColor(200, 200, 200);
-            doc.setLineWidth(0.2);
-            doc.line(margin, y, pageW - margin, y);
-            y += 3;
+            while (srcY < srcH) {
+                if (!isFirstPage) doc.addPage();
+                isFirstPage = false;
 
-            // 各サイズのデータ
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(9);
-            mainSizes.forEach(size => {
-                const arr = portData[size] || [];
-                const latest = arr.find(v => v.date === latestDate);
-                const prev = arr.length > 1 ? arr[arr.length - 2] : null;
+                const sliceH = Math.min(srcH - srcY, Math.floor(srcH * ((pageH - margin * 2) / pageImgH)));
+                const sliceCanvas = document.createElement('canvas');
+                sliceCanvas.width = canvas.width;
+                sliceCanvas.height = sliceH;
+                const ctx = sliceCanvas.getContext('2d');
+                ctx.drawImage(canvas, 0, srcY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
+                const sliceImg = sliceCanvas.toDataURL('image/png');
+                const sliceHmm = contentW * (sliceH / canvas.width) * 2;
 
-                const price = latest ? latest.price.toFixed(1) : '-';
-                const vol = latest ? latest.volume.toFixed(1) : '-';
-                let diff = '-';
-                let diffColor = [100, 100, 100];
-
-                if (latest && prev) {
-                    const d = latest.price - prev.price;
-                    diff = d > 0 ? `+${d.toFixed(1)}` : d.toFixed(1);
-                    diffColor = d > 0 ? [255, 107, 107] : d < 0 ? [81, 207, 102] : [100, 100, 100];
-                }
-
-                doc.setTextColor(200, 200, 200);
-                doc.text(size, margin, y);
-                doc.text(price, margin + 35, y);
-                doc.text(vol, margin + 65, y);
-                doc.setTextColor(...diffColor);
-                doc.text(diff, margin + 90, y);
-                y += 5;
-            });
-
-            y += 4;
-            // ページを越えそうなら改ページ
-            if (y > 260) { doc.addPage(); y = 20; }
-        });
-
-        // グラフ画像の嵌込み
-        y += 5;
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.setTextColor(88, 166, 255);
-        doc.text('相場グラフ', margin, y);
-        y += 6;
-
-        for (const port of ports) {
-            const canvas = document.getElementById(`chart-${port}`);
-            if (!canvas) continue;
-            try {
-                const imgData = canvas.toDataURL('image/png');
-                const imgW = pageW - margin * 2;
-                const imgH = imgW * (canvas.height / canvas.width);
-                if (y + imgH > 280) { doc.addPage(); y = 20; }
-                doc.addImage(imgData, 'PNG', margin, y, imgW, imgH);
-                y += imgH + 5;
-            } catch (e) {
-                console.warn(`${port}のグラフ画像取得に失敗:`, e);
+                doc.addImage(sliceImg, 'PNG', margin, margin, contentW, Math.min(sliceHmm, pageH - margin * 2));
+                srcY += sliceH;
             }
         }
 
-        // フッター
-        const pageCount = doc.internal.getNumberOfPages();
-        for (let i = 1; i <= pageCount; i++) {
-            doc.setPage(i);
-            doc.setFontSize(8);
-            doc.setTextColor(100, 100, 100);
-            doc.text(`マルチョウ 鱚相場データ  ${i} / ${pageCount}`, pageW / 2, 292, { align: 'center' });
+        // --- ② グラフタブに切り替えてキャプチャ ---
+        // グラフタブを一時的に表示
+        const chartTab = document.querySelector('.tab-item[data-tab="chart"]');
+        const summaryTab = document.querySelector('.tab-item[data-tab="summary"]');
+        const chartView = document.getElementById('chart-view');
+        const summaryView = document.getElementById('summary-view');
+
+        let chartTabWasHidden = false;
+        if (chartView && chartView.style.display === 'none' || !chartView?.classList.contains('active')) {
+            chartTabWasHidden = true;
+            // グラフタブを表示
+            if (chartView) { chartView.classList.add('active'); chartView.style.display = 'block'; }
+            if (summaryView) { summaryView.classList.remove('active'); summaryView.style.display = 'none'; }
         }
 
-        // ダウンロード
+        // 各港のグラフをキャプチャ
+        for (const port of ports) {
+            const chartCard = document.getElementById(`chart-${port}`)?.closest('.chart-card');
+            if (!chartCard) continue;
+
+            const canvas = await html2canvas(chartCard, {
+                scale: 2,
+                backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg').trim() || '#161b22',
+                useCORS: true,
+                logging: false
+            });
+            const imgData = canvas.toDataURL('image/png');
+            const imgH = contentW * (canvas.height / canvas.width);
+
+            doc.addPage();
+            if (imgH <= pageH - margin * 2) {
+                doc.addImage(imgData, 'PNG', margin, margin, contentW, imgH);
+            } else {
+                // 縦長の場合は縮小して収める
+                const scale = (pageH - margin * 2) / imgH;
+                doc.addImage(imgData, 'PNG', margin, margin, contentW * scale, imgH * scale);
+            }
+        }
+
+        // グラフタブを元に戻す
+        if (chartTabWasHidden) {
+            if (chartView) { chartView.classList.remove('active'); chartView.style.display = 'none'; }
+            if (summaryView) { summaryView.classList.add('active'); summaryView.style.display = 'block'; }
+        }
+
+        // --- ③ ダウンロード ---
         const filename = `鱚相場週報_${moment().format('YYYYMMDD')}.pdf`;
         doc.save(filename);
 
     } catch (err) {
         console.error('PDF生成エラー:', err);
-        alert('PDFの生成に失敗しました。グラフタブを開いてから再度お試しください。');
+        alert('PDFの生成に失敗しました。しばらく待ってから再度お試しください。');
     } finally {
-        if (btn) { btn.textContent = '\ud83d\udcc4 週報PDF'; btn.disabled = false; }
+        if (btn) { btn.textContent = '📄 週報PDF'; btn.disabled = false; }
     }
 }
+
 
 // ============================================================
 // 相場メモ機能 (localStorage)
