@@ -14,55 +14,6 @@ class KatsuoDataFetcher:
             os.makedirs(data_dir)
             
         self.ports = ["焼津", "枕崎", "山川"]
-        # 画像に基づいた全サイズリスト (かつお)
-        self.sizes = [
-            "10.0kg上", "8.0kg上", "6.0kg上", "4.5kg上", "2.5kg上", "1.8kg上", "1.8kg下", "0.5kg下",
-            "B品2.5kg上", "B品2.5kg下", "PS", "1.5kg下"
-        ]
-        
-    def generate_sample_data(self, years=5):
-        """
-        過去5年分のサンプルデータを生成する（プロトタイプ用）
-        実際の運用時はJAFICや各漁協のデータソースに差し替える
-        """
-        data = []
-        end_date = datetime.now()
-        start_date = end_date - timedelta(days=365 * years)
-        
-        current_date = start_date
-        
-        # 拠点ごとの基準価格（円/kg） - 画像データに基づき補完
-        default_base = {
-            "10.0kg上": 200, "8.0kg上": 205, "6.0kg上": 215, "4.5kg上": 240, 
-            "2.5kg上": 245, "1.8kg上": 240, "1.8kg下": 235, "0.5kg下": 220,
-            "B品2.5kg上": 210, "B品2.5kg下": 215, "PS": 180, "1.5kg下": 190
-        }
-        
-        while current_date <= end_date:
-            month = current_date.month
-            season_factor = 1.0 + 0.1 * (abs(month - 7) / 6.0)
-            
-            for port in self.ports:
-                for size in self.sizes:
-                    base = default_base.get(size, 200)
-                    # 拠点ごとの微調整
-                    if port == "枕崎": base += 5
-                    if port == "山川": base -= 5
-                    
-                    price = base * season_factor + random.uniform(-15, 15)
-                    volume = random.uniform(5, 100)
-                    
-                    data.append({
-                        "date": current_date.strftime("%Y-%m-%d"),
-                        "port": port,
-                        "size": size,
-                        "price": round(price, 1),
-                        "volume": round(volume, 1)
-                    })
-            
-            current_date += timedelta(days=1)
-            
-        return pd.DataFrame(data)
 
     def load_from_csv(self):
         """
