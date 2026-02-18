@@ -11,6 +11,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
     <!-- アイコン設定 -->
     <link rel="icon" type="image/png" href="marucyou_mark.png">
@@ -41,6 +43,7 @@
                 <button class="btn-filter active" data-range="30">1ヶ月</button>
                 <button class="btn-filter" data-range="7">1週間</button>
                 <button id="btn-refresh" class="btn-refresh">🔄 更新</button>
+                <button id="btn-pdf" class="btn-pdf">📄 週報PDF</button>
             </div>
         </header>
 
@@ -111,14 +114,31 @@
             </div>
         </div>
 
+        <!-- 相場メモ入力モーダル -->
+        <div id="memo-modal" class="modal-overlay">
+            <div class="modal-content">
+                <div class="memo-modal-header">
+                    <h3>📝 相場メモ</h3>
+                    <span id="memo-date" class="memo-date-label"></span>
+                    <span id="memo-port" data-date="" data-port=""></span>
+                </div>
+                <textarea id="memo-textarea" class="memo-textarea" placeholder="例：大型高。第88永盛丸の入港で水揚げ増加見込み。"
+                    rows="5"></textarea>
+                <div class="memo-modal-footer">
+                    <button id="memo-cancel-btn" class="btn-filter">キャンセル</button>
+                    <button id="memo-save-btn" class="btn-filter"
+                        style="background:var(--accent-color);color:white;border-color:var(--accent-color)">保存</button>
+                </div>
+            </div>
+        </div>
+
         <footer>
             <p>Data Source: 各市況データ</p>
             <p>&copy; 2026 Marucyou Skipjack Analytics</p>
         </footer>
     </div>
 
-    <script src="dashboard.js?v=20260218-phase2"></script>
-    </script>
+    <script src="dashboard.js?v=20260218-pdf"></script>
 </body>
 
 </html>

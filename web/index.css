@@ -574,3 +574,116 @@ footer {
     white-space: nowrap;
     max-width: fit-content;
 }
+
+/* PDFボタン */
+.btn-pdf {
+    background: rgba(255, 159, 64, 0.15);
+    border: 1px solid rgba(255, 159, 64, 0.8);
+    color: rgba(255, 159, 64, 1);
+    padding: 8px 16px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+}
+
+.btn-pdf:hover {
+    background: rgba(255, 159, 64, 0.3);
+}
+
+.btn-pdf:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* サマリーカードヘッダー（メモボタン配置用） */
+.summary-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 5px;
+}
+
+/* メモボタン */
+.btn-memo {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    cursor: pointer;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: all 0.2s;
+}
+
+.btn-memo:hover {
+    background: rgba(88, 166, 255, 0.1);
+    border-color: var(--accent-color);
+}
+
+/* メモプレビュー */
+.memo-preview {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    background: rgba(88, 166, 255, 0.08);
+    border-left: 3px solid var(--accent-color);
+    padding: 6px 10px;
+    border-radius: 0 6px 6px 0;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+
+/* メモモーダル */
+.memo-modal-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+}
+
+.memo-modal-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--accent-color);
+}
+
+.memo-date-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+.memo-textarea {
+    width: 100%;
+    background: var(--bg-color);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-color);
+    font-size: 0.95rem;
+    padding: 12px;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.5;
+    box-sizing: border-box;
+}
+
+.memo-textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.memo-modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 15px;
+}
