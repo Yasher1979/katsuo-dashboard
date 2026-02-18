@@ -32,6 +32,7 @@ const baseColors = [
 ];
 
 let currentData = null;
+let currentData2024 = null; // 2024年データ用
 let currentRange = 'all';
 let currentTheme = 'dark';
 let activeTab = 'summary';
@@ -49,6 +50,19 @@ async function initDashboard() {
             currentData = await fallbackResponse.json();
         } else {
             currentData = await response.json();
+        }
+
+        // --- 2024年データ取得 (昨対比用) ---
+        try {
+            const response2024 = await fetch(`../data/katsuo_market_data_2024.json?v=${Date.now()}`);
+            if (response2024.ok) {
+                currentData2024 = await response2024.json();
+            } else {
+                const fallbackResponse2024 = await fetch(`/data/katsuo_market_data_2024.json?v=${Date.now()}`);
+                if (fallbackResponse2024.ok) currentData2024 = await fallbackResponse2024.json();
+            }
+        } catch (e) {
+            console.warn("2024年データの読み込みに失敗しました:", e);
         }
 
         renderDashboard();
@@ -374,7 +388,50 @@ function updateOrCreateChart(port, portData) {
             barPercentage: 0.5,
             hidden: false // デフォルトで表示
         });
+
+        // 4. 昨対比 (2024年データ)
+        if (currentData2024 && currentData2024[port] && currentData2024[port][size]) {
+            const dataArr2024 = currentData2024[port][size];
+            if (dataArr2024.length > 0) {
+                // 日付を+1年して今年の日付に合わせる
+                const projectedData = dataArr2024.map(d => {
+                    const dateObj = moment(d.date).add(1, 'year');
+                    return {
+                        x: dateObj.format('YYYY/MM/DD'),
+                        y: d.price,
+                        originalDate: d.date
+                    };
+                });
+
+                // 現在のRangeでフィルタリング
+                let filtered2024 = projectedData;
+                if (currentRange !== 'all') {
+                    const now = moment();
+                    filtered2024 = projectedData.filter(d => {
+                        return now.diff(moment(d.x), 'days') <= parseInt(currentRange);
+                    });
+                }
+
+                if (filtered2024.length > 0) {
+                    datasets.push({
+                        type: 'line',
+                        label: `(去) ${size}`,
+                        data: filtered2024,
+                        borderColor: color.border,
+                        borderWidth: 1,
+                        borderDash: [2, 2], // 細かい点線
+                        pointRadius: 0, // 点はなし
+                        pointHoverRadius: 4,
+                        tension: 0.4,
+                        yAxisID: 'y',
+                        fill: false,
+                        order: 10 // 奥に表示
+                    });
+                }
+            }
+        }
     });
+
 
     // --- 自動スケーリング計算 ---
     let minPrice = Infinity;
