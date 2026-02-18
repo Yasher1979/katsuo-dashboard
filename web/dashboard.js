@@ -777,19 +777,19 @@ async function generateWeeklyReport() {
             console.error("summary-container が見つかりません");
         } else {
             const canvas = await html2canvas(summaryContainer, {
-                scale: 1, // 負荷軽減のため一時的に2から1に下げ
+                scale: 1.5,
                 backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg-color').trim() || '#0d1117',
                 useCORS: true,
-                logging: true
+                logging: false
             });
-            const imgData = canvas.toDataURL('image/png');
+            const imgData = canvas.toDataURL('image/jpeg', 0.9);
 
             if (!isFirstPage) doc.addPage();
             isFirstPage = false;
 
             const imgH = contentW * (canvas.height / canvas.width);
             // ページ内に収まるように調整
-            doc.addImage(imgData, 'PNG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
+            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
             console.log("サマリーキャプチャ完了");
         }
 
@@ -816,16 +816,16 @@ async function generateWeeklyReport() {
 
             console.log(`${port} のグラフをキャプチャ中...`);
             const canvas = await html2canvas(chartCard, {
-                scale: 1,
+                scale: 1.5,
                 backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg').trim() || '#161b22',
                 useCORS: true,
-                logging: true
+                logging: false
             });
-            const imgData = canvas.toDataURL('image/png');
+            const imgData = canvas.toDataURL('image/jpeg', 0.95);
             const imgH = contentW * (canvas.height / canvas.width);
 
             doc.addPage();
-            doc.addImage(imgData, 'PNG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
+            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
         }
 
         // グラフタブを元に戻す
