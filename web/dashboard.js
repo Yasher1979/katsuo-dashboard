@@ -784,12 +784,20 @@ async function generateWeeklyReport() {
             });
             const imgData = canvas.toDataURL('image/jpeg', 0.9);
 
+
+
+            const imgH = canvas.width > 0 ? (contentW * (canvas.height / canvas.width)) : 0;
+            console.log(`サマリーサイズ: ${canvas.width}x${canvas.height}, 描画高: ${imgH}mm`);
+
+            if (imgH <= 0 || isNaN(imgH) || !isFinite(imgH)) {
+                throw new Error('サマリーセクションの画像変換に失敗しました（サイズ異常）。');
+            }
+
             if (!isFirstPage) doc.addPage();
             isFirstPage = false;
 
-            const imgH = contentW * (canvas.height / canvas.width);
             // ページ内に収まるように調整
-            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
+            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2), undefined, 'FAST');
             console.log("サマリーキャプチャ完了");
         }
 
@@ -822,10 +830,16 @@ async function generateWeeklyReport() {
                 logging: false
             });
             const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            const imgH = contentW * (canvas.height / canvas.width);
+            const imgH = canvas.width > 0 ? (contentW * (canvas.height / canvas.width)) : 0;
+            console.log(`${port} グラフサイズ: ${canvas.width}x${canvas.height}, 描画高: ${imgH}mm`);
+
+            if (imgH <= 0 || isNaN(imgH) || !isFinite(imgH)) {
+                console.warn(`${port} のグラフサイズが異常なためスキップします。`);
+                continue;
+            }
 
             doc.addPage();
-            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
+            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2), undefined, 'FAST');
         }
 
         // グラフタブを元に戻す
@@ -848,7 +862,7 @@ async function generateWeeklyReport() {
 
     } catch (err) {
         console.error('PDF生成エラーの詳細:', err);
-        alert(`【Ver.2026/02/18-D】PDFの生成に失敗しました。\nエラー: ${err.message || '不明なエラー'}\n通信状態やブラウザのキャッシュをクリアして再度お試しください。`);
+        alert(`【Ver.2026/02/18-F】PDFの生成に失敗しました。\nエラー: ${err.message || '不明なエラー'}\n通信状態やブラウザのキャッシュをクリアして再度お試しください。`);
     } finally {
         if (btn) { btn.textContent = '📄 週報PDF'; btn.disabled = false; }
     }
