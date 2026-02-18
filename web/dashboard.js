@@ -33,6 +33,7 @@ const baseColors = [
 
 let currentData = null;
 let currentData2024 = null; // 2024年データ用
+let currentVesselInfo = null; // 船舶情報用
 let currentRange = 'all';
 let currentTheme = 'dark';
 let activeTab = 'summary';
@@ -65,9 +66,23 @@ async function initDashboard() {
             console.warn("2024年データの読み込みに失敗しました:", e);
         }
 
+        // --- 船舶情報取得 ---
+        try {
+            const responseVessel = await fetch(`../data/vessel_info.json?v=${Date.now()}`);
+            if (responseVessel.ok) {
+                currentVesselInfo = await responseVessel.json();
+            } else {
+                const fallbackVessel = await fetch(`/data/vessel_info.json?v=${Date.now()}`);
+                if (fallbackVessel.ok) currentVesselInfo = await fallbackVessel.json();
+            }
+        } catch (e) {
+            console.warn("船舶情報の読み込みに失敗しました:", e);
+        }
+
         renderDashboard();
         renderSummary();
         updateInsights();
+        renderVesselInfo(); // 船舶情報表示
         setupFilters();
         setupThemeSwitcher();
         setupTabs();
@@ -763,5 +778,48 @@ function getPrevData(data, port, size) {
     const arr = data[port][size];
     return arr.length > 1 ? arr[arr.length - 2] : null;
 }
+
+// --- 船舶・漁場情報表示 ---
+function renderVesselInfo() {
+    // 挿入先要素を作成（サマリーの下あたりに追加）
+    const summaryContainer = document.getElementById('summary-container');
+    if (!currentVesselInfo || !summaryContainer) return;
+
+    let vesselSection = document.getElementById('vessel-section');
+    if (!vesselSection) {
+        vesselSection = document.createElement('div');
+        vesselSection.id = 'vessel-section';
+        vesselSection.className = 'dashboard-section';
+        vesselSection.innerHTML = `
+            <div class="section-header">
+                <h2>🚢 主要船団・漁場情報</h2>
+                <div class="weather-links">
+                    <a href="https://tenki.jp/world/9/93/91366/" target="_blank" class="weather-link">⛅ ミクロネシアの天気</a>
+                    <a href="https://tenki.jp/world/9/94/92035/" target="_blank" class="weather-link">⛅ パプアニューギニアの天気</a>
+                    <a href="https://www.jma.go.jp/bosai/typhoon/" target="_blank" class="weather-link">🌀 台風情報 (気象庁)</a>
+                </div>
+            </div>
+            <div class="vessel-grid" id="vessel-grid"></div>
+        `;
+        // サマリーの後に挿入
+        summaryContainer.parentNode.insertBefore(vesselSection, summaryContainer.nextSibling);
+    }
+
+    const grid = document.getElementById('vessel-grid');
+    grid.innerHTML = '';
+
+    currentVesselInfo.forEach(vessel => {
+        const card = document.createElement('div');
+        card.className = 'vessel-card';
+        card.innerHTML = `
+            <div class="vessel-name">${vessel.name}</div>
+            <div class="vessel-area">📍 ${vessel.fishing_area}</div>
+            <div class="vessel-company">${vessel.company}</div>
+            <div class="vessel-desc">${vessel.description}</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
 
 document.addEventListener('DOMContentLoaded', initDashboard);

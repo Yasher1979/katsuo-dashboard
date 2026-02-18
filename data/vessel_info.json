@@ -1,0 +1,62 @@
+[
+    {
+        "name": "タイヨーチューク",
+        "company": "マルハニチロ系（現地合弁）",
+        "fishing_area": "ミクロネシア連邦（チューク島周辺）",
+        "description": "マルハニチロ系の現地合弁会社による操業船。"
+    },
+    {
+        "name": "ときわ丸",
+        "company": "極洋水産（静岡県）",
+        "fishing_area": "中西部太平洋（赤道付近）",
+        "description": "極洋水産が所有する大型まき網船。"
+    },
+    {
+        "name": "78光洋丸 / 88光洋丸",
+        "company": "極洋水産（静岡県）",
+        "fishing_area": "中西部太平洋",
+        "description": "最新鋭の大型船。"
+    },
+    {
+        "name": "81源福丸",
+        "company": "濱田屋水産（宮城県気仙沼）",
+        "fishing_area": "中西部太平洋",
+        "description": "海外まき網の有力船。"
+    },
+    {
+        "name": "83福一丸",
+        "company": "福一漁業（静岡県焼津）",
+        "fishing_area": "中西部太平洋",
+        "description": "焼津の老舗大手、福一漁業の船。"
+    },
+    {
+        "name": "6わかば丸 / 11わかば丸",
+        "company": "極洋水産（静岡県）",
+        "fishing_area": "中西部太平洋",
+        "description": "船団として広く展開。"
+    },
+    {
+        "name": "岬洋丸（こうようまる）",
+        "company": "共同船舶関連",
+        "fishing_area": "中西部太平洋",
+        "description": "大型遠洋船として有名。"
+    },
+    {
+        "name": "宮丸（みやまる）",
+        "company": "共和水産（鳥取県境港）",
+        "fishing_area": "中西部太平洋",
+        "description": "共和水産などが運営する船団。"
+    },
+    {
+        "name": "八興丸（はっこうまる）",
+        "company": "八興漁業（三重県など）",
+        "fishing_area": "中西部太平洋",
+        "description": "海外まき網に従事。"
+    },
+    {
+        "name": "昇喜丸（しょうきまる）",
+        "company": "三重県などの遠洋まき網船団",
+        "fishing_area": "中西部太平洋",
+        "description": "三重県などの漁業会社に多い名称。"
+    }
+]
