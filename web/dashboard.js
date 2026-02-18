@@ -426,11 +426,15 @@ function updateOrCreateChart(port, portData) {
         maintainAspectRatio: false,
         interaction: {
             mode: 'index',
-            intersect: false,
+            intersect: true, // 点に直接触れた時のみ表示 (空白タップで消えるようにする)
         },
-        // グラフ内タップ時の挙動を制御（ドキュメントレベルのイベントリスナーに委譲）
-        // onClick: (e, activeElements, chart) => {}, 
-
+        elements: {
+            point: {
+                radius: 5,
+                hitRadius: 20, // タップ判定を広げて操作性を確保
+                hoverRadius: 7
+            }
+        },
         plugins: {
             legend: {
                 position: 'top',
