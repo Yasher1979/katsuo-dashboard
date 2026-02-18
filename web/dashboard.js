@@ -32,8 +32,6 @@ const baseColors = [
 ];
 
 let currentData = null;
-let currentData2024 = null; // 2024年データ用
-let currentVesselInfo = null; // 船舶情報用
 let currentRange = '30'; // デフォルトを1ヶ月に変更
 let currentTheme = 'dark';
 let activeTab = 'summary';
@@ -53,38 +51,9 @@ async function initDashboard() {
             currentData = await response.json();
         }
 
-        // --- 2024年データ取得 (昨対比用) ---
-        /* ユーザー要望により一時停止 (2025/02/18)
-        try {
-            const response2024 = await fetch(`../data/katsuo_market_data_2024.json?v=${Date.now()}`);
-            if (response2024.ok) {
-                currentData2024 = await response2024.json();
-            } else {
-                const fallbackResponse2024 = await fetch(`/data/katsuo_market_data_2024.json?v=${Date.now()}`);
-                if (fallbackResponse2024.ok) currentData2024 = await fallbackResponse2024.json();
-            }
-        } catch (e) {
-            console.warn("2024年データの読み込みに失敗しました:", e);
-        }
-        */
-
-        // --- 船舶情報取得 ---
-        try {
-            const responseVessel = await fetch(`../data/vessel_info.json?v=${Date.now()}`);
-            if (responseVessel.ok) {
-                currentVesselInfo = await responseVessel.json();
-            } else {
-                const fallbackVessel = await fetch(`/data/vessel_info.json?v=${Date.now()}`);
-                if (fallbackVessel.ok) currentVesselInfo = await fallbackVessel.json();
-            }
-        } catch (e) {
-            console.warn("船舶情報の読み込みに失敗しました:", e);
-        }
-
         renderDashboard();
         renderSummary();
         updateInsights();
-        renderVesselInfo(); // 船舶情報表示
         setupFilters();
         setupThemeSwitcher();
         setupTabs();
@@ -179,9 +148,17 @@ function renderSummary() {
                 }
             }
 
+            let vesselHtml = '';
+            if (latestEntry && latestEntry.vessel) {
+                vesselHtml = `<span class="vessel-badge">🚢 ${latestEntry.vessel}</span>`;
+            }
+
             rowsHtml += `
                 <div class="summary-row">
-                    <div class="summary-label">${size}</div>
+                    <div class="summary-label-group">
+                        <div class="summary-label">${size}</div>
+                        ${vesselHtml}
+                    </div>
                     
                     <div class="summary-values">
                         <div class="price-vol-group">
@@ -240,9 +217,17 @@ function showDetail(port, portData, latestDateStr) {
             }
         }
 
+        let vesselHtml = '';
+        if (latestEntry && latestEntry.vessel) {
+            vesselHtml = `<span class="vessel-badge">🚢 ${latestEntry.vessel}</span>`;
+        }
+
         rowsHtml += `
             <div class="summary-row">
-                <div class="summary-label">${size}</div>
+                <div class="summary-label-group">
+                    <div class="summary-label">${size}</div>
+                    ${vesselHtml}
+                </div>
                 
                 <div class="summary-values">
                     <div class="price-vol-group">
@@ -406,48 +391,7 @@ function updateOrCreateChart(port, portData) {
             hidden: false // デフォルトで表示
         });
 
-        // 4. 昨対比 (2024年データ)
-        // データが存在する場合のみ表示 (現在は読み込み停止中)
-        if (currentData2024 && currentData2024[port] && currentData2024[port][size]) {
-            const dataArr2024 = currentData2024[port][size];
-            if (dataArr2024.length > 0) {
-                // 日付を+1年して今年の日付に合わせる
-                const projectedData = dataArr2024.map(d => {
-                    const dateObj = moment(d.date).add(1, 'year');
-                    return {
-                        x: dateObj.format('YYYY/MM/DD'),
-                        y: d.price,
-                        originalDate: d.date
-                    };
-                });
-
-                // 現在のRangeでフィルタリング
-                let filtered2024 = projectedData;
-                if (currentRange !== 'all') {
-                    const now = moment();
-                    filtered2024 = projectedData.filter(d => {
-                        return now.diff(moment(d.x), 'days') <= parseInt(currentRange);
-                    });
-                }
-
-                if (filtered2024.length > 0) {
-                    datasets.push({
-                        type: 'line',
-                        label: `(去) ${size}`,
-                        data: filtered2024,
-                        borderColor: color.border,
-                        borderWidth: 1,
-                        borderDash: [2, 2], // 細かい点線
-                        pointRadius: 0, // 点はなし
-                        pointHoverRadius: 4,
-                        tension: 0.4,
-                        yAxisID: 'y',
-                        fill: false,
-                        order: 10 // 奥に表示
-                    });
-                }
-            }
-        }
+        // 4. 昨対比 (削除済み)
     });
 
 
@@ -782,47 +726,7 @@ function getPrevData(data, port, size) {
     return arr.length > 1 ? arr[arr.length - 2] : null;
 }
 
-// --- 船舶・漁場情報表示 ---
-function renderVesselInfo() {
-    // 挿入先要素を作成（サマリーの下あたりに追加）
-    const summaryContainer = document.getElementById('summary-container');
-    if (!currentVesselInfo || !summaryContainer) return;
-
-    let vesselSection = document.getElementById('vessel-section');
-    if (!vesselSection) {
-        vesselSection = document.createElement('div');
-        vesselSection.id = 'vessel-section';
-        vesselSection.className = 'dashboard-section';
-        vesselSection.innerHTML = `
-            <div class="section-header">
-                <h2>🚢 主要船団・漁場情報</h2>
-                <div class="weather-links">
-                    <a href="https://tenki.jp/world/9/93/91366/" target="_blank" class="weather-link">⛅ ミクロネシアの天気</a>
-                    <a href="https://tenki.jp/world/9/94/92035/" target="_blank" class="weather-link">⛅ パプアニューギニアの天気</a>
-                    <a href="https://www.jma.go.jp/bosai/typhoon/" target="_blank" class="weather-link">🌀 台風情報 (気象庁)</a>
-                </div>
-            </div>
-            <div class="vessel-grid" id="vessel-grid"></div>
-        `;
-        // サマリーの後に挿入
-        summaryContainer.parentNode.insertBefore(vesselSection, summaryContainer.nextSibling);
-    }
-
-    const grid = document.getElementById('vessel-grid');
-    grid.innerHTML = '';
-
-    currentVesselInfo.forEach(vessel => {
-        const card = document.createElement('div');
-        card.className = 'vessel-card';
-        card.innerHTML = `
-            <div class="vessel-name">${vessel.name}</div>
-            <div class="vessel-area">📍 ${vessel.fishing_area}</div>
-            <div class="vessel-company">${vessel.company}</div>
-            <div class="vessel-desc">${vessel.description}</div>
-        `;
-        grid.appendChild(card);
-    });
-}
+// 船舶情報表示関数は削除されました
 
 
 document.addEventListener('DOMContentLoaded', initDashboard);
