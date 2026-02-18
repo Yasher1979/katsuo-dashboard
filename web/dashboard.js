@@ -753,9 +753,15 @@ async function generateWeeklyReport() {
     const btn = document.getElementById('btn-pdf');
     if (btn) { btn.textContent = '… 生成中'; btn.disabled = true; }
 
-    try {
-        const { jsPDF } = window.jspdf;
+    console.log("PDF生成を開始します...");
 
+    try {
+        // ライブラリの存在チェック
+        if (typeof window.jspdf === 'undefined' || typeof window.html2canvas === 'undefined') {
+            throw new Error('PDF生成ライブラリ (jsPDF/html2canvas) がロードされていません。');
+        }
+
+        const { jsPDF } = window.jspdf;
         const pageW = 210;
         const pageH = 297;
         const margin = 10;
@@ -765,53 +771,42 @@ async function generateWeeklyReport() {
         let isFirstPage = true;
 
         // --- ① サマリーセクションをキャプチャ ---
+        console.log("サマリーセクションをキャプチャ中...");
         const summaryContainer = document.getElementById('summary-container');
-        if (summaryContainer) {
+        if (!summaryContainer) {
+            console.error("summary-container が見つかりません");
+        } else {
             const canvas = await html2canvas(summaryContainer, {
-                scale: 2,
+                scale: 1, // 負荷軽減のため一時的に2から1に下げ
                 backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg-color').trim() || '#0d1117',
                 useCORS: true,
-                logging: false
+                logging: true
             });
             const imgData = canvas.toDataURL('image/png');
+
+            if (!isFirstPage) doc.addPage();
+            isFirstPage = false;
+
             const imgH = contentW * (canvas.height / canvas.width);
-
-            // 長い場合は複数ページに分割
-            let srcY = 0;
-            const srcH = canvas.height;
-            const pageImgH = srcH * (contentW / (canvas.width / 2)); // mm換算
-
-            while (srcY < srcH) {
-                if (!isFirstPage) doc.addPage();
-                isFirstPage = false;
-
-                const sliceH = Math.min(srcH - srcY, Math.floor(srcH * ((pageH - margin * 2) / pageImgH)));
-                const sliceCanvas = document.createElement('canvas');
-                sliceCanvas.width = canvas.width;
-                sliceCanvas.height = sliceH;
-                const ctx = sliceCanvas.getContext('2d');
-                ctx.drawImage(canvas, 0, srcY, canvas.width, sliceH, 0, 0, canvas.width, sliceH);
-                const sliceImg = sliceCanvas.toDataURL('image/png');
-                const sliceHmm = contentW * (sliceH / canvas.width) * 2;
-
-                doc.addImage(sliceImg, 'PNG', margin, margin, contentW, Math.min(sliceHmm, pageH - margin * 2));
-                srcY += sliceH;
-            }
+            // ページ内に収まるように調整
+            doc.addImage(imgData, 'PNG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
+            console.log("サマリーキャプチャ完了");
         }
 
         // --- ② グラフタブに切り替えてキャプチャ ---
-        // グラフタブを一時的に表示
-        const chartTab = document.querySelector('.tab-item[data-tab="chart"]');
-        const summaryTab = document.querySelector('.tab-item[data-tab="summary"]');
+        console.log("グラフセクションをキャプチャ中...");
         const chartView = document.getElementById('chart-view');
         const summaryView = document.getElementById('summary-view');
 
         let chartTabWasHidden = false;
-        if (chartView && chartView.style.display === 'none' || !chartView?.classList.contains('active')) {
+        if (chartView && (chartView.style.display === 'none' || !chartView.classList.contains('active'))) {
             chartTabWasHidden = true;
-            // グラフタブを表示
-            if (chartView) { chartView.classList.add('active'); chartView.style.display = 'block'; }
-            if (summaryView) { summaryView.classList.remove('active'); summaryView.style.display = 'none'; }
+            chartView.style.display = 'block';
+            chartView.classList.add('active');
+            if (summaryView) {
+                summaryView.style.display = 'none';
+                summaryView.classList.remove('active');
+            }
         }
 
         // 各港のグラフをキャプチャ
@@ -819,38 +814,41 @@ async function generateWeeklyReport() {
             const chartCard = document.getElementById(`chart-${port}`)?.closest('.chart-card');
             if (!chartCard) continue;
 
+            console.log(`${port} のグラフをキャプチャ中...`);
             const canvas = await html2canvas(chartCard, {
-                scale: 2,
+                scale: 1,
                 backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg').trim() || '#161b22',
                 useCORS: true,
-                logging: false
+                logging: true
             });
             const imgData = canvas.toDataURL('image/png');
             const imgH = contentW * (canvas.height / canvas.width);
 
             doc.addPage();
-            if (imgH <= pageH - margin * 2) {
-                doc.addImage(imgData, 'PNG', margin, margin, contentW, imgH);
-            } else {
-                // 縦長の場合は縮小して収める
-                const scale = (pageH - margin * 2) / imgH;
-                doc.addImage(imgData, 'PNG', margin, margin, contentW * scale, imgH * scale);
-            }
+            doc.addImage(imgData, 'PNG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2));
         }
 
         // グラフタブを元に戻す
         if (chartTabWasHidden) {
-            if (chartView) { chartView.classList.remove('active'); chartView.style.display = 'none'; }
-            if (summaryView) { summaryView.classList.add('active'); summaryView.style.display = 'block'; }
+            if (chartView) {
+                chartView.style.display = 'none';
+                chartView.classList.remove('active');
+            }
+            if (summaryView) {
+                summaryView.style.display = 'block';
+                summaryView.classList.add('active');
+            }
         }
 
         // --- ③ ダウンロード ---
+        console.log("PDFを保存中...");
         const filename = `鱚相場週報_${moment().format('YYYYMMDD')}.pdf`;
         doc.save(filename);
+        console.log("PDF生成が正常に完了しました。");
 
     } catch (err) {
-        console.error('PDF生成エラー:', err);
-        alert('PDFの生成に失敗しました。しばらく待ってから再度お試しください。');
+        console.error('PDF生成エラーの詳細:', err);
+        alert(`PDFの生成に失敗しました。\nエラー: ${err.message || '不明なエラー'}\n通信状態やタブの状態を確認して再度お試しください。`);
     } finally {
         if (btn) { btn.textContent = '📄 週報PDF'; btn.disabled = false; }
     }
