@@ -65,11 +65,24 @@ async function initDashboard() {
             document.getElementById('splash-screen').classList.add('fade-out');
         }, delay);
 
-        // --- グラフ外タップでツールチップを消す処理 ---
+        // --- グラフ外タップ、またはグラフ内空白タップでツールチップを消す処理 ---
         const hideTooltips = (e) => {
-            // Canvas以外の場所をタップした場合のみ、全チャートのツールチップを消す
-            // (Canvas内のタップは chartOptions.onClick で処理されるため除外)
-            if (e.target.tagName !== 'CANVAS') {
+            if (e.target.tagName === 'CANVAS') {
+                // グラフ内タップの場合:
+                // "点の上"を直接タップしていない限り消す (intersect: true で厳密判定)
+                const chart = Object.values(charts).find(c => c.canvas === e.target);
+                if (chart) {
+                    // ここでのポイント: intersect: true にすることで「点の上」だけを検出
+                    const activePoints = chart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+
+                    if (activePoints.length === 0) {
+                        // 点の上でなければ非表示にする
+                        chart.tooltip.setActiveElements([], { x: 0, y: 0 });
+                        chart.update();
+                    }
+                }
+            } else {
+                // グラフ外タップの場合: 全チャートのツールチップを消す
                 Object.values(charts).forEach(chart => {
                     if (chart.tooltip && chart.tooltip.getActiveElements().length > 0) {
                         chart.tooltip.setActiveElements([], { x: 0, y: 0 });
@@ -79,7 +92,9 @@ async function initDashboard() {
             }
         };
 
+        // click イベントで制御
         document.addEventListener('click', hideTooltips);
+        // タッチデバイスでの即応性向上のため touchstart も追加 (passive: true)
         document.addEventListener('touchstart', hideTooltips, { passive: true });
 
     } catch (error) {
@@ -413,17 +428,9 @@ function updateOrCreateChart(port, portData) {
             mode: 'index',
             intersect: false,
         },
-        // グラフ内タップ時の挙動を制御
-        onClick: (e, activeElements, chart) => {
-            // intersect: true で厳密に点の上をクリックしたか判定
-            const points = chart.getElementsAtEventForMode(e.native, 'nearest', { intersect: true }, true);
+        // グラフ内タップ時の挙動を制御（ドキュメントレベルのイベントリスナーに委譲）
+        // onClick: (e, activeElements, chart) => {}, 
 
-            if (points.length === 0) {
-                // 点の上でなければツールチップを隠す
-                chart.tooltip.setActiveElements([], { x: 0, y: 0 });
-                chart.update();
-            }
-        },
         plugins: {
             legend: {
                 position: 'top',
