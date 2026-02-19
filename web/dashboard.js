@@ -495,9 +495,9 @@ function updateInsights() {
     });
 
     if (totalVolume > 500) {
-        insights.push({ title: "🚚 大量水揚げ", text: "各港で水揚げが集中しています！供給過多による価格調整の動きに注意が必要ですが、鮮度は抜群です。", memo: "全体的に強含み" });
+        insights.push({ title: "💎 供給爆発・異常水揚げ", text: "かつてないほどの水揚げが各港で爆発しています！相場は一時的に緩む可能性がありますが、高鮮度な個体を一気に確保する千載一遇の好機です。", memo: "大量確保を推奨" });
     } else if (totalVolume < 100) {
-        insights.push({ title: "⚠️ 品薄警戒", text: "水揚げ量が極端に減少しています。買い気が集中し、キロ単価が跳ね上がる「取り合い」の様相を呈しています。", memo: "品薄による高騰" });
+        insights.push({ title: "⚠️ 枯渇警報・争奪戦勃発", text: "水揚げが干上がっています！市場はかつてない争奪戦の様相を呈し、単価は垂直立ち上げ。冷静な資金管理と、何が何でも確保する執念の双方が求められます。", memo: "高値掴み厳重注意" });
     }
 
     // 2. 港別の特記
@@ -505,19 +505,17 @@ function updateInsights() {
         const size = "2.5kg上";
         const arr = (currentData[p] || {})[size];
         if (arr && arr.length >= 2) {
-            const last = arr[arr.length - 1];
-            const prev = arr[arr.length - 2];
+            const last = arr[arr.length - 1], prev = arr[arr.length - 2];
             const diff = last.price - prev.price;
-
             if (diff >= 15) {
-                insights.push({ title: `🚀 ${p}激震`, text: `${p}の${size}が前日比+${diff.toFixed(1)}円の爆騰！この勢いは止まりそうにありません。`, memo: "強烈な買い気" });
+                insights.push({ title: `⚡ ${p}相場爆騰`, text: `${p}の${size}が前日比+${diff.toFixed(1)}円の爆騰！買い向かう熱量に一切の衰えがなく、勢いは加速しています。`, memo: "強気買い推奨" });
             } else if (diff <= -15) {
-                insights.push({ title: `📉 ${p}急落`, text: `${p}の${size}が${diff.toFixed(1)}円の大幅ダウン。今が仕入れの絶好機かもしれません。`, memo: "弱気相場" });
+                insights.push({ title: `🌊 ${p}価格崩落`, text: `${p}の${size}が${diff.toFixed(1)}円の大幅下落。市場心理は一気に弱含みに転じました。今こそ底値を見極める「プロの眼」が試されています。`, memo: "底値見極め" });
             }
         }
     });
 
-    const sel = insights.length ? insights[Math.floor(Math.random() * insights.length)] : { title: "📊 安定推移", text: "現在の相場は極めて安定しています。大きな変動の予兆はなく、計画的な仕入れが可能な状態です。", memo: "凪の状態" };
+    const sel = insights.length ? insights[Math.floor(Math.random() * insights.length)] : { title: "❄️ 凪の静寂・安定相場", text: "現在は嵐の前の静けさか、極めて安定した推移。こういう時こそ、緻密なデータを精査し、次の暴風雨に備える「守り」から「攻め」への準備期間です。", memo: "次期トレンド注視" };
 
     el.innerHTML = `
         <div class="insight-heat">
