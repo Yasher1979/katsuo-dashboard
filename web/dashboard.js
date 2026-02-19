@@ -383,20 +383,36 @@ function setupMemoModal() {
     c.onclick = () => m.classList.remove('active'); m.onclick = (e) => { if (e.target === m) m.classList.remove('active'); };
 }
 
-function renderNews() {
+window.displayedNewsCount = 0;
+
+function renderNews(isLoadMore = false) {
     const container = document.getElementById('news-container');
+    const loadMoreBtnContainer = document.getElementById('news-load-more-container');
     const data = window.katsuoNewsData;
     if (!container || !data) return;
-    container.innerHTML = '';
-    data.forEach(news => {
+
+    // 初回読み込み時はソートして初期化
+    if (!isLoadMore) {
+        data.sort((a, b) => new Date(b.date) - new Date(a.date));
+        container.innerHTML = '';
+        window.displayedNewsCount = 0;
+    }
+
+    const nextBatch = data.slice(window.displayedNewsCount, window.displayedNewsCount + 5);
+
+    nextBatch.forEach((news, idx) => {
         const card = document.createElement('a');
-        card.className = 'news-card';
+        card.className = 'news-card new-item';
+        card.style.animationDelay = `${idx * 0.1}s`;
         card.href = news.url;
         card.target = '_blank';
+
         let icon = '📰';
         if (news.category === '漁況') icon = '🐟';
         if (news.category === '燃費油') icon = '⛽';
         if (news.category === '規制') icon = '⚖️';
+        if (news.category === '市場') icon = '📈';
+
         card.innerHTML = `
             <div class="news-category">${icon} ${news.category}</div>
             <h4>${news.title}</h4>
@@ -408,6 +424,28 @@ function renderNews() {
         `;
         container.appendChild(card);
     });
+
+    window.displayedNewsCount += nextBatch.length;
+
+    // もっと見るボタンの表示制御
+    if (loadMoreBtnContainer) {
+        if (window.displayedNewsCount < data.length) {
+            loadMoreBtnContainer.style.display = 'flex';
+        } else {
+            loadMoreBtnContainer.style.display = 'none';
+        }
+    }
 }
 
-document.addEventListener('DOMContentLoaded', initDashboard);
+// ページネーション用ボタンのセットアップ
+function setupNewsLoadMore() {
+    const btn = document.getElementById('btn-load-more-news');
+    if (btn) {
+        btn.onclick = () => renderNews(true);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    initDashboard();
+    setupNewsLoadMore();
+});
