@@ -14,39 +14,51 @@
         "items": [
             {
                 "category": "B カツオ",
-                "size": "8.0 上",
+                "size": "8.0kg上",
                 "type": "入札",
                 "volume": 0
             },
             {
                 "category": "B カツオ",
-                "size": "6.0 上",
+                "size": "6.0kg上",
                 "type": "入札",
                 "volume": 40.0
             },
             {
                 "category": "B カツオ",
-                "size": "4.5 上",
+                "size": "4.5kg上",
                 "type": "入札",
                 "volume": 40.0
             },
             {
                 "category": "B カツオ",
-                "size": "2.5 上",
+                "size": "2.5kg上",
                 "type": "入札",
                 "volume": 150.0
             },
             {
                 "category": "B カツオ",
-                "size": "1.8 上",
+                "size": "1.8kg上",
                 "type": "入札",
                 "volume": 20.0
             },
             {
                 "category": "B カツオ",
-                "size": "1.8 下",
+                "size": "1.8kg下",
                 "type": "入札",
                 "volume": 10.0
+            },
+            {
+                "category": "キワ(キメ)",
+                "size": "込",
+                "type": "入札",
+                "volume": 0
+            },
+            {
+                "category": "ダルマ",
+                "size": "込",
+                "type": "入札",
+                "volume": 0
             }
         ],
         "total_volume": 260.0
