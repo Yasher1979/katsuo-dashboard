@@ -399,7 +399,6 @@ function updateOrCreateChart(port, portData) {
         charts[port] = new Chart(ctx, { type: 'line', data: { datasets }, options: options });
     }
 }
-}
 
 function setupFilters() {
     document.querySelectorAll('.btn-filter').forEach(btn => btn.addEventListener('click', () => {
@@ -451,7 +450,7 @@ function updateInsights() {
             if (diff >= 15) {
                 insights.push({ title: `⚡ ${p}相場爆騰`, text: `${p}の${size}が前日比+${diff.toFixed(1)}円の爆騰！買い向かう熱量に一切の衰えがなく、勢いは加速しています。`, memo: "強気買い推奨" });
             } else if (diff <= -15) {
-                insights.push({ title: `🌊 ${p}価格崩落`, text: `${p}の${size}が${diff.toFixed(1)}円の大幅下落。市場心理は一気に弱含みに転じました。今こそ底値を見極める「プロの眼」が試されています。`, memo: "底値見極め" });
+                insights.push({ title: `🌊 ${p}価格崩落`, text: `${p}の${size}が${diff.toFixed(1)}円の大幅下落！市場心理は一気に弱気に転換！この混乱こそ、底値を見極める「プロの眼」が輝く瞬間！`, memo: "底値見極め、逆張りチャンス！" });
             }
         }
     });
