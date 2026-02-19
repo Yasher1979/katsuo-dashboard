@@ -50,6 +50,7 @@
         <nav class="main-tabs">
             <button class="tab-item active" data-tab="summary">📋 最新相場一覧</button>
             <button class="tab-item" data-tab="charts">📈 グラフ推移</button>
+            <button class="tab-item" data-tab="bid-schedule">🚢 入札予定</button>
         </nav>
 
         <!-- 最新一覧サマリービュー（初期表示） -->
@@ -62,6 +63,7 @@
 
         <!-- グラフ表示ビュー -->
         <div id="view-charts" class="tab-view">
+            <!-- (既存のグラフ表示内容) -->
             <div class="insight-section">
                 <div class="insight-card">
                     <div class="insight-header">
@@ -75,6 +77,7 @@
             </div>
 
             <div class="dashboard-grid">
+                <!-- ...各港のグラフ... -->
                 <div class="chart-card">
                     <div class="chart-header">
                         <span class="port-title">枕崎市漁業協同組合市況</span>
@@ -100,6 +103,24 @@
                     <div class="chart-container">
                         <canvas id="chart-山川"></canvas>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 入札予定ビュー -->
+        <div id="view-bid-schedule" class="tab-view">
+            <div class="bid-section">
+                <div id="latest-bid-container">
+                    <!-- 最新の入札予定を表示 -->
+                </div>
+
+                <div class="archive-section">
+                    <details>
+                        <summary class="archive-summary">📁 過去の入札予定アーカイブを表示</summary>
+                        <div id="archive-bid-container">
+                            <!-- 過去のデータを表示 -->
+                        </div>
+                    </details>
                 </div>
             </div>
         </div>

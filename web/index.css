@@ -687,3 +687,162 @@ footer {
     gap: 10px;
     margin-top: 15px;
 }
+
+/* 入札予定セクション */
+.bid-section {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.bid-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    border-top: 4px solid var(--accent-color);
+    margin-bottom: 20px;
+}
+
+.bid-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--grid-color);
+}
+
+.bid-info-main h2 {
+    margin: 0 0 8px 0;
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--text-color);
+}
+
+.bid-dates {
+    display: flex;
+    gap: 15px;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.bid-date-item-label {
+    margin-right: 5px;
+    font-weight: 600;
+    color: var(--accent-color);
+}
+
+.bid-sea-area {
+    background: rgba(88, 166, 255, 0.05);
+    border: 1px dashed var(--accent-color);
+    padding: 12px 18px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.sea-area-title {
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    font-weight: 700;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.sea-area-coords {
+    display: flex;
+    gap: 20px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.bid-table-container {
+    overflow-x: auto;
+}
+
+.bid-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+}
+
+.bid-table th {
+    text-align: left;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--text-muted);
+    font-weight: 600;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.bid-table td {
+    padding: 12px;
+    border-bottom: 1px solid var(--grid-color);
+}
+
+.bid-table tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.category-row {
+    background: rgba(88, 166, 255, 0.1);
+    font-weight: 700;
+    color: var(--accent-color);
+}
+
+.volume-val {
+    font-weight: 700;
+    color: var(--text-color);
+    text-align: right;
+}
+
+.volume-unit {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+.archive-section {
+    margin-top: 20px;
+}
+
+.archive-summary {
+    cursor: pointer;
+    color: var(--text-muted);
+    font-weight: 600;
+    padding: 15px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s;
+    user-select: none;
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.archive-summary::before {
+    content: '▶';
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+}
+
+details[open] .archive-summary::before {
+    transform: rotate(90deg);
+}
+
+.archive-summary:hover {
+    border-color: var(--accent-color);
+    color: var(--text-color);
+}
+
+.bid-card.archive {
+    opacity: 0.75;
+    border-top-color: var(--text-muted);
+    margin-top: 15px;
+    transform: scale(0.98);
+}

@@ -32,6 +32,7 @@ const baseColors = [
 ];
 
 let currentData = null;
+let bidScheduleData = null;
 let currentRange = '30'; // デフォルトを1ヶ月に変更
 let currentTheme = 'dark';
 let activeTab = 'summary';
@@ -41,18 +42,28 @@ async function initDashboard() {
     try {
         const startTime = Date.now();
 
-        // キャッシュ回避のためにタイムスタンプを付与
-        const response = await fetch(`../data/katsuo_market_data.json?v=${Date.now()}`);
-        if (!response.ok) {
-            const fallbackResponse = await fetch(`/data/katsuo_market_data.json?v=${Date.now()}`);
-            if (!fallbackResponse.ok) throw new Error('Data not found');
-            currentData = await fallbackResponse.json();
+        // データの並列ロード
+        const [marketRes, bidRes] = await Promise.all([
+            fetch(`../data/katsuo_market_data.json?v=${Date.now()}`),
+            fetch(`../data/bid_schedule.json?v=${Date.now()}`)
+        ]);
+
+        let marketDataResponse = marketRes;
+        if (!marketDataResponse.ok) {
+            marketDataResponse = await fetch(`/data/katsuo_market_data.json?v=${Date.now()}`);
+        }
+        currentData = await marketDataResponse.json();
+
+        if (bidRes.ok) {
+            bidScheduleData = await bidRes.json();
         } else {
-            currentData = await response.json();
+            const bidResAlt = await fetch(`/data/bid_schedule.json?v=${Date.now()}`);
+            if (bidResAlt.ok) bidScheduleData = await bidResAlt.json();
         }
 
         renderDashboard();
         renderSummary();
+        renderBidSchedule();
         updateInsights();
         setupFilters();
         setupThemeSwitcher();
@@ -63,11 +74,10 @@ async function initDashboard() {
         const elapsed = Date.now() - startTime;
         const delay = Math.max(0, 1500 - elapsed);
         setTimeout(() => {
-            document.getElementById('splash-screen').classList.add('fade-out');
+            const splash = document.getElementById('splash-screen');
+            if (splash) splash.classList.add('fade-out');
         }, delay);
 
-        // --- グラフ外タップでツールチップを消す処理 ---
-        // グラフ内のタップは Chart.js の onClick で処理するため、ここではCanvas以外を対象にする
         const hideTooltips = (e) => {
             if (e.target.tagName !== 'CANVAS') {
                 Object.values(charts).forEach(chart => {
@@ -79,14 +89,13 @@ async function initDashboard() {
             }
         };
 
-        // click イベントで制御
         document.addEventListener('click', hideTooltips);
-        // タッチデバイス対策
         document.addEventListener('touchstart', hideTooltips, { passive: true });
 
     } catch (error) {
         console.error('Error initializing dashboard:', error);
-        document.getElementById('splash-screen').classList.add('fade-out');
+        const splash = document.getElementById('splash-screen');
+        if (splash) splash.classList.add('fade-out');
     }
 }
 
@@ -107,7 +116,6 @@ function renderSummary() {
         const portData = currentData[port];
         if (!portData) return;
 
-        // 全サイズの中から最も新しい取引日を探す
         const availableSizes = Object.keys(portData);
         let latestDateStr = "";
         availableSizes.forEach(size => {
@@ -124,7 +132,6 @@ function renderSummary() {
         card.onclick = () => showDetail(port, portData, latestDateStr);
 
         let rowsHtml = '';
-        // 概要版では主要3サイズのみ表示
         mainSizesForSummary.forEach(size => {
             const dataArr = portData[size] || [];
             const latestEntry = dataArr.find(v => v.date === latestDateStr);
@@ -160,14 +167,12 @@ function renderSummary() {
                         <div class="summary-label">${size}</div>
                         ${vesselHtml}
                     </div>
-                    
                     <div class="summary-values">
                         <div class="price-vol-group">
                             <span class="now-price">${priceHtml}<span class="currency">円</span></span>
                         </div>
                         <div class="now-volume">${volHtml}<span class="currency">t</span></div>
                     </div>
-
                     <div class="diff-area">
                         ${diffHtml}
                     </div>
@@ -238,17 +243,13 @@ function showDetail(port, portData, latestDateStr) {
                     <div class="summary-label">${size}</div>
                     ${vesselHtml}
                 </div>
-                
                 <div class="summary-values">
                     <div class="price-vol-group">
                         <span class="now-price">${priceHtml}<span class="currency">円</span></span>
                     </div>
                     <div class="now-volume">${volHtml}<span class="currency">t</span></div>
                 </div>
-
-                <div class="diff-area">
-                    ${diffHtml}
-                </div>
+                <div class="diff-area">${diffHtml}</div>
             </div>
         `;
     });
@@ -256,70 +257,88 @@ function showDetail(port, portData, latestDateStr) {
     modalBody.innerHTML = `
         <div class="summary-port">${port} 全サイズ一覧</div>
         <div class="summary-date">取引日: ${latestDateStr}</div>
-        <div class="summary-rows-container">
-            ${rowsHtml}
-        </div>
+        <div class="summary-rows-container">${rowsHtml}</div>
     `;
 
     modal.classList.add('active');
 }
 
-function setupModal() {
-    const modal = document.getElementById('detail-modal');
-    const closeBtn = document.getElementById('modal-close');
+function renderBidSchedule() {
+    const latestContainer = document.getElementById('latest-bid-container');
+    const archiveContainer = document.getElementById('archive-bid-container');
+    if (!latestContainer || !bidScheduleData) return;
 
-    if (closeBtn && modal) {
-        closeBtn.onclick = () => modal.classList.remove('active');
-        modal.onclick = (e) => {
-            if (e.target === modal) modal.classList.remove('active');
-        };
+    latestContainer.innerHTML = '';
+    archiveContainer.innerHTML = '';
+
+    const sortedData = [...bidScheduleData].sort((a, b) => new Date(b.bid_date) - new Date(a.bid_date));
+
+    sortedData.forEach((bid, index) => {
+        const card = document.createElement('div');
+        card.className = `bid-card ${index > 0 ? 'archive' : ''}`;
+
+        let itemsHtml = '';
+        bid.items.forEach(item => {
+            if (item.category === 'PS カツオ' || item.volume <= 0) return;
+            itemsHtml += `
+                <tr>
+                    <td>${item.category}</td>
+                    <td>${item.size}</td>
+                    <td>${item.type}</td>
+                    <td class="volume-val">${item.volume.toFixed(1)}<span class="volume-unit">t</span></td>
+                </tr>
+            `;
+        });
+
+        card.innerHTML = `
+            <div class="bid-card-header">
+                <div class="bid-info-main">
+                    <h2>${bid.vessel_name}</h2>
+                    <div class="bid-dates">
+                        <span><span class="bid-date-item-label">入札予定日:</span>${bid.bid_date}</span>
+                        <span><span class="bid-date-item-label">情報提供:</span>${bid.delivery_date}</span>
+                    </div>
+                </div>
+                <div class="vessel-badge" style="font-size: 1rem; padding: 5px 12px;">🚢 ${bid.tonnage}t積</div>
+            </div>
+            <div class="bid-sea-area">
+                <span class="sea-area-title">📍 操業海域</span>
+                <div class="sea-area-coords">
+                    <span>${bid.sea_area.lat}</span>
+                    <span>${bid.sea_area.lon}</span>
+                </div>
+            </div>
+            <div class="bid-table-container">
+                <table class="bid-table">
+                    <thead>
+                        <tr><th>カテゴリ</th><th>サイズ</th><th>区分</th><th style="text-align: right;">数量</th></tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                        <tr class="category-row">
+                            <td colspan="3">合計重量 (Bカツオ等)</td>
+                            <td class="volume-val">${bid.total_volume.toFixed(1)}<span class="volume-unit">t</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        if (index === 0) {
+            latestContainer.appendChild(card);
+        } else {
+            archiveContainer.appendChild(card);
+        }
+    });
+
+    if (sortedData.length <= 1) {
+        const archiveSection = document.querySelector('.archive-section');
+        if (archiveSection) archiveSection.style.display = 'none';
     }
 }
 
-function setupTabs() {
-    const tabButtons = document.querySelectorAll('.tab-item');
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const tabId = btn.dataset.tab;
-            if (tabId === activeTab) return;
-
-            tabButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-
-            document.querySelectorAll('.tab-view').forEach(view => view.classList.remove('active'));
-            document.getElementById(`view-${tabId}`).classList.add('active');
-
-            activeTab = tabId;
-
-            if (tabId === 'charts') {
-                renderDashboard();
-            }
-        });
-    });
-}
-
-function filterDataByRange(portData, range) {
-    if (!portData || range === 'all') return portData;
-    const now = moment();
-    const result = {};
-    const availableSizes = Object.keys(portData);
-    availableSizes.forEach(size => {
-        if (portData[size]) {
-            result[size] = portData[size].filter(d => {
-                const date = moment(d.date);
-                return now.diff(date, 'days') <= parseInt(range);
-            });
-        }
-    });
-    return result;
-}
-
-
-
-// 単純移動平均 (SMA) を計算する関数
 function calculateSimpleMovingAverage(data, windowSize) {
     if (!data || data.length < windowSize) return data.map(d => ({ x: d.date, y: null }));
-
     let smaData = [];
     for (let i = 0; i < data.length; i++) {
         if (i < windowSize - 1) {
@@ -336,27 +355,21 @@ function calculateSimpleMovingAverage(data, windowSize) {
 }
 
 const mainSizesForCharts = ['1.8kg下', '1.8kg上', '2.5kg上', '4.5kg上'];
-
 const chartColors = {
-    '1.8kg下': { border: 'rgb(255, 99, 132)', bg: 'rgba(255, 99, 132, 0.5)' }, // 赤
-    '1.8kg上': { border: 'rgb(54, 162, 235)', bg: 'rgba(54, 162, 235, 0.5)' }, // 青
-    '2.5kg上': { border: 'rgb(255, 206, 86)', bg: 'rgba(255, 206, 86, 0.5)' }, // 黄
-    '4.5kg上': { border: 'rgb(75, 192, 192)', bg: 'rgba(75, 192, 192, 0.5)' }  // 緑
+    '1.8kg下': { border: 'rgb(255, 99, 132)', bg: 'rgba(255, 99, 132, 0.5)' },
+    '1.8kg上': { border: 'rgb(54, 162, 235)', bg: 'rgba(54, 162, 235, 0.5)' },
+    '2.5kg上': { border: 'rgb(255, 206, 86)', bg: 'rgba(255, 206, 86, 0.5)' },
+    '4.5kg上': { border: 'rgb(75, 192, 192)', bg: 'rgba(75, 192, 192, 0.5)' }
 };
 
 function updateOrCreateChart(port, portData) {
     const ctx = document.getElementById(`chart-${port}`);
     if (!ctx) return;
-
     const datasets = [];
-
     mainSizesForCharts.forEach(size => {
         const dataArr = portData[size];
         if (!dataArr || dataArr.length === 0) return;
-
         const color = chartColors[size] || { border: '#999', bg: '#999' };
-
-        // 1. 価格推移（折れ線）
         datasets.push({
             type: 'line',
             label: `${size} 価格`,
@@ -364,15 +377,13 @@ function updateOrCreateChart(port, portData) {
             borderColor: color.border,
             backgroundColor: color.border,
             borderWidth: 2,
-            tension: 0.4, // 滑らかな曲線に
-            spanGaps: true, // データがない期間も線でつなぐ
+            tension: 0.4,
+            spanGaps: true,
             yAxisID: 'y',
             pointRadius: 5,
             pointHoverRadius: 8,
             fill: false
         });
-
-        // 2. 5日移動平均（点線）
         const smaData = calculateSimpleMovingAverage(dataArr, 5);
         datasets.push({
             type: 'line',
@@ -381,15 +392,12 @@ function updateOrCreateChart(port, portData) {
             borderColor: color.border,
             borderWidth: 1,
             borderDash: [5, 5],
-            tension: 0.4, // 滑らかに
+            tension: 0.4,
             spanGaps: true,
             pointRadius: 0,
             yAxisID: 'y',
-            fill: false,
-            hidden: false
+            fill: false
         });
-
-        // 3. 水揚げ量（棒グラフ）
         datasets.push({
             type: 'bar',
             label: `${size} 水揚量`,
@@ -397,21 +405,13 @@ function updateOrCreateChart(port, portData) {
             backgroundColor: color.bg,
             borderColor: 'transparent',
             yAxisID: 'yVolume',
-            barPercentage: 0.5,
-            hidden: false // デフォルトで表示
+            barPercentage: 0.5
         });
-
-        // 4. 昨対比 (削除済み)
     });
 
-
-    // --- 自動スケーリング計算 ---
-    let minPrice = Infinity;
-    let maxPrice = -Infinity;
-    let maxVolume = 0;
-
+    let minPrice = Infinity, maxPrice = -Infinity, maxVolume = 0;
     datasets.forEach(ds => {
-        if (ds.yAxisID === 'y' && !ds.hidden) {
+        if (ds.yAxisID === 'y') {
             ds.data.forEach(p => {
                 if (p.y !== null) {
                     if (p.y < minPrice) minPrice = p.y;
@@ -419,98 +419,38 @@ function updateOrCreateChart(port, portData) {
                 }
             });
         }
-        if (ds.yAxisID === 'yVolume' && !ds.hidden) {
+        if (ds.yAxisID === 'yVolume') {
             ds.data.forEach(p => {
                 if (p.y !== null && p.y > maxVolume) maxVolume = p.y;
             });
         }
     });
 
-    // データがない場合のデフォルト
     if (minPrice === Infinity) { minPrice = 200; maxPrice = 250; }
     if (maxVolume === 0) maxVolume = 100;
-
-    // マージン設定 (価格: ±10円程度, 水揚: +20%)
-    const suggestedMinPrice = Math.floor(minPrice - 10);
-    const suggestedMaxPrice = Math.ceil(maxPrice + 10);
-    const suggestedMaxVolume = Math.ceil(maxVolume * 1.2);
 
     const theme = themes[currentTheme];
     const chartOptions = {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-            mode: 'index',
-            intersect: true, // 点に直接触れた時のみ表示
-        },
-        onClick: (e, activeElements, chart) => {
-            // intersect: true なので、空白部分をクリックすると activeElements は空になる
-            if (activeElements.length === 0) {
-                // ツールチップを非表示にする
-                chart.tooltip.setActiveElements([], { x: 0, y: 0 });
-                chart.update();
-            }
-        },
-        elements: {
-            point: {
-                radius: 5,
-                hitRadius: 20, // タップ判定を広げて操作性を確保
-                hoverRadius: 7
-            }
-        },
+        interaction: { mode: 'index', intersect: true },
         plugins: {
-            legend: {
-                position: 'top',
-                labels: {
-                    color: theme.text,
-                    boxWidth: 12,
-                    font: { size: 10 },
-                    filter: function (item, chart) {
-                        return true;
-                    }
-                }
-            },
+            legend: { position: 'top', labels: { color: theme.text, font: { size: 10 } } },
             tooltip: {
                 backgroundColor: theme.tooltipBg,
-                padding: 10,
                 callbacks: {
                     label: (context) => {
                         const label = context.dataset.label || '';
                         const val = context.parsed.y !== null ? context.parsed.y.toFixed(1) : '-';
-                        if (label.includes('価格') || label.includes('平均')) {
-                            return `${label}: ${val} 円`;
-                        } else {
-                            return `${label}: ${val} t`;
-                        }
+                        return label.includes('価格') || label.includes('平均') ? `${label}: ${val} 円` : `${label}: ${val} t`;
                     }
                 }
             }
         },
         scales: {
-            x: {
-                type: 'time',
-                time: { unit: 'day', displayFormats: { day: 'MM/DD' } },
-                grid: { color: theme.grid },
-                ticks: { color: theme.text }
-            },
-            y: {
-                title: { display: true, text: '単価 (円)', color: theme.text },
-                grid: { color: theme.grid },
-                ticks: { color: theme.text },
-                position: 'left',
-                // 自動計算した範囲を適用
-                min: suggestedMinPrice,
-                max: suggestedMaxPrice
-            },
-            yVolume: {
-                title: { display: true, text: '水揚量 (t)', color: theme.text },
-                grid: { display: false },
-                ticks: { color: theme.text },
-                position: 'right',
-                beginAtZero: true,
-                // 自動計算した最大値を適用
-                max: suggestedMaxVolume
-            }
+            x: { type: 'time', grid: { color: theme.grid }, ticks: { color: theme.text } },
+            y: { position: 'left', grid: { color: theme.grid }, ticks: { color: theme.text }, min: Math.floor(minPrice - 10), max: Math.ceil(maxPrice + 10) },
+            yVolume: { position: 'right', grid: { display: false }, ticks: { color: theme.text }, beginAtZero: true, max: Math.ceil(maxVolume * 1.2) }
         }
     };
 
@@ -533,31 +473,9 @@ function setupFilters() {
             renderDashboard();
         });
     });
-
-    const refreshBtn = document.getElementById('btn-refresh');
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            refreshBtn.textContent = '🔄 更新中...';
-            location.reload();
-        });
-    }
-
-    const reloadInsightBtn = document.getElementById('btn-reload-insight');
-    if (reloadInsightBtn) {
-        reloadInsightBtn.addEventListener('click', () => {
-            // ボタンを回転させるアニメーションクラスを一瞬付与（CSSでrotate定義済みならクラス切り替えもありだが、今回はtransformで対応済み）
-            // 再度 updateInsights を呼び出す
-            updateInsights();
-        });
-    }
-
-    // PDFボタン
-    const pdfBtn = document.getElementById('btn-pdf');
-    if (pdfBtn) {
-        pdfBtn.addEventListener('click', () => {
-            generateWeeklyReport();
-        });
-    }
+    document.getElementById('btn-refresh')?.addEventListener('click', () => location.reload());
+    document.getElementById('btn-reload-insight')?.addEventListener('click', () => updateInsights());
+    document.getElementById('btn-pdf')?.addEventListener('click', () => generateWeeklyReport());
 }
 
 function setupThemeSwitcher() {
@@ -567,376 +485,143 @@ function setupThemeSwitcher() {
             const theme = btn.dataset.theme;
             buttons.forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-
             document.body.className = `theme-${theme}`;
             currentTheme = theme;
-
             renderDashboard();
             renderSummary();
         });
     });
 }
 
-// --- データ駆動型 AI風分析ロジック ---
-
 function updateInsights() {
     const insightContent = document.getElementById('insight-content');
     if (!currentData || !insightContent) return;
-
-    // 全ての分析を実行してインサイト候補を収集
-    let insights = [];
-    insights = insights.concat(analyzeVolatility(currentData));
-    insights = insights.concat(analyzeSupplyDemand(currentData));
-    insights = insights.concat(analyzePortSpread(currentData));
-    insights = insights.concat(analyzeSizeTrend(currentData));
-
-    // インサイトがない場合のデフォルトメッセージ
-    if (insights.length === 0) {
-        insights.push({
-            title: "市場概況",
-            text: "➡️ **横ばい**: 目立った価格変動は見られず、全般的に様子見ムードが漂っています。次回の水揚げ情報が待たれます。",
-            memo: "特筆すべき変動なし"
-        });
-    }
-
-    // ランダムに1つ選択して表示
+    let insights = [].concat(analyzeVolatility(currentData), analyzeSupplyDemand(currentData), analyzePortSpread(currentData), analyzeSizeTrend(currentData));
+    if (insights.length === 0) insights.push({ title: "市場概況", text: "➡️ **横ばい**: 目立った変動なし。", memo: "安定期" });
     const selected = insights[Math.floor(Math.random() * insights.length)];
-
-    insightContent.innerHTML = `
-        <p><strong>💡 AIアナリストの視点 (${selected.title}):</strong></p>
-        <p class="insight-text">${selected.text}</p>
-        <p class="insight-memo">Memo: ${selected.memo}</p>
-    `;
+    insightContent.innerHTML = `<p><strong>💡 AIアナリストの視点 (${selected.title}):</strong></p><p class="insight-text">${selected.text}</p><p class="insight-memo">Memo: ${selected.memo}</p>`;
 }
 
-// 1. 急騰・急落アラート（前日比 ±10円以上）
 function analyzeVolatility(data) {
     const results = [];
     ports.forEach(port => {
-        const portData = data[port];
-        if (!portData) return;
-        Object.keys(portData).forEach(size => {
-            const arr = portData[size];
+        Object.keys(data[port] || {}).forEach(size => {
+            const arr = data[port][size];
             if (arr.length < 2) return;
-            const latest = arr[arr.length - 1];
-            const prev = arr[arr.length - 2];
-            const diff = latest.price - prev.price;
-
-            if (diff >= 10) {
-                results.push({
-                    title: "急騰アラート",
-                    text: `📈 **${port} ${size}** が前日比 <span class="diff-up">+${diff.toFixed(1)}円</span> の急騰！供給不足により買い注文が殺到している可能性があります。`,
-                    memo: `${latest.date}時点`
-                });
-            } else if (diff <= -10) {
-                results.push({
-                    title: "急落アラート",
-                    text: `📉 **${port} ${size}** が前日比 <span class="diff-down">${diff.toFixed(1)}円</span> の急落。まとまった水揚げにより相場が一時的に崩れています。`,
-                    memo: `${latest.date}時点`
-                });
-            }
+            const diff = arr[arr.length - 1].price - arr[arr.length - 2].price;
+            if (Math.abs(diff) >= 10) results.push({ title: diff > 0 ? "急騰アラート" : "急落アラート", text: `📊 **${port} ${size}** が前日比 ${diff > 0 ? '+' : ''}${diff.toFixed(1)}円。`, memo: `${arr[arr.length - 1].date}` });
         });
     });
     return results;
 }
 
-// 2. 需給ギャップ分析（水揚げ増なのに価格上昇、またはその逆）
 function analyzeSupplyDemand(data) {
     const results = [];
     ports.forEach(port => {
-        const portData = data[port];
-        if (!portData) return;
-        Object.keys(portData).forEach(size => {
-            const arr = portData[size];
+        Object.keys(data[port] || {}).forEach(size => {
+            const arr = data[port][size];
             if (arr.length < 2) return;
-            const latest = arr[arr.length - 1];
-            const prev = arr[arr.length - 2];
-            const priceDiff = latest.price - prev.price;
-            const volDiff = latest.volume - prev.volume;
-
-            // 水揚げ増 (+20t以上) なのに 価格上昇 (+2円以上)
-            if (volDiff >= 20 && priceDiff >= 2) {
-                results.push({
-                    title: "需給ギャップ（強気）",
-                    text: `🔥 **${port} ${size}** は水揚げが増加（+${volDiff.toFixed(0)}t）したにも関わらず、単価が上昇しています。実需が非常に強く、相場は底堅い動きです。`,
-                    memo: "供給増を吸収する強い需要あり"
-                });
-            }
-            // 水揚げ減 (-20t以下) なのに 価格下落 (-2円以上)
-            if (volDiff <= -20 && priceDiff <= -2) {
-                results.push({
-                    title: "需給ギャップ（弱気）",
-                    text: `❄️ **${port} ${size}** は水揚げが減少しましたが、単価は下落しました。買い気が薄く、市場の関心が低下している恐れがあります。`,
-                    memo: "供給減でも買われない展開"
-                });
-            }
+            const priceDiff = arr[arr.length - 1].price - arr[arr.length - 2].price;
+            const volDiff = arr[arr.length - 1].volume - arr[arr.length - 2].volume;
+            if (volDiff >= 20 && priceDiff >= 2) results.push({ title: "需給ギャップ（強気）", text: `🔥 **${port} ${size}** 水揚げ増(+${volDiff.toFixed(0)}t)でも単価上昇。実需強。`, memo: "底堅い推移" });
         });
     });
     return results;
 }
 
-// 3. 港間スプレッド分析（同サイズの価格差が20円以上）
 function analyzePortSpread(data) {
     const results = [];
-    const targetSizes = ["4.5kg上", "2.5kg上", "1.8kg上"];
-
-    // 焼津 vs 枕崎
-    targetSizes.forEach(size => {
-        const p1 = getLatestData(data, "焼津", size);
-        const p2 = getLatestData(data, "枕崎", size);
-        if (!p1 || !p2 || p1.date !== p2.date) return; // 日付がズレている場合は除外
-
+    ["4.5kg上", "2.5kg上", "1.8kg上"].forEach(size => {
+        const p1 = getLatestData(data, "焼津", size), p2 = getLatestData(data, "枕崎", size);
+        if (!p1 || !p2 || p1.date !== p2.date) return;
         const spread = p1.price - p2.price;
-        if (spread >= 20) {
-            results.push({
-                title: "港間格差（焼津高・枕崎安）",
-                text: `⚖️ **${size}** において、焼津が枕崎より <span class="diff-up">${spread.toFixed(1)}円</span> 高くなっています。枕崎での仕入れに割安感が出ています。`,
-                memo: `焼津:${p1.price}円 vs 枕崎:${p2.price}円`
-            });
-        } else if (spread <= -20) {
-            results.push({
-                title: "港間格差（枕崎高・焼津安）",
-                text: `⚖️ **${size}** において、枕崎が焼津より <span class="diff-up">${Math.abs(spread).toFixed(1)}円</span> 高値をつけています。焼津相場の出遅れ感が意識される展開です。`,
-                memo: `枕崎:${p2.price}円 vs 焼津:${p1.price}円`
-            });
-        }
+        if (Math.abs(spread) >= 20) results.push({ title: "港間格差", text: `⚖️ **${size}** において、${spread > 0 ? '焼津' : '枕崎'}が他方より ${Math.abs(spread).toFixed(1)}円 高くなっています。`, memo: `${p1.price}円 vs ${p2.price}円` });
     });
     return results;
 }
 
-// 4. サイズ別トレンド分析（大型 vs 小型）
 function analyzeSizeTrend(data) {
     const results = [];
     ports.forEach(port => {
-        const large = getLatestData(data, port, "4.5kg上");
-        const small = getLatestData(data, port, "1.8kg下");
-        if (!large || !small || large.date !== small.date) return;
-
-        // 前日比が取得できるか確認
-        const largePrev = getPrevData(data, port, "4.5kg上");
-        const smallPrev = getPrevData(data, port, "1.8kg下");
-        if (!largePrev || !smallPrev) return;
-
-        const largeDiff = large.price - largePrev.price;
-        const smallDiff = small.price - smallPrev.price;
-
-        // 大型が上がって(+5以上)、小型が下がったor変わらず(0以下)
-        if (largeDiff >= 5 && smallDiff <= 0) {
-            results.push({
-                title: "サイズ選別（大型高）",
-                text: `📏 **${port}** では大型魚（4.5kg上）に人気が集中し独歩高となっています。小型魚との価格差が拡大しており、サイズによる二極化が進行中です。`,
-                memo: `大型:+${largeDiff}円 / 小型:${smallDiff}円`
-            });
-        }
+        const large = getLatestData(data, port, "4.5kg上"), small = getLatestData(data, port, "1.8kg下");
+        const lPrev = getPrevData(data, port, "4.5kg上"), sPrev = getPrevData(data, port, "1.8kg下");
+        if (large && small && lPrev && sPrev && (large.price - lPrev.price >= 5) && (small.price - sPrev.price <= 0))
+            results.push({ title: "サイズ選別", text: `📏 **${port}** 大型魚は独歩高。小型魚との二極化。`, memo: "大型人気集中" });
     });
     return results;
 }
 
-function getLatestData(data, port, size) {
-    if (!data[port] || !data[port][size]) return null;
-    const arr = data[port][size];
-    return arr.length > 0 ? arr[arr.length - 1] : null;
-}
+function getLatestData(data, port, size) { const arr = (data[port] || {})[size]; return arr && arr.length > 0 ? arr[arr.length - 1] : null; }
+function getPrevData(data, port, size) { const arr = (data[port] || {})[size]; return arr && arr.length > 1 ? arr[arr.length - 2] : null; }
 
-function getPrevData(data, port, size) {
-    if (!data[port] || !data[port][size]) return null;
-    const arr = data[port][size];
-    return arr.length > 1 ? arr[arr.length - 2] : null;
-}
-
-// 船舶情報表示関数は削除されました
-
-// ============================================================
-// 週報PDF生成 (html2canvas スクリーンショット方式)
-// ============================================================
 async function generateWeeklyReport() {
     const btn = document.getElementById('btn-pdf');
-    if (btn) { btn.textContent = '… 生成中'; btn.disabled = true; }
-
-    console.log("PDF生成を開始します...");
-
+    if (btn) { btn.textContent = '… 戦略レポート生成中'; btn.disabled = true; }
     try {
-        // ライブラリの存在チェック
-        if (typeof window.jspdf === 'undefined' || typeof window.html2canvas === 'undefined') {
-            throw new Error('PDF生成ライブラリ (jsPDF/html2canvas) がロードされていません。');
-        }
-
         const { jsPDF } = window.jspdf;
-        const pageW = 210;
-        const pageH = 297;
-        const margin = 10;
-        const contentW = pageW - margin * 2;
-
+        const pageW = 210, pageH = 297, margin = 15, contentW = pageW - margin * 2;
         const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
-        let isFirstPage = true;
-
-        // --- ① サマリーセクションをキャプチャ ---
-        console.log("サマリーセクションをキャプチャ中...");
-        const summaryContainer = document.getElementById('summary-container');
-        if (!summaryContainer) {
-            console.error("summary-container が見つかりません");
-        } else {
-            const canvas = await html2canvas(summaryContainer, {
-                scale: 1.5,
-                backgroundColor: getComputedStyle(document.body).getPropertyValue('--bg-color').trim() || '#0d1117',
-                useCORS: true,
-                logging: false
-            });
-            const imgData = canvas.toDataURL('image/jpeg', 0.9);
-
-
-
-            const imgH = canvas.width > 0 ? (contentW * (canvas.height / canvas.width)) : 0;
-            console.log(`サマリーサイズ: ${canvas.width}x${canvas.height}, 描画高: ${imgH}mm`);
-
-            if (imgH <= 0 || isNaN(imgH) || !isFinite(imgH)) {
-                throw new Error('サマリーセクションの画像変換に失敗しました（サイズ異常）。');
-            }
-
-            if (!isFirstPage) doc.addPage();
-            isFirstPage = false;
-
-            // ページ内に収まるように調整
-            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2), undefined, 'FAST');
-            console.log("サマリーキャプチャ完了");
+        doc.setFillColor(13, 17, 23); doc.rect(0, 0, pageW, 25, 'F');
+        doc.setTextColor(88, 166, 255); doc.setFontSize(18); doc.text("鰹相場 戦略分析レポート (Weekly Insights)", margin, 17);
+        doc.setFontSize(8); doc.setTextColor(139, 148, 158); doc.text(`発行日: ${moment().format('YYYY/MM/DD')} | Confidential`, pageW - margin - 50, 17);
+        let yPos = 35;
+        const insightCard = document.querySelector('.insight-card');
+        if (insightCard) {
+            const canvas = await html2canvas(insightCard, { scale: 2, backgroundColor: '#0d1117' });
+            const imgH = contentW * (canvas.height / canvas.width);
+            doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, yPos, contentW, imgH);
+            yPos += imgH + 10;
         }
-
-        // --- ② グラフタブに切り替えてキャプチャ ---
-        console.log("グラフセクションをキャプチャ中...");
-        const chartView = document.getElementById('chart-view');
-        const summaryView = document.getElementById('summary-view');
-
-        let chartTabWasHidden = false;
-        if (chartView && (chartView.style.display === 'none' || !chartView.classList.contains('active'))) {
-            chartTabWasHidden = true;
-            chartView.style.display = 'block';
-            chartView.classList.add('active');
-            if (summaryView) {
-                summaryView.style.display = 'none';
-                summaryView.classList.remove('active');
-            }
+        const summaryGrid = document.getElementById('summary-container');
+        if (summaryGrid) {
+            const canvas = await html2canvas(summaryGrid, { scale: 1.5, backgroundColor: '#0d1117' });
+            const imgH = contentW * (canvas.height / canvas.width);
+            if (yPos + imgH > pageH - 20) { doc.addPage(); yPos = margin; }
+            doc.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', margin, yPos, contentW, imgH);
+            yPos += imgH + 10;
         }
-
-        // 各港のグラフをキャプチャ
-        for (const port of ports) {
-            const chartCard = document.getElementById(`chart-${port}`)?.closest('.chart-card');
-            if (!chartCard) continue;
-
-            console.log(`${port} のグラフをキャプチャ中...`);
-            const canvas = await html2canvas(chartCard, {
-                scale: 1.5,
-                backgroundColor: getComputedStyle(document.body).getPropertyValue('--card-bg').trim() || '#161b22',
-                useCORS: true,
-                logging: false
-            });
-            const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            const imgH = canvas.width > 0 ? (contentW * (canvas.height / canvas.width)) : 0;
-            console.log(`${port} グラフサイズ: ${canvas.width}x${canvas.height}, 描画高: ${imgH}mm`);
-
-            if (imgH <= 0 || isNaN(imgH) || !isFinite(imgH)) {
-                console.warn(`${port} のグラフサイズが異常なためスキップします。`);
-                continue;
-            }
-
-            doc.addPage();
-            doc.addImage(imgData, 'JPEG', margin, margin, contentW, Math.min(imgH, pageH - margin * 2), undefined, 'FAST');
+        const latestBid = document.getElementById('latest-bid-container');
+        if (latestBid && latestBid.children.length > 0) {
+            doc.addPage(); yPos = 20; doc.setFontSize(14); doc.setTextColor(88, 166, 255); doc.text("🚢 今後の入札予定・供給予測", margin, yPos);
+            const canvas = await html2canvas(latestBid.firstChild, { scale: 1.5, backgroundColor: '#0d1117' });
+            doc.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', margin, yPos + 8, contentW, contentW * (canvas.height / canvas.width));
         }
-
-        // グラフタブを元に戻す
-        if (chartTabWasHidden) {
-            if (chartView) {
-                chartView.style.display = 'none';
-                chartView.classList.remove('active');
-            }
-            if (summaryView) {
-                summaryView.style.display = 'block';
-                summaryView.classList.add('active');
-            }
+        for (const port of ["枕崎", "焼津"]) {
+            const card = document.getElementById(`chart-${port}`)?.closest('.chart-card');
+            if (!card) continue;
+            doc.addPage(); doc.setFontSize(14); doc.setTextColor(88, 166, 255); doc.text(`📈 推移分析: ${port}`, margin, 20);
+            const canvas = await html2canvas(card, { scale: 1.5, backgroundColor: '#161b22' });
+            doc.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', margin, 30, contentW, contentW * (canvas.height / canvas.width));
         }
-
-        // --- ③ ダウンロード ---
-        console.log("PDFを保存中...");
-        const filename = `鱚相場週報_${moment().format('YYYYMMDD')}.pdf`;
-        doc.save(filename);
-        console.log("PDF生成が正常に完了しました。");
-
-    } catch (err) {
-        console.error('PDF生成エラーの詳細:', err);
-        alert(`【Ver.2026/02/18-F】PDFの生成に失敗しました。\nエラー: ${err.message || '不明なエラー'}\n通信状態やブラウザのキャッシュをクリアして再度お試しください。`);
-    } finally {
-        if (btn) { btn.textContent = '📄 週報PDF'; btn.disabled = false; }
-    }
+        doc.save(`鰹相場レポート_${moment().format('YYYYMMDD')}.pdf`);
+    } catch (err) { alert(`生成失敗: ${err.message}`); }
+    finally { if (btn) { btn.textContent = '📄 週報PDF (高度分析)'; btn.disabled = false; } }
 }
 
+function setupModal() {
+    const modal = document.getElementById('detail-modal'), btn = document.getElementById('modal-close');
+    if (btn && modal) { btn.onclick = () => modal.classList.remove('active'); modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); }; }
+}
 
-// ============================================================
-// 相場メモ機能 (localStorage)
-// ============================================================
+function setupTabs() {
+    const btns = document.querySelectorAll('.tab-item');
+    btns.forEach(btn => btn.addEventListener('click', () => {
+        const id = btn.dataset.tab; if (id === activeTab) return;
+        btns.forEach(b => b.classList.remove('active')); btn.classList.add('active');
+        document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active')); document.getElementById(`view-${id}`).classList.add('active');
+        activeTab = id; if (id === 'charts') renderDashboard();
+    }));
+}
+
 const MEMO_KEY = 'katsuo_memos';
-
-function getAllMemos() {
-    try {
-        return JSON.parse(localStorage.getItem(MEMO_KEY) || '{}');
-    } catch { return {}; }
-}
-
-function saveMemo(date, port, text) {
-    const memos = getAllMemos();
-    if (!memos[date]) memos[date] = {};
-    if (text.trim()) {
-        memos[date][port] = text.trim();
-    } else {
-        delete memos[date][port];
-        if (Object.keys(memos[date]).length === 0) delete memos[date];
-    }
-    localStorage.setItem(MEMO_KEY, JSON.stringify(memos));
-}
-
-function getMemo(date, port) {
-    const memos = getAllMemos();
-    return (memos[date] && memos[date][port]) ? memos[date][port] : '';
-}
-
-function openMemoModal(date, port) {
-    const existing = getMemo(date, port);
-    const modal = document.getElementById('memo-modal');
-    const dateEl = document.getElementById('memo-date');
-    const portEl = document.getElementById('memo-port');
-    const textarea = document.getElementById('memo-textarea');
-    if (!modal || !textarea) return;
-
-    dateEl.textContent = `${port} / ${date}`;
-    portEl.dataset.date = date;
-    portEl.dataset.port = port;
-    textarea.value = existing;
-    modal.classList.add('active');
-    textarea.focus();
-}
-
+function getAllMemos() { try { return JSON.parse(localStorage.getItem(MEMO_KEY) || '{}'); } catch { return {}; } }
+function getMemo(d, p) { return (getAllMemos()[d] || {})[p] || ''; }
+function saveMemo(d, p, t) { const m = getAllMemos(); if (!m[d]) m[d] = {}; if (t.trim()) m[d][p] = t.trim(); else { delete m[d][p]; if (!Object.keys(m[d]).length) delete m[d]; } localStorage.setItem(MEMO_KEY, JSON.stringify(m)); }
+function openMemoModal(d, p) { const m = document.getElementById('memo-modal'), t = document.getElementById('memo-textarea'); if (!m || !t) return; document.getElementById('memo-date').textContent = `${p} / ${d}`; const pe = document.getElementById('memo-port'); pe.dataset.date = d; pe.dataset.port = p; t.value = getMemo(d, p); m.classList.add('active'); t.focus(); }
 function setupMemoModal() {
-    const modal = document.getElementById('memo-modal');
-    const saveBtn = document.getElementById('memo-save-btn');
-    const cancelBtn = document.getElementById('memo-cancel-btn');
-    const portEl = document.getElementById('memo-port');
-
-    if (!modal) return;
-
-    saveBtn && saveBtn.addEventListener('click', () => {
-        const date = portEl.dataset.date;
-        const port = portEl.dataset.port;
-        const text = document.getElementById('memo-textarea').value;
-        saveMemo(date, port, text);
-        modal.classList.remove('active');
-        renderSummary(); // メモアイコンを更新
-    });
-
-    cancelBtn && cancelBtn.addEventListener('click', () => {
-        modal.classList.remove('active');
-    });
-
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('active');
-    });
+    const m = document.getElementById('memo-modal'), s = document.getElementById('memo-save-btn'), c = document.getElementById('memo-cancel-btn'), p = document.getElementById('memo-port');
+    if (!m) return; s && s.addEventListener('click', () => { saveMemo(p.dataset.date, p.dataset.port, document.getElementById('memo-textarea').value); m.classList.remove('active'); renderSummary(); });
+    c && c.addEventListener('click', () => m.classList.remove('active')); m.addEventListener('click', (e) => { if (e.target === m) m.classList.remove('active'); });
 }
 
 document.addEventListener('DOMContentLoaded', initDashboard);
