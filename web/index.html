@@ -31,10 +31,8 @@
     <div class="container">
         <header class="app-header">
             <div class="header-overlay"></div>
-            <div class="theme-switcher">
-                <button class="btn-theme active" data-theme="dark">Dark</button>
-                <button class="btn-theme" data-theme="light">Light</button>
-                <button class="btn-theme" data-theme="ocean">Ocean</button>
+            <div class="header-controls">
+                <button id="btn-settings" class="btn-icon" title="設定">⚙️</button>
             </div>
             <div class="logo-container">
                 <img src="marucyou_mark_white.png" alt="Marucyou Logo" class="header-logo">
@@ -49,6 +47,78 @@
                 <button id="btn-refresh" class="btn-refresh">🔄 更新</button>
             </div>
         </header>
+
+        <!-- 設定モーダル -->
+        <div id="settings-modal" class="modal-overlay">
+            <div class="settings-content">
+                <div class="settings-header">
+                    <h3>⚙️ アプリ設定</h3>
+                    <button id="settings-close" class="btn-close">&times;</button>
+                </div>
+                <div class="settings-body">
+                    <!-- テーマ選択 (6色) -->
+                    <section class="settings-section">
+                        <h4>🎨 表示テーマ</h4>
+                        <div class="theme-grid">
+                            <button class="theme-option" data-theme="dark"><span
+                                    class="theme-preview dark"></span>Dark</button>
+                            <button class="theme-option" data-theme="light"><span
+                                    class="theme-preview light"></span>Light</button>
+                            <button class="theme-option" data-theme="ocean"><span
+                                    class="theme-preview ocean"></span>Ocean</button>
+                            <button class="theme-option" data-theme="forest"><span
+                                    class="theme-preview forest"></span>Forest</button>
+                            <button class="theme-option" data-theme="sunset"><span
+                                    class="theme-preview sunset"></span>Sunset</button>
+                            <button class="theme-option" data-theme="graphite"><span
+                                    class="theme-preview graphite"></span>Graphite</button>
+                        </div>
+                    </section>
+
+                    <!-- 文字サイズ -->
+                    <section class="settings-section">
+                        <h4>📏 文字サイズ</h4>
+                        <div class="setting-row">
+                            <button class="btn-setting-toggle" data-font="small">小</button>
+                            <button class="btn-setting-toggle active" data-font="medium">中</button>
+                            <button class="btn-setting-toggle" data-font="large">大</button>
+                        </div>
+                    </section>
+
+                    <!-- 追加オプション (6項目) -->
+                    <section class="settings-section">
+                        <h4>🚀 高度な設定</h4>
+                        <div class="option-list">
+                            <label class="option-item">
+                                <span>港の表示: 枕崎</span>
+                                <input type="checkbox" id="check-port-makurazaki" checked>
+                            </label>
+                            <label class="option-item">
+                                <span>港の表示: 焼津</span>
+                                <input type="checkbox" id="check-port-yaizu" checked>
+                            </label>
+                            <label class="option-item">
+                                <span>港の表示: 山川</span>
+                                <input type="checkbox" id="check-port-yamagawa" checked>
+                            </label>
+                            <hr>
+                            <label class="option-item">
+                                <span>コンパクトモード</span>
+                                <input type="checkbox" id="check-compact">
+                            </label>
+                            <label class="option-item">
+                                <span>アニメーション有効</span>
+                                <input type="checkbox" id="check-animation" checked>
+                            </label>
+                            <label class="option-item">
+                                <span>グラフ塗りつぶし</span>
+                                <input type="checkbox" id="check-chart-fill" checked>
+                            </label>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
 
         <nav class="main-tabs">
             <button class="tab-item active" data-tab="summary">📋 最新相場一覧</button>
