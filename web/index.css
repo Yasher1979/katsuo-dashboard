@@ -950,9 +950,26 @@ details[open] .archive-summary::before {
     padding-top: 12px;
 }
 
+.news-source-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
 .news-source {
     font-weight: 600;
     color: var(--text-color);
+}
+
+.read-more {
+    color: var(--accent-color);
+    font-weight: 700;
+    border-bottom: 1px dashed transparent;
+    transition: all 0.2s;
+}
+
+.news-card:hover .read-more {
+    border-bottom-color: var(--accent-color);
 }
 
 .loading-news {

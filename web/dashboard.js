@@ -418,8 +418,11 @@ function renderNews(isLoadMore = false) {
             <h4>${news.title}</h4>
             <div class="news-summary">${news.summary}</div>
             <div class="news-footer">
-                <span class="news-source">${news.source}</span>
-                <span class="news-date">${news.date}</span>
+                <div class="news-source-group">
+                    <span class="news-source">${news.source}</span>
+                    <span class="news-date">${news.date}</span>
+                </div>
+                <span class="read-more">記事詳細 ↗</span>
             </div>
         `;
         container.appendChild(card);
