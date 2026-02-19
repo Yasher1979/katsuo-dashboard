@@ -1,50 +1,66 @@
 :root {
-    /* デフォルト (Dark) */
-    --bg-color: #0d1117;
-    --card-bg: rgba(22, 27, 34, 0.8);
-    --text-color: #c9d1d9;
+    /* プレミアム・ダークテーマ (Default) */
+    --bg-color: #05070a;
+    --card-bg: rgba(13, 17, 23, 0.7);
+    --glass-bg: rgba(22, 27, 34, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --text-color: #f0f6fc;
     --text-muted: #8b949e;
     --accent-color: #58a6ff;
-    --border-color: #30363d;
-    --grid-color: rgba(48, 54, 61, 0.3);
-    --header-gradient: linear-gradient(90deg, #58a6ff, #bc8cff);
-    --btn-bg: rgba(22, 27, 34, 1);
-    --diff-up: #ff6b6b;
-    --diff-down: #51cf66;
+    --accent-glow: rgba(88, 166, 255, 0.4);
+    --border-color: rgba(48, 54, 61, 0.6);
+    --grid-color: rgba(48, 54, 61, 0.2);
+    --header-gradient: linear-gradient(135deg, #79c0ff 0%, #bc8cff 100%);
+    --btn-bg: rgba(33, 38, 45, 0.8);
+    --diff-up: #ff7b72;
+    --diff-down: #3fb950;
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 .theme-light {
     --bg-color: #f6f8fa;
-    --card-bg: rgba(255, 255, 255, 0.9);
+    --card-bg: rgba(255, 255, 255, 0.8);
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(0, 0, 0, 0.05);
     --text-color: #1f2328;
     --text-muted: #656d76;
     --accent-color: #0969da;
+    --accent-glow: rgba(9, 105, 218, 0.2);
     --border-color: #d0d7de;
     --grid-color: rgba(208, 215, 222, 0.5);
-    --header-gradient: linear-gradient(90deg, #0969da, #8250df);
+    --header-gradient: linear-gradient(135deg, #0969da 0%, #8250df 100%);
     --btn-bg: #ffffff;
+    --card-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
 }
 
 .theme-ocean {
-    --bg-color: #001a33;
-    --card-bg: rgba(0, 35, 70, 0.85);
-    --text-color: #e6f1ff;
+    --bg-color: #000c1a;
+    --card-bg: rgba(0, 26, 51, 0.8);
+    --glass-bg: rgba(0, 35, 70, 0.6);
+    --glass-border: rgba(0, 212, 255, 0.1);
+    --text-color: #f0f7ff;
     --text-muted: #aabccf;
     --accent-color: #00d4ff;
-    --border-color: #004d99;
-    --grid-color: rgba(0, 77, 153, 0.4);
-    --header-gradient: linear-gradient(90deg, #00d4ff, #0077ff);
-    --btn-bg: #00264d;
+    --accent-glow: rgba(0, 212, 255, 0.4);
+    --border-color: rgba(0, 77, 153, 0.5);
+    --grid-color: rgba(0, 77, 153, 0.3);
+    --header-gradient: linear-gradient(135deg, #00d4ff 0%, #0077ff 100%);
+    --btn-bg: rgba(0, 38, 77, 0.8);
+    --card-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
 body {
     background-color: var(--bg-color);
+    background-image:
+        radial-gradient(at 0% 0%, rgba(88, 166, 255, 0.03) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(188, 140, 255, 0.03) 0px, transparent 50%);
     color: var(--text-color);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: 'Outfit', 'Noto Sans JP', -apple-system, sans-serif;
     margin: 0;
     padding: 20px;
-    transition: background-color 0.4s, color 0.4s;
+    transition: all 0.5s ease;
     overflow-x: hidden;
+    line-height: 1.6;
 }
 
 /* スプラッシュ画面（透かし演出） */
@@ -220,11 +236,15 @@ h1 {
 .main-tabs {
     display: flex;
     justify-content: center;
-    gap: 4px;
-    margin-bottom: 25px;
-    background: var(--border-color);
-    padding: 4px;
-    border-radius: 12px;
+    gap: 8px;
+    margin-bottom: 30px;
+    background: var(--glass-bg);
+    padding: 6px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--card-shadow);
 }
 
 .tab-item {
@@ -232,18 +252,24 @@ h1 {
     background: transparent;
     border: none;
     color: var(--text-muted);
-    padding: 12px;
+    padding: 14px;
     font-size: 0.95rem;
     font-weight: 600;
     cursor: pointer;
-    border-radius: 8px;
-    transition: all 0.3s;
+    border-radius: 12px;
+    transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .tab-item.active {
-    background: var(--bg-color);
-    color: var(--accent-color);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    background: var(--accent-color);
+    color: white;
+    box-shadow: 0 4px 15px var(--accent-glow);
+    transform: translateY(-1px);
+}
+
+.tab-item:hover:not(.active) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-color);
 }
 
 /* ビューの切り替え */
@@ -375,6 +401,52 @@ h1 {
     display: grid;
     grid-template-columns: 1fr;
     gap: 30px;
+}
+
+/* カードの共通プレミアムスタイル */
+.summary-card,
+.news-card,
+.bid-card {
+    background: var(--card-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 24px;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: var(--card-shadow);
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.summary-card:hover,
+.news-card:hover,
+.bid-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(88, 166, 255, 0.3);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+}
+
+.summary-card::before,
+.news-card::before,
+.bid-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+            transparent,
+            rgba(255, 255, 255, 0.03),
+            transparent);
+    transition: 0.5s;
+}
+
+.summary-card:hover::before,
+.news-card:hover::before,
+.bid-card:hover::before {
+    left: 100%;
 }
 
 .chart-card {
