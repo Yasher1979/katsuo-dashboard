@@ -404,7 +404,7 @@ function updateOrCreateChart(port, portData) {
         scales: {
             x: {
                 type: 'time',
-                time: { unit: 'day', displayFormats: { day: 'M/d' }, tooltipFormat: 'M/d' },
+                time: { unit: 'day', displayFormats: { day: 'M/D' }, tooltipFormat: 'M/D' },
                 grid: { color: theme.grid, borderDash: [2, 2] },
                 ticks: { color: theme.text, font: { size: 10 }, maxRotation: 0 },
                 title: { display: true, text: '日付', color: theme.text, font: { size: 10 } }
