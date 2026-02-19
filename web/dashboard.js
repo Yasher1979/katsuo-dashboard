@@ -321,11 +321,18 @@ function updateOrCreateChart(port, portData) {
         onClick: (e, elements, chart) => {
             const hud = document.getElementById('premium-hud');
 
-            // すでにHUDが表示されている間にチャートをタップした場合、HUDを閉じることを優先
+            // すでにHUDが表示されている間にタップした場合、HUDを閉じる。
+            // 閉じた際、Chart.jsのこのイベントが継続して再オープンするのを防ぐため、一旦終了する。
             if (hud && hud.classList.contains('active')) {
                 hud.classList.remove('active');
+                // 閉じた直後であることをマーキング
+                hud.dataset.justClosed = "true";
+                setTimeout(() => delete hud.dataset.justClosed, 300);
                 return;
             }
+
+            // 閉じた瞬間の連打やバブリングによる再オープンを防止
+            if (hud && hud.dataset.justClosed) return;
 
             if (elements && elements.length > 0) {
                 const firstPoint = elements[0];
@@ -343,8 +350,13 @@ function updateOrCreateChart(port, portData) {
 
                 let gridHtml = '';
                 chart.data.datasets.forEach(ds => {
+                    // 平均線(pointRadius: 0)はHUDに含めない
                     if (ds.pointRadius === 0) return;
-                    const val = ds.data[firstPoint.index].y;
+
+                    // 【最重要】インデックスではなく日付(dateVal)で正確なデータを検索
+                    const entry = (ds.data || []).find(pt => pt.x === dateVal);
+                    const val = entry ? entry.y : null;
+
                     if (val !== null && val !== undefined) {
                         const unit = ds.yAxisID === 'yVolume' ? 't' : '円';
                         gridHtml += `
