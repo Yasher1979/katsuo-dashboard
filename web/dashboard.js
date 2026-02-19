@@ -322,142 +322,109 @@ function updateOrCreateChart(port, portData) {
             if (elements && elements.length > 0) {
                 const firstPoint = elements[0];
                 const dateVal = chart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index].x;
-                const dateObj = new Date(dateVal);
-                const fullDateStr = `${dateObj.getFullYear()}年${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
+                const d = new Date(dateVal);
+                const dateStr = `${d.getMonth() + 1}/${d.getDate()}`;
 
-                // 既存のオーバーレイを削除
-                document.querySelectorAll('.chart-overlay-detail').forEach(el => el.remove());
+                let hud = document.getElementById('premium-hud');
+                if (!hud) {
+                    hud = document.createElement('div');
+                    hud.id = 'premium-hud';
+                    hud.className = 'premium-hud-panel';
+                    document.body.appendChild(hud);
+                }
 
-                const overlay = document.createElement('div');
-                overlay.className = 'chart-overlay-detail';
-
-                let rowsHtml = '';
-                chart.data.datasets.forEach(dataset => {
-                    // 平均線や、ポイント表示のないデータは除外
-                    if (dataset.pointRadius === 0) return;
-
-                    const val = dataset.data[firstPoint.index].y;
+                let gridHtml = '';
+                chart.data.datasets.forEach(ds => {
+                    if (ds.pointRadius === 0) return;
+                    const val = ds.data[firstPoint.index].y;
                     if (val !== null && val !== undefined) {
-                        const unit = dataset.yAxisID === 'yVolume' ? 't' : '円';
-                        rowsHtml += `
-                            <div class="overlay-row">
-                                <span class="overlay-label">${dataset.label.replace('価格', '').replace('水揚量', '')}</span>
-                                <span class="overlay-value">${val.toLocaleString()}<span style="font-size:0.7rem;margin-left:2px">${unit}</span></span>
-                            </div>`;
+                        const unit = ds.yAxisID === 'yVolume' ? 't' : '円';
+                        gridHtml += `
+                        <div class="hud-item">
+                            <span class="hud-label">${ds.label.replace('価格', '').replace('水揚量', '')}</span>
+                            <span class="hud-value">${val.toLocaleString()}<span class="hud-unit">${unit}</span></span>
+                        </div>`;
                     }
                 });
 
-                overlay.innerHTML = `
-                    <div class="overlay-title"><span>📍 ${fullDateStr}</span></div>
-                    ${rowsHtml}
+                hud.innerHTML = `
+                    <div class="hud-header">
+                        <span class="hud-title">📊 ${dateStr} 詳細レポート</span>
+                        <button class="hud-close" onclick="document.getElementById('premium-hud').classList.remove('active')">&times;</button>
+                    </div>
+                    <div class="hud-grid">${gridHtml}</div>
                 `;
+                hud.classList.add('active');
 
-                // 配置位置の計算
-                const canvasRect = chart.canvas.getBoundingClientRect();
-                const container = chart.canvas.parentElement;
-
-                // オーバーレイをコンテナに追加
-                container.style.position = 'relative';
-                container.appendChild(overlay);
-
-                // コンテナの相対座標で配置
-                overlay.style.left = `${e.native.offsetX + 15}px`;
-                overlay.style.top = `${e.native.offsetY + 15}px`;
-
-                // 端で切れないように調整
-                const rect = overlay.getBoundingClientRect();
-                if (e.native.offsetX + rect.width + 20 > canvasRect.width) {
-                    overlay.style.left = `${e.native.offsetX - rect.width - 15}px`;
-                }
-
-                // 一定時間で消去
-                setTimeout(() => {
-                    overlay.style.opacity = '0';
-                    setTimeout(() => overlay.remove(), 300);
-                }, 3000);
+                const closeHandler = (ev) => {
+                    if (!hud.contains(ev.target) && ev.target !== chart.canvas) {
+                        hud.classList.remove('active');
+                        document.removeEventListener('click', closeHandler);
+                    }
+                };
+                setTimeout(() => document.addEventListener('click', closeHandler), 100);
             }
         },
         plugins: {
             legend: {
                 labels: { color: theme.text, font: { size: 10 } }
             },
-            tooltip: {
-                backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                titleColor: '#fff',
-                bodyColor: '#fff',
-                padding: 10,
-                displayColors: true,
-                callbacks: {
-                    title: (context) => {
-                        const date = new Date(context[0].parsed.x);
-                        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+            tooltip: { enabled: false },
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        displayFormats: { day: 'M/D' },
+                        tooltipFormat: 'YYYY年M月D日'
                     },
-                    label: (context) => {
-                        let label = context.dataset.label || '';
-                        if (label) label += ': ';
-                        if (context.parsed.y !== null) {
-                            label += context.parsed.y.toLocaleString();
-                            label += context.dataset.yAxisID === 'yVolume' ? ' t' : ' 円/kg';
+                    grid: { color: theme.grid },
+                    ticks: {
+                        color: theme.text,
+                        callback: function (val, index) {
+                            const date = new Date(val);
+                            return (date.getMonth() + 1) + '月' + date.getDate() + '日';
                         }
-                        return label;
                     }
+                },
+                y: {
+                    position: 'left',
+                    grid: { color: theme.grid },
+                    ticks: {
+                        color: theme.text,
+                        callback: (value) => value + ' 円'
+                    },
+                    title: {
+                        display: true,
+                        text: '価格 (円/kg)',
+                        color: theme.text,
+                        font: { size: 10 }
+                    },
+                    min: Math.floor(minP - 10),
+                    max: Math.ceil(maxP + 10)
+                },
+                yVolume: {
+                    position: 'right',
+                    grid: { display: false },
+                    ticks: {
+                        color: theme.text,
+                        callback: (value) => value + ' t'
+                    },
+                    title: {
+                        display: true,
+                        text: '水揚げ量 (t)',
+                        color: theme.text,
+                        font: { size: 10 }
+                    },
+                    beginAtZero: true,
+                    max: Math.ceil(maxV * 1.2)
                 }
             }
-        },
-        scales: {
-            x: {
-                type: 'time',
-                time: {
-                    unit: 'day',
-                    displayFormats: { day: 'M/D' },
-                    tooltipFormat: 'YYYY年M月D日'
-                },
-                grid: { color: theme.grid },
-                ticks: {
-                    color: theme.text,
-                    callback: function (val, index) {
-                        const date = new Date(val);
-                        return (date.getMonth() + 1) + '月' + date.getDate() + '日';
-                    }
-                }
-            },
-            y: {
-                position: 'left',
-                grid: { color: theme.grid },
-                ticks: {
-                    color: theme.text,
-                    callback: (value) => value + ' 円'
-                },
-                title: {
-                    display: true,
-                    text: '価格 (円/kg)',
-                    color: theme.text,
-                    font: { size: 10 }
-                },
-                min: Math.floor(minP - 10),
-                max: Math.ceil(maxP + 10)
-            },
-            yVolume: {
-                position: 'right',
-                grid: { display: false },
-                ticks: {
-                    color: theme.text,
-                    callback: (value) => value + ' t'
-                },
-                title: {
-                    display: true,
-                    text: '水揚げ量 (t)',
-                    color: theme.text,
-                    font: { size: 10 }
-                },
-                beginAtZero: true,
-                max: Math.ceil(maxV * 1.2)
-            }
-        }
-    };
+        };
 
-    if (charts[port]) { charts[port].data.datasets = datasets; charts[port].options = options; charts[port].update(); }
-    else if (typeof Chart !== 'undefined') { charts[port] = new Chart(ctx, { data: { datasets }, options: options }); }
+        if(charts[port]) { charts[port].data.datasets = datasets; charts[port].options = options; charts[port].update(); }
+    else if(typeof Chart !== 'undefined') { charts[port] = new Chart(ctx, { data: { datasets }, options: options });
+}
 }
 
 function setupFilters() {

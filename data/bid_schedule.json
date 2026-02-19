@@ -50,17 +50,17 @@
             },
             {
                 "category": "キワ(キメ)",
-                "size": "込",
+                "size": "3.0kg下",
                 "type": "入札",
-                "volume": 0
+                "volume": 10.0
             },
             {
                 "category": "ダルマ",
-                "size": "込",
+                "size": "1.5kg上",
                 "type": "入札",
-                "volume": 0
+                "volume": 11.0
             }
         ],
-        "total_volume": 260.0
+        "total_volume": 281.0
     }
 ]
