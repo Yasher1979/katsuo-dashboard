@@ -314,8 +314,33 @@ function updateOrCreateChart(port, portData) {
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
-            mode: 'index',
+            mode: 'nearest',
             intersect: false,
+        },
+        onClick: (e, elements, chart) => {
+            if (elements && elements.length > 0) {
+                const firstPoint = elements[0];
+                const label = chart.data.labels[firstPoint.index] || chart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index].x;
+                const dateObj = new Date(label);
+                const dateStr = `${dateObj.getFullYear()}年${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
+
+                let html = `<p><strong>📍 ${dateStr} の詳細データ</strong></p><ul class="insight-list">`;
+                chart.data.datasets.forEach(dataset => {
+                    const val = dataset.data[firstPoint.index].y;
+                    if (val !== null && val !== undefined) {
+                        const unit = dataset.yAxisID === 'yVolume' ? 't' : '円/kg';
+                        html += `<li>${dataset.label}: <span class="accent-text">${val.toLocaleString()}</span> ${unit}</li>`;
+                    }
+                });
+                html += `</ul>`;
+
+                const insightEl = document.getElementById('insight-content');
+                if (insightEl) {
+                    insightEl.innerHTML = html;
+                    // スムーズに分析エリアへスクロール（モバイル配慮）
+                    // insightEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            }
         },
         plugins: {
             legend: {
