@@ -21,9 +21,10 @@ async function initDashboard() {
         const startTime = Date.now();
 
         // データの並列ロード
-        const [marketRes, bidRes] = await Promise.all([
+        const [marketRes, bidRes, newsRes] = await Promise.all([
             fetch(`../data/katsuo_market_data.json?v=${Date.now()}`).catch(e => ({ ok: false })),
-            fetch(`../data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }))
+            fetch(`../data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false })),
+            fetch(`../data/katsuo_news.json?v=${Date.now()}`).catch(e => ({ ok: false }))
         ]);
 
         let mRes = marketRes;
@@ -34,11 +35,16 @@ async function initDashboard() {
         if (!bRes.ok) bRes = await fetch(`/data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }));
         if (bRes.ok) bidScheduleData = await bRes.json();
 
+        let nRes = newsRes;
+        if (!nRes.ok) nRes = await fetch(`/data/katsuo_news.json?v=${Date.now()}`).catch(e => ({ ok: false }));
+        if (nRes.ok) window.katsuoNewsData = await nRes.json();
+
         if (!currentData) throw new Error("Market data could not be loaded.");
 
         renderDashboard();
         renderSummary();
         renderBidSchedule();
+        renderNews();
         updateInsights();
         setupFilters();
         setupThemeSwitcher();
@@ -369,6 +375,33 @@ function setupMemoModal() {
     const m = document.getElementById('memo-modal'), s = document.getElementById('memo-save-btn'), c = document.getElementById('memo-cancel-btn'), p = document.getElementById('memo-port');
     if (!m) return; s.onclick = () => { saveMemo(p.dataset.date, p.dataset.port, document.getElementById('memo-textarea').value); m.classList.remove('active'); renderSummary(); };
     c.onclick = () => m.classList.remove('active'); m.onclick = (e) => { if (e.target === m) m.classList.remove('active'); };
+}
+
+function renderNews() {
+    const container = document.getElementById('news-container');
+    const data = window.katsuoNewsData;
+    if (!container || !data) return;
+    container.innerHTML = '';
+    data.forEach(news => {
+        const card = document.createElement('a');
+        card.className = 'news-card';
+        card.href = news.url;
+        card.target = '_blank';
+        let icon = '📰';
+        if (news.category === '漁況') icon = '🐟';
+        if (news.category === '燃費油') icon = '⛽';
+        if (news.category === '規制') icon = '⚖️';
+        card.innerHTML = `
+            <div class="news-category">${icon} ${news.category}</div>
+            <h4>${news.title}</h4>
+            <div class="news-summary">${news.summary}</div>
+            <div class="news-footer">
+                <span class="news-source">${news.source}</span>
+                <span class="news-date">${news.date}</span>
+            </div>
+        `;
+        container.appendChild(card);
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initDashboard);

@@ -50,6 +50,7 @@
             <button class="tab-item active" data-tab="summary">📋 最新相場一覧</button>
             <button class="tab-item" data-tab="charts">📈 グラフ推移</button>
             <button class="tab-item" data-tab="bid-schedule">🚢 入札予定</button>
+            <button class="tab-item" data-tab="topic">📰 トピック</button>
         </nav>
 
         <!-- 最新一覧サマリービュー（初期表示） -->
@@ -57,6 +58,20 @@
             <div id="summary-container" class="summary-grid">
                 <!-- ここにJSでカードが生成されます -->
                 <p>最新データを分析中...</p>
+            </div>
+        </div>
+
+        <!-- ニュース・トピックビュー -->
+        <div id="view-topic" class="tab-view">
+            <div class="news-section">
+                <div class="news-header">
+                    <h3>⚓️ 市場に影響する最新トピック</h3>
+                    <p class="news-subtitle">漁況・海況・燃費油などの背景情報</p>
+                </div>
+                <div id="news-container" class="news-grid">
+                    <!-- ニュースカードがここに生成される -->
+                    <div class="loading-news">ニュースを読み込んでいます...</div>
+                </div>
             </div>
         </div>
 
