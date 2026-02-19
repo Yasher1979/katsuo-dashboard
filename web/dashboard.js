@@ -63,6 +63,8 @@ async function initDashboard() {
         setupTabs();
         setupModal();
         setupMemoModal();
+        setupSettings(); // 設定機能の初期化
+        loadAllSettings(); // 全設定の読み込み
 
         // 初期タブに応じたコントロール表示
         updateControlVisibility(activeTab);
@@ -391,6 +393,116 @@ function updateControlVisibility(tabId) {
     } else {
         controls.classList.add('hide-filters');
     }
+}
+// --- 設定機能 (localStorage連動) ---
+const SETTINGS_KEY = 'katsuo_app_settings';
+let appSettings = {
+    theme: 'dark',
+    fontSize: 'medium',
+    ports: ['枕崎', '焼津', '山川'],
+    compactMode: false,
+    animation: true,
+    chartFill: true
+};
+
+function setupSettings() {
+    const modal = document.getElementById('settings-modal');
+    const btnOpen = document.getElementById('btn-settings');
+    const btnClose = document.getElementById('settings-close');
+
+    if (btnOpen) btnOpen.onclick = () => modal.classList.add('active');
+    if (btnClose) btnClose.onclick = () => modal.classList.remove('active');
+    if (modal) modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+
+    // テーマ選択
+    document.querySelectorAll('.theme-option').forEach(btn => btn.addEventListener('click', () => {
+        const t = btn.dataset.theme;
+        appSettings.theme = t;
+        applyAppSettings();
+        saveAppSettings();
+    }));
+
+    // 文字サイズ
+    document.querySelectorAll('.btn-setting-toggle[data-font]').forEach(btn => btn.addEventListener('click', () => {
+        const size = btn.dataset.font;
+        appSettings.fontSize = size;
+        applyAppSettings();
+        saveAppSettings();
+    }));
+
+    // チェックボックス (港、オプション)
+    const setupCheckbox = (id, key, isArray = false, val = null) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.onchange = () => {
+            if (isArray) {
+                if (el.checked) { if (!appSettings[key].includes(val)) appSettings[key].push(val); }
+                else { appSettings[key] = appSettings[key].filter(v => v !== val); }
+            } else {
+                appSettings[key] = el.checked;
+            }
+            applyAppSettings();
+            saveAppSettings();
+        };
+    };
+
+    setupCheckbox('check-port-makurazaki', 'ports', true, '枕崎');
+    setupCheckbox('check-port-yaizu', 'ports', true, '焼津');
+    setupCheckbox('check-port-yamagawa', 'ports', true, '山川');
+    setupCheckbox('check-compact', 'compactMode');
+    setupCheckbox('check-animation', 'animation');
+    setupCheckbox('check-chart-fill', 'chartFill');
+}
+
+function applyAppSettings() {
+    // 1. テーマ反映
+    document.body.className = `theme-${appSettings.theme}`;
+    document.querySelectorAll('.theme-option').forEach(b => b.classList.toggle('active', b.dataset.theme === appSettings.theme));
+
+    // 2. 文字サイズ反映
+    document.documentElement.className = `font-${appSettings.fontSize}`;
+    document.querySelectorAll('.btn-setting-toggle[data-font]').forEach(b => b.classList.toggle('active', b.dataset.font === appSettings.fontSize));
+
+    // 3. コンパクトモード反映
+    document.body.classList.toggle('compact-mode', appSettings.compactMode);
+    const cbCompact = document.getElementById('check-compact');
+    if (cbCompact) cbCompact.checked = appSettings.compactMode;
+
+    // 4. アニメーション反映 (簡易実装: クラス付与)
+    document.body.classList.toggle('no-animation', !appSettings.animation);
+    const cbAnim = document.getElementById('check-animation');
+    if (cbAnim) cbAnim.checked = appSettings.animation;
+
+    // 5. 港のチェックボックス同期
+    const syncPort = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.checked = appSettings.ports.includes(val);
+    };
+    syncPort('check-port-makurazaki', '枕崎');
+    syncPort('check-port-yaizu', '焼津');
+    syncPort('check-port-yamagawa', '山川');
+
+    const cbFill = document.getElementById('check-chart-fill');
+    if (cbFill) cbFill.checked = appSettings.chartFill;
+
+    // 再レンダリングが必要な要素
+    renderDashboard();
+    renderSummary();
+}
+
+function saveAppSettings() {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings));
+}
+
+function loadAllSettings() {
+    const saved = localStorage.getItem(SETTINGS_KEY);
+    if (saved) {
+        try {
+            const parsed = JSON.parse(saved);
+            appSettings = { ...appSettings, ...parsed };
+        } catch (e) { console.warn("Failed to parse settings", e); }
+    }
+    applyAppSettings();
 }
 const MEMO_KEY = 'katsuo_memos';
 function getMemo(d, p) { try { return (JSON.parse(localStorage.getItem(MEMO_KEY) || '{}')[d] || {})[p] || ''; } catch { return ''; } }
