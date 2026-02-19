@@ -320,8 +320,12 @@ function updateOrCreateChart(port, portData) {
         },
         onClick: (e, elements, chart) => {
             const hud = document.getElementById('premium-hud');
-            // すでに表示されている、または閉じた直後（300ms以内）は再反応しないようにガード
-            if (hud && (hud.classList.contains('active') || hud.dataset.justClosed)) return;
+
+            // すでにHUDが表示されている間にチャートをタップした場合、HUDを閉じることを優先
+            if (hud && hud.classList.contains('active')) {
+                hud.classList.remove('active');
+                return;
+            }
 
             if (elements && elements.length > 0) {
                 const firstPoint = elements[0];
@@ -361,25 +365,20 @@ function updateOrCreateChart(port, portData) {
                 hud.classList.add('active');
 
                 const closeHandler = (ev) => {
-                    // HUD自身、またはHUD内の要素をクリックした場合は何もしない
-                    if (hud.contains(ev.target)) return;
+                    // HUD自身、またはチャート（キャンバス）をクリックした場合は、それぞれのハンドラに任せる
+                    if (hud.contains(ev.target) || ev.target.tagName === 'CANVAS') return;
 
-                    // HUDを隠す
+                    // 背景部分などのクリックでHUDを隠す
                     hud.classList.remove('active');
 
-                    // 重要：閉じ動作中であることをフラグに立て、Chart.jsのonClick再発火を防ぐ
-                    hud.dataset.justClosed = "true";
-                    setTimeout(() => { delete hud.dataset.justClosed; }, 300);
-
                     // リスナーを自ら削除
-                    document.removeEventListener('mousedown', closeHandler);
+                    document.removeEventListener('click', closeHandler);
                     document.removeEventListener('touchstart', closeHandler);
                 };
 
-                // 100msのディレイ：HUDが表示された瞬間のクリックイベントで即閉じするのを防ぐ
+                // 表示から少し（100ms）遅らせてリスナーを追加することで、表示時のクリックでの即閉じを防止
                 setTimeout(() => {
-                    // mousedown/touchstart で反応させることで「瞬時の消去」を実現
-                    document.addEventListener('mousedown', closeHandler);
+                    document.addEventListener('click', closeHandler);
                     document.addEventListener('touchstart', closeHandler, { passive: true });
                 }, 100);
             }
