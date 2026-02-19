@@ -357,18 +357,21 @@ function updateOrCreateChart(port, portData) {
                 hud.classList.add('active');
 
                 const closeHandler = (ev) => {
-                    // HUD自身、またはHUD内の要素をクリックした場合は閉じない
+                    // HUD自身、またはHUD内の要素をクリックした場合は何もしない
                     if (hud.contains(ev.target)) return;
 
-                    // それ以外（背景、グラフなど）をクリック・タップで閉じる
+                    // HUDを閉じ、アニメーションを考慮してクラスを外す
                     hud.classList.remove('active');
-                    document.removeEventListener('click', closeHandler);
+
+                    // リスナーを自ら削除
+                    document.removeEventListener('mousedown', closeHandler);
                     document.removeEventListener('touchstart', closeHandler);
                 };
 
-                // 少し遅延をおいてリスナーを追加（展開時のクリックで即閉じするのを防ぐ）
+                // 100msのディレイ：HUDが表示された瞬間のクリックイベントで即閉じするのを防ぐ
                 setTimeout(() => {
-                    document.addEventListener('click', closeHandler);
+                    // mousedown/touchstart で反応させることで「瞬時の消去」を実現
+                    document.addEventListener('mousedown', closeHandler);
                     document.addEventListener('touchstart', closeHandler, { passive: true });
                 }, 100);
             }
