@@ -489,12 +489,14 @@ function setupTabs() {
 }
 
 function updateControlVisibility(tabId) {
-    const controls = document.querySelector('.filter-controls');
-    if (!controls) return;
+    const actionRow = document.querySelector('.header-action-row');
+    const filterGroup = document.querySelector('.filter-group');
+    if (!actionRow || !filterGroup) return;
+
     if (tabId === 'charts') {
-        controls.classList.remove('hide-filters');
+        filterGroup.style.display = 'flex';
     } else {
-        controls.classList.add('hide-filters');
+        filterGroup.style.display = 'none';
     }
 }
 // --- 設定機能 (localStorage連動) ---

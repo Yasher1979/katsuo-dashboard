@@ -32,18 +32,19 @@
         <header class="app-header">
             <div class="header-visual-container">
                 <img src="header_visual.png" alt="鰹相場データ" class="header-main-visual">
-                <div class="header-action-overlay">
-                    <button id="btn-settings" class="btn-icon floating" title="設定">⚙️</button>
-                    <button id="btn-refresh-floating" class="btn-icon floating" title="更新">🔄</button>
+                <div class="filter-controls-container">
+                    <div class="header-action-row">
+                        <div class="filter-group">
+                            <button class="btn-filter" data-range="all">全期間推移</button>
+                            <button class="btn-filter active" data-range="30">30日間</button>
+                            <button class="btn-filter" data-range="7">7日間</button>
+                        </div>
+                        <div class="system-group">
+                            <button id="btn-refresh" class="btn-system"><span class="icon">🔄</span> 更新</button>
+                            <button id="btn-settings" class="btn-system"><span class="icon">⚙️</span> 設定</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="filter-controls-container">
-                <div class="filter-controls">
-                    <button class="btn-filter" data-range="all">全期間</button>
-                    <button class="btn-filter active" data-range="30">1ヶ月</button>
-                    <button class="btn-filter" data-range="7">1週間</button>
-                </div>
-            </div>
         </header>
 
         <!-- 設定モーダル -->
