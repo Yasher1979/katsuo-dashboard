@@ -311,12 +311,88 @@ function updateOrCreateChart(port, portData) {
 
     const theme = themes[currentTheme] || themes.dark;
     const options = {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { labels: { color: theme.text, font: { size: 10 } } } },
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+            mode: 'index',
+            intersect: false,
+        },
+        plugins: {
+            legend: {
+                labels: { color: theme.text, font: { size: 10 } }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                padding: 10,
+                displayColors: true,
+                callbacks: {
+                    title: (context) => {
+                        const date = new Date(context[0].parsed.x);
+                        return `${date.getFullYear()}年${date.getMonth() + 1}月${date.getDate()}日`;
+                    },
+                    label: (context) => {
+                        let label = context.dataset.label || '';
+                        if (label) label += ': ';
+                        if (context.parsed.y !== null) {
+                            label += context.parsed.y.toLocaleString();
+                            label += context.dataset.yAxisID === 'yVolume' ? ' t' : ' 円/kg';
+                        }
+                        return label;
+                    }
+                }
+            }
+        },
         scales: {
-            x: { type: 'time', grid: { color: theme.grid }, ticks: { color: theme.text } },
-            y: { position: 'left', grid: { color: theme.grid }, ticks: { color: theme.text }, min: Math.floor(minP - 10), max: Math.ceil(maxP + 10) },
-            yVolume: { position: 'right', grid: { display: false }, ticks: { color: theme.text }, beginAtZero: true, max: Math.ceil(maxV * 1.2) }
+            x: {
+                type: 'time',
+                time: {
+                    unit: 'day',
+                    displayFormats: { day: 'M/D' },
+                    tooltipFormat: 'YYYY年M月D日'
+                },
+                grid: { color: theme.grid },
+                ticks: {
+                    color: theme.text,
+                    callback: function (val, index) {
+                        const date = new Date(val);
+                        return (date.getMonth() + 1) + '月' + date.getDate() + '日';
+                    }
+                }
+            },
+            y: {
+                position: 'left',
+                grid: { color: theme.grid },
+                ticks: {
+                    color: theme.text,
+                    callback: (value) => value + ' 円'
+                },
+                title: {
+                    display: true,
+                    text: '価格 (円/kg)',
+                    color: theme.text,
+                    font: { size: 10 }
+                },
+                min: Math.floor(minP - 10),
+                max: Math.ceil(maxP + 10)
+            },
+            yVolume: {
+                position: 'right',
+                grid: { display: false },
+                ticks: {
+                    color: theme.text,
+                    callback: (value) => value + ' t'
+                },
+                title: {
+                    display: true,
+                    text: '水揚げ量 (t)',
+                    color: theme.text,
+                    font: { size: 10 }
+                },
+                beginAtZero: true,
+                max: Math.ceil(maxV * 1.2)
+            }
         }
     };
 
