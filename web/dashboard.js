@@ -319,6 +319,10 @@ function updateOrCreateChart(port, portData) {
             intersect: false,
         },
         onClick: (e, elements, chart) => {
+            const hud = document.getElementById('premium-hud');
+            // すでに表示されている、または閉じた直後（300ms以内）は再反応しないようにガード
+            if (hud && (hud.classList.contains('active') || hud.dataset.justClosed)) return;
+
             if (elements && elements.length > 0) {
                 const firstPoint = elements[0];
                 const dateVal = chart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index].x;
@@ -360,8 +364,12 @@ function updateOrCreateChart(port, portData) {
                     // HUD自身、またはHUD内の要素をクリックした場合は何もしない
                     if (hud.contains(ev.target)) return;
 
-                    // HUDを閉じ、アニメーションを考慮してクラスを外す
+                    // HUDを隠す
                     hud.classList.remove('active');
+
+                    // 重要：閉じ動作中であることをフラグに立て、Chart.jsのonClick再発火を防ぐ
+                    hud.dataset.justClosed = "true";
+                    setTimeout(() => { delete hud.dataset.justClosed; }, 300);
 
                     // リスナーを自ら削除
                     document.removeEventListener('mousedown', closeHandler);
