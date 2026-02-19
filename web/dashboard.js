@@ -201,7 +201,10 @@ function renderBidSchedule() {
                 <div class="bid-info-main"><h2>${bid.vessel_name}</h2><div class="bid-dates"><span>予定日:${bid.bid_date}</span><span>情報:${bid.delivery_date}</span></div></div>
                 <div class="vessel-badge">🚢 ${bid.tonnage}t積</div>
             </div>
-            <div class="bid-sea-area"><span class="sea-area-title">📍 操業海域</span><div class="sea-area-coords"><span>${bid.sea_area.lat}</span> / <span>${bid.sea_area.lon}</span></div></div>
+            <div class="bid-sea-area" onclick="openSeaAreaMap('${bid.sea_area.lat}', '${bid.sea_area.lon}')" style="cursor:pointer;" title="地図で表示">
+                <span class="sea-area-title">📍 操業海域 (地図で見る)</span>
+                <div class="sea-area-coords"><span>${bid.sea_area.lat}</span> / <span>${bid.sea_area.lon}</span></div>
+            </div>
             <div class="bid-table-container">
                 <table class="bid-table"><thead><tr><th>カテゴリ</th><th>サイズ</th><th>区分</th><th style="text-align:right;">数量</th></tr></thead>
                 <tbody>${itemsH}<tr class="category-row"><td colspan="3">合計重量 (Bカツオ等)</td><td class="volume-val">${bid.total_volume.toFixed(1)}<span class="volume-unit">t</span></td></tr></tbody>
@@ -211,6 +214,31 @@ function renderBidSchedule() {
     });
     const arcSec = document.querySelector('.archive-section');
     if (arcSec) arcSec.style.display = sorted.length > 1 ? 'block' : 'none';
+}
+
+function openSeaAreaMap(latStr, lonStr) {
+    // 座標文字列から数値を抽出 (例: "N 03°41'" -> 3.68)
+    const parseCoord = (str) => {
+        const parts = str.match(/([NSEW])\s*(\d+)[°°]\s*(\d+)/);
+        if (!parts) return null;
+        const [_, dir, deg, min] = parts;
+        let val = parseInt(deg) + (parseInt(min) / 60);
+        if (dir === 'S' || dir === 'W') val = -val;
+        return val;
+    };
+
+    // 範囲表示の場合は最初の座標を使用
+    const lat = parseCoord(latStr.split('〜')[0]);
+    const lon = parseCoord(lonStr.split('〜')[0]);
+
+    if (lat !== null && lon !== null) {
+        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+        window.open(url, '_blank');
+    } else {
+        // パース失敗時は文字列で検索
+        const query = encodeURIComponent(`${latStr} ${lonStr}`);
+        window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+    }
 }
 
 function filterDataByRange(portData, range) {
