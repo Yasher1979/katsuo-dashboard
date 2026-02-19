@@ -35,6 +35,9 @@ async function initDashboard() {
         if (!bRes.ok) bRes = await fetch(`/data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }));
         if (bRes.ok) bidScheduleData = await bRes.json();
 
+        let nRes = newsRes;
+        if (!nRes.ok) nRes = await fetch(`/data/katsuo_news.json?v=${Date.now()}`).catch(e => ({ ok: false }));
+
         if (nRes.ok) {
             window.katsuoNewsData = await nRes.json();
             console.log("News data loaded:", window.katsuoNewsData);
