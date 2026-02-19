@@ -404,19 +404,30 @@ function updateOrCreateChart(port, portData) {
         scales: {
             x: {
                 type: 'time',
-                time: { unit: 'day', displayFormats: { day: 'M/d' } },
+                time: { unit: 'day', displayFormats: { day: 'M/d' }, tooltipFormat: 'M/d' },
                 grid: { color: theme.grid, borderDash: [2, 2] },
-                ticks: { color: theme.text, font: { size: 10 } }
+                ticks: { color: theme.text, font: { size: 10 }, maxRotation: 0 },
+                title: { display: true, text: '日付', color: theme.text, font: { size: 10 } }
             },
             y: {
                 position: 'left',
                 grid: { color: theme.grid },
-                ticks: { color: theme.text, font: { size: 10 } }
+                ticks: {
+                    color: theme.text,
+                    font: { size: 10 },
+                    callback: function (value) { return value + '円'; }
+                },
+                title: { display: true, text: '単価（円/kg）', color: theme.text, font: { size: 10 } }
             },
             yVolume: {
                 position: 'right',
                 grid: { drawOnChartArea: false },
-                ticks: { color: theme.text, font: { size: 10 } }
+                ticks: {
+                    color: theme.text,
+                    font: { size: 10 },
+                    callback: function (value) { return value + 't'; }
+                },
+                title: { display: true, text: '水揚量（t）', color: theme.text, font: { size: 10 } }
             }
         }
     };
