@@ -197,12 +197,19 @@ function renderBidSchedule() {
         const card = document.createElement('div');
         card.className = `bid-card ${i > 0 ? 'archive' : ''}`;
         card.innerHTML = `
-            <div class="bid-card-header">
-                <div class="bid-info-main"><h2>${bid.vessel_name}</h2><div class="bid-dates"><span>予定日:${bid.bid_date}</span><span>情報:${bid.delivery_date}</span></div></div>
+        card.innerHTML = `
+            < div class="bid-card-header" >
+                <div class="bid-info-main">
+                    <h2>${bid.vessel_name}</h2>
+                    <div class="bid-dates">
+                        <span class="bid-date-highlight">入札予定日: ${bid.bid_date}</span>
+                        <span>情報:${bid.delivery_date}</span>
+                    </div>
+                </div>
                 <div class="vessel-badge">🚢 ${bid.tonnage}t積</div>
-            </div>
-            <div class="bid-sea-area" onclick="openSeaAreaMap('${bid.sea_area.lat}', '${bid.sea_area.lon}')" style="cursor:pointer;" title="地図で表示">
-                <span class="sea-area-title">📍 操業海域 (地図で見る)</span>
+            </div >
+            <div class="bid-sea-area" onclick="openSeaAreaMap('${bid.sea_area.lat}', '${bid.sea_area.lon}')" role="button" tabindex="0" title="地図で表示">
+                <span class="sea-area-title">📍 操業海域 (こちらをタップして地図を表示)</span>
                 <div class="sea-area-coords"><span>${bid.sea_area.lat}</span> / <span>${bid.sea_area.lon}</span></div>
             </div>
             <div class="bid-table-container">
