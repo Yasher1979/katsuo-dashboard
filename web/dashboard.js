@@ -214,8 +214,9 @@ function renderBidSchedule() {
     sorted.forEach((bid, i) => {
         let itemsH = '';
         (bid.items || []).forEach(item => {
-            if (item.category === 'PS カツオ' || item.volume <= 0) return;
-            itemsH += `<tr><td>${item.category}</td><td>${item.size}</td><td>${item.type}</td><td class="volume-val">${item.volume.toFixed(1)}<span class="volume-unit">t</span></td></tr>`;
+            // PSカツオは除外するが、それ以外はすべて表示（重量0も含む）
+            if (item.category === 'PS カツオ') return;
+            itemsH += `<tr><td>${item.category}</td><td>${item.size}</td><td>${item.type}</td><td class="volume-val">${(item.volume || 0).toFixed(1)}<span class="volume-unit">t</span></td></tr>`;
         });
         // マップURLの生成
         const parseCoord = (str) => {
@@ -320,26 +321,60 @@ function updateOrCreateChart(port, portData) {
         onClick: (e, elements, chart) => {
             if (elements && elements.length > 0) {
                 const firstPoint = elements[0];
-                const label = chart.data.labels[firstPoint.index] || chart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index].x;
-                const dateObj = new Date(label);
-                const dateStr = `${dateObj.getFullYear()}年${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
+                const dateVal = chart.data.datasets[firstPoint.datasetIndex].data[firstPoint.index].x;
+                const dateObj = new Date(dateVal);
+                const fullDateStr = `${dateObj.getFullYear()}年${dateObj.getMonth() + 1}月${dateObj.getDate()}日`;
 
-                let html = `<p><strong>📍 ${dateStr} の詳細データ</strong></p><ul class="insight-list">`;
+                // 既存のオーバーレイを削除
+                document.querySelectorAll('.chart-overlay-detail').forEach(el => el.remove());
+
+                const overlay = document.createElement('div');
+                overlay.className = 'chart-overlay-detail';
+
+                let rowsHtml = '';
                 chart.data.datasets.forEach(dataset => {
+                    // 平均線や、ポイント表示のないデータは除外
+                    if (dataset.pointRadius === 0) return;
+
                     const val = dataset.data[firstPoint.index].y;
                     if (val !== null && val !== undefined) {
-                        const unit = dataset.yAxisID === 'yVolume' ? 't' : '円/kg';
-                        html += `<li>${dataset.label}: <span class="accent-text">${val.toLocaleString()}</span> ${unit}</li>`;
+                        const unit = dataset.yAxisID === 'yVolume' ? 't' : '円';
+                        rowsHtml += `
+                            <div class="overlay-row">
+                                <span class="overlay-label">${dataset.label.replace('価格', '').replace('水揚量', '')}</span>
+                                <span class="overlay-value">${val.toLocaleString()}<span style="font-size:0.7rem;margin-left:2px">${unit}</span></span>
+                            </div>`;
                     }
                 });
-                html += `</ul>`;
 
-                const insightEl = document.getElementById('insight-content');
-                if (insightEl) {
-                    insightEl.innerHTML = html;
-                    // スムーズに分析エリアへスクロール（モバイル配慮）
-                    // insightEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                overlay.innerHTML = `
+                    <div class="overlay-title"><span>📍 ${fullDateStr}</span></div>
+                    ${rowsHtml}
+                `;
+
+                // 配置位置の計算
+                const canvasRect = chart.canvas.getBoundingClientRect();
+                const container = chart.canvas.parentElement;
+
+                // オーバーレイをコンテナに追加
+                container.style.position = 'relative';
+                container.appendChild(overlay);
+
+                // コンテナの相対座標で配置
+                overlay.style.left = `${e.native.offsetX + 15}px`;
+                overlay.style.top = `${e.native.offsetY + 15}px`;
+
+                // 端で切れないように調整
+                const rect = overlay.getBoundingClientRect();
+                if (e.native.offsetX + rect.width + 20 > canvasRect.width) {
+                    overlay.style.left = `${e.native.offsetX - rect.width - 15}px`;
                 }
+
+                // 一定時間で消去
+                setTimeout(() => {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => overlay.remove(), 300);
+                }, 3000);
             }
         },
         plugins: {
@@ -446,9 +481,53 @@ function setupThemeSwitcher() {
 
 function updateInsights() {
     const el = document.getElementById('insight-content'); if (!currentData || !el) return;
-    const list = [].concat(analyzeVolatility(currentData), analyzeSupplyDemand(currentData), analyzePortSpread(currentData));
-    const sel = list.length ? list[Math.floor(Math.random() * list.length)] : { title: "概況", text: "安定しています。", memo: "-" };
-    el.innerHTML = `<p><strong>💡 AIアナリスト (${sel.title}):</strong></p><p class="insight-text">${sel.text}</p><p class="insight-memo">Memo: ${sel.memo}</p>`;
+
+    // 熱量のある分析文言の生成
+    const insights = [];
+
+    // 1. 全体的なトレンド
+    let totalVolume = 0;
+    ports.forEach(p => {
+        Object.keys(currentData[p] || {}).forEach(s => {
+            const arr = currentData[p][s];
+            if (arr.length > 0) totalVolume += arr[arr.length - 1].volume;
+        });
+    });
+
+    if (totalVolume > 500) {
+        insights.push({ title: "🚚 大量水揚げ", text: "各港で水揚げが集中しています！供給過多による価格調整の動きに注意が必要ですが、鮮度は抜群です。", memo: "全体的に強含み" });
+    } else if (totalVolume < 100) {
+        insights.push({ title: "⚠️ 品薄警戒", text: "水揚げ量が極端に減少しています。買い気が集中し、キロ単価が跳ね上がる「取り合い」の様相を呈しています。", memo: "品薄による高騰" });
+    }
+
+    // 2. 港別の特記
+    ports.forEach(p => {
+        const size = "2.5kg上";
+        const arr = (currentData[p] || {})[size];
+        if (arr && arr.length >= 2) {
+            const last = arr[arr.length - 1];
+            const prev = arr[arr.length - 2];
+            const diff = last.price - prev.price;
+
+            if (diff >= 15) {
+                insights.push({ title: `🚀 ${p}激震`, text: `${p}の${size}が前日比+${diff.toFixed(1)}円の爆騰！この勢いは止まりそうにありません。`, memo: "強烈な買い気" });
+            } else if (diff <= -15) {
+                insights.push({ title: `📉 ${p}急落`, text: `${p}の${size}が${diff.toFixed(1)}円の大幅ダウン。今が仕入れの絶好機かもしれません。`, memo: "弱気相場" });
+            }
+        }
+    });
+
+    const sel = insights.length ? insights[Math.floor(Math.random() * insights.length)] : { title: "📊 安定推移", text: "現在の相場は極めて安定しています。大きな変動の予兆はなく、計画的な仕入れが可能な状態です。", memo: "凪の状態" };
+
+    el.innerHTML = `
+        <div class="insight-heat">
+            <p><strong>🔥 AIアナリスト熱血診断 (${sel.title}):</strong></p>
+            <p class="insight-text" style="font-size: 1.1rem; font-weight: 700; color: var(--text-color);">${sel.text}</p>
+            <div class="insight-footer" style="margin-top: 10px; border-top: 1px dashed var(--grid-color); padding-top: 8px;">
+                <span class="insight-memo" style="background: var(--accent-color); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;">戦略: ${sel.memo}</span>
+            </div>
+        </div>
+    `;
 }
 function analyzeVolatility(d) {
     const res = []; ports.forEach(p => Object.keys(d[p] || {}).forEach(s => {
