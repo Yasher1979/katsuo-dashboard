@@ -733,15 +733,19 @@ footer {
     font-weight: 800;
     color: var(--accent-color);
     background: rgba(88, 166, 255, 0.1);
-    padding: 2px 8px;
-    border-radius: 4px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    display: inline-block;
 }
 
 .bid-sea-area {
+    display: block;
+    text-decoration: none;
+    color: inherit;
     background: rgba(88, 166, 255, 0.05);
     border: 1px dashed var(--accent-color);
-    padding: 12px 18px;
-    border-radius: 10px;
+    padding: 15px;
+    border-radius: 12px;
     margin-bottom: 25px;
     cursor: pointer;
     transition: all 0.2s;
@@ -754,6 +758,7 @@ footer {
     background: rgba(88, 166, 255, 0.15);
     border-style: solid;
     transform: translateY(-2px);
+    outline: none;
 }
 
 .sea-area-title {
@@ -763,14 +768,14 @@ footer {
     font-weight: 800;
     margin-bottom: 8px;
     display: block;
-    text-decoration: underline;
 }
 
 .sea-area-coords {
     display: flex;
-    gap: 20px;
+    flex-wrap: wrap;
+    gap: 10px 15px;
     font-family: 'Inter', sans-serif;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-color);
 }
