@@ -194,11 +194,25 @@ function renderBidSchedule() {
             if (item.category === 'PS カツオ' || item.volume <= 0) return;
             itemsH += `<tr><td>${item.category}</td><td>${item.size}</td><td>${item.type}</td><td class="volume-val">${item.volume.toFixed(1)}<span class="volume-unit">t</span></td></tr>`;
         });
+        // マップURLの生成
+        const parseCoord = (str) => {
+            const parts = str.match(/([NSEW])\s*(\d+)[°°]\s*(\d+)/);
+            if (!parts) return null;
+            const [_, dir, deg, min] = parts;
+            let val = parseInt(deg) + (parseInt(min) / 60);
+            if (dir === 'S' || dir === 'W') val = -val;
+            return val;
+        };
+        const lat = (bid.sea_area && bid.sea_area.lat) ? parseCoord(bid.sea_area.lat.split('〜')[0]) : null;
+        const lon = (bid.sea_area && bid.sea_area.lon) ? parseCoord(bid.sea_area.lon.split('〜')[0]) : null;
+        const mapUrl = (lat !== null && lon !== null)
+            ? `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`
+            : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((bid.sea_area?.lat || '') + ' ' + (bid.sea_area?.lon || ''))}`;
+
         const card = document.createElement('div');
         card.className = `bid-card ${i > 0 ? 'archive' : ''}`;
         card.innerHTML = `
-        card.innerHTML = `
-            < div class="bid-card-header" >
+            <div class="bid-card-header">
                 <div class="bid-info-main">
                     <h2>${bid.vessel_name}</h2>
                     <div class="bid-dates">
@@ -207,11 +221,11 @@ function renderBidSchedule() {
                     </div>
                 </div>
                 <div class="vessel-badge">🚢 ${bid.tonnage}t積</div>
-            </div >
-            <div class="bid-sea-area" onclick="openSeaAreaMap('${bid.sea_area.lat}', '${bid.sea_area.lon}')" role="button" tabindex="0" title="地図で表示">
+            </div>
+            <a href="${mapUrl}" target="_blank" class="bid-sea-area" title="Google Mapsで表示">
                 <span class="sea-area-title">📍 操業海域 (こちらをタップして地図を表示)</span>
                 <div class="sea-area-coords"><span>${bid.sea_area.lat}</span> / <span>${bid.sea_area.lon}</span></div>
-            </div>
+            </a>
             <div class="bid-table-container">
                 <table class="bid-table"><thead><tr><th>カテゴリ</th><th>サイズ</th><th>区分</th><th style="text-align:right;">数量</th></tr></thead>
                 <tbody>${itemsH}<tr class="category-row"><td colspan="3">合計重量 (Bカツオ等)</td><td class="volume-val">${bid.total_volume.toFixed(1)}<span class="volume-unit">t</span></td></tr></tbody>
@@ -221,31 +235,6 @@ function renderBidSchedule() {
     });
     const arcSec = document.querySelector('.archive-section');
     if (arcSec) arcSec.style.display = sorted.length > 1 ? 'block' : 'none';
-}
-
-function openSeaAreaMap(latStr, lonStr) {
-    // 座標文字列から数値を抽出 (例: "N 03°41'" -> 3.68)
-    const parseCoord = (str) => {
-        const parts = str.match(/([NSEW])\s*(\d+)[°°]\s*(\d+)/);
-        if (!parts) return null;
-        const [_, dir, deg, min] = parts;
-        let val = parseInt(deg) + (parseInt(min) / 60);
-        if (dir === 'S' || dir === 'W') val = -val;
-        return val;
-    };
-
-    // 範囲表示の場合は最初の座標を使用
-    const lat = parseCoord(latStr.split('〜')[0]);
-    const lon = parseCoord(lonStr.split('〜')[0]);
-
-    if (lat !== null && lon !== null) {
-        const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
-        window.open(url, '_blank');
-    } else {
-        // パース失敗時は文字列で検索
-        const query = encodeURIComponent(`${latStr} ${lonStr}`);
-        window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
-    }
 }
 
 function filterDataByRange(portData, range) {
