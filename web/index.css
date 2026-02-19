@@ -221,12 +221,26 @@ h1 {
 .filter-controls {
     display: flex;
     justify-content: center;
-    gap: 10px;
-    margin-top: 15px;
+    gap: 12px;
+    margin-top: 25px;
     flex-wrap: wrap;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
 }
 
-.btn-filter {
+/* グラフ以外ではフィルターボタンを隠す */
+.filter-controls.hide-filters .btn-filter {
+    display: none;
+}
+
+/* フィルター非表示時の更新ボタンの強調 */
+.filter-controls.hide-filters .btn-refresh {
+    margin: 0 auto;
+    padding: 10px 40px;
+    min-width: 180px;
+}
+
+.btn-filter,
+.btn-refresh {
     background: var(--btn-bg);
     border: 1px solid var(--border-color);
     color: var(--text-color);

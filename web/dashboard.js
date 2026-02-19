@@ -47,6 +47,12 @@ async function initDashboard() {
 
         if (!currentData) throw new Error("Market data could not be loaded.");
 
+        // テーマの読み込み
+        const savedTheme = localStorage.getItem('katsuo_theme') || 'dark';
+        currentTheme = savedTheme;
+        document.body.className = `theme-${savedTheme}`;
+        document.querySelectorAll('.btn-theme').forEach(b => b.classList.toggle('active', b.dataset.theme === savedTheme));
+
         renderDashboard();
         renderSummary();
         renderBidSchedule();
@@ -57,6 +63,9 @@ async function initDashboard() {
         setupTabs();
         setupModal();
         setupMemoModal();
+
+        // 初期タブに応じたコントロール表示
+        updateControlVisibility(activeTab);
 
         const elapsed = Date.now() - startTime;
         const delay = Math.max(0, 1000 - elapsed);
@@ -326,7 +335,7 @@ function setupThemeSwitcher() {
     document.querySelectorAll('.btn-theme').forEach(btn => btn.addEventListener('click', () => {
         const t = btn.dataset.theme; document.querySelectorAll('.btn-theme').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); document.body.className = `theme-${t}`;
-        currentTheme = t; renderDashboard(); renderSummary();
+        currentTheme = t; localStorage.setItem('katsuo_theme', t); renderDashboard(); renderSummary();
     }));
 }
 
@@ -370,8 +379,18 @@ function setupTabs() {
         const id = btn.dataset.tab; if (activeTab === id) return;
         document.querySelectorAll('.tab-item').forEach(b => b.classList.remove('active')); btn.classList.add('active');
         document.querySelectorAll('.tab-view').forEach(v => v.classList.remove('active')); document.getElementById(`view-${id}`).classList.add('active');
-        activeTab = id; if (id === 'charts') renderDashboard();
+        activeTab = id; updateControlVisibility(id); if (id === 'charts') renderDashboard();
     }));
+}
+
+function updateControlVisibility(tabId) {
+    const controls = document.querySelector('.filter-controls');
+    if (!controls) return;
+    if (tabId === 'charts') {
+        controls.classList.remove('hide-filters');
+    } else {
+        controls.classList.add('hide-filters');
+    }
 }
 const MEMO_KEY = 'katsuo_memos';
 function getMemo(d, p) { try { return (JSON.parse(localStorage.getItem(MEMO_KEY) || '{}')[d] || {})[p] || ''; } catch { return ''; } }
