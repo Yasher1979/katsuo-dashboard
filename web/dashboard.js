@@ -369,61 +369,35 @@ function updateOrCreateChart(port, portData) {
             legend: {
                 labels: { color: theme.text, font: { size: 10 } }
             },
-            tooltip: { enabled: false },
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'day',
-                        displayFormats: { day: 'M/D' },
-                        tooltipFormat: 'YYYY年M月D日'
-                    },
-                    grid: { color: theme.grid },
-                    ticks: {
-                        color: theme.text,
-                        callback: function (val, index) {
-                            const date = new Date(val);
-                            return (date.getMonth() + 1) + '月' + date.getDate() + '日';
-                        }
-                    }
-                },
-                y: {
-                    position: 'left',
-                    grid: { color: theme.grid },
-                    ticks: {
-                        color: theme.text,
-                        callback: (value) => value + ' 円'
-                    },
-                    title: {
-                        display: true,
-                        text: '価格 (円/kg)',
-                        color: theme.text,
-                        font: { size: 10 }
-                    },
-                    min: Math.floor(minP - 10),
-                    max: Math.ceil(maxP + 10)
-                },
-                yVolume: {
-                    position: 'right',
-                    grid: { display: false },
-                    ticks: {
-                        color: theme.text,
-                        callback: (value) => value + ' t'
-                    },
-                    title: {
-                        display: true,
-                        text: '水揚げ量 (t)',
-                        color: theme.text,
-                        font: { size: 10 }
-                    },
-                    beginAtZero: true,
-                    max: Math.ceil(maxV * 1.2)
-                }
+            tooltip: { enabled: false }
+        },
+        scales: {
+            x: {
+                type: 'time',
+                time: { unit: 'day', displayFormats: { day: 'M/d' } },
+                grid: { color: theme.grid, borderDash: [2, 2] },
+                ticks: { color: theme.text, font: { size: 10 } }
+            },
+            y: {
+                position: 'left',
+                grid: { color: theme.grid },
+                ticks: { color: theme.text, font: { size: 10 } }
+            },
+            yVolume: {
+                position: 'right',
+                grid: { drawOnChartArea: false },
+                ticks: { color: theme.text, font: { size: 10 } }
             }
-        };
+        }
+    };
 
-        if(charts[port]) { charts[port].data.datasets = datasets; charts[port].options = options; charts[port].update(); }
-    else if(typeof Chart !== 'undefined') { charts[port] = new Chart(ctx, { data: { datasets }, options: options });
+    if (charts[port]) {
+        charts[port].data.datasets = datasets;
+        charts[port].options = options;
+        charts[port].update();
+    } else if (typeof Chart !== 'undefined') {
+        charts[port] = new Chart(ctx, { type: 'line', data: { datasets }, options: options });
+    }
 }
 }
 
