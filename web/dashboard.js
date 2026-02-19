@@ -357,12 +357,20 @@ function updateOrCreateChart(port, portData) {
                 hud.classList.add('active');
 
                 const closeHandler = (ev) => {
-                    if (!hud.contains(ev.target) && ev.target !== chart.canvas) {
-                        hud.classList.remove('active');
-                        document.removeEventListener('click', closeHandler);
-                    }
+                    // HUD自身、またはHUD内の要素をクリックした場合は閉じない
+                    if (hud.contains(ev.target)) return;
+
+                    // それ以外（背景、グラフなど）をクリック・タップで閉じる
+                    hud.classList.remove('active');
+                    document.removeEventListener('click', closeHandler);
+                    document.removeEventListener('touchstart', closeHandler);
                 };
-                setTimeout(() => document.addEventListener('click', closeHandler), 100);
+
+                // 少し遅延をおいてリスナーを追加（展開時のクリックで即閉じするのを防ぐ）
+                setTimeout(() => {
+                    document.addEventListener('click', closeHandler);
+                    document.addEventListener('touchstart', closeHandler, { passive: true });
+                }, 100);
             }
         },
         plugins: {
