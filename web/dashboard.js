@@ -382,85 +382,57 @@ async function generateWeeklyReport() {
 
         let yPos = 35;
 
-        // 1. エグゼクティブ・サマリー (AI分析セクション)
-        const insightCard = document.querySelector('.insight-card');
-        if (insightCard) {
-            console.log("Capturing insights...");
-            const canvas = await html2canvas(insightCard, {
-                scale: 2,
-                backgroundColor: '#0d1117',
-                useCORS: true
-            });
-            const imgH = contentW * (canvas.height / canvas.width);
-            doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, yPos, contentW, imgH);
-            yPos += imgH + 10;
-        }
-
-        // 2. 最新相場一覧 (サマリーグリッド)
-        const summaryGrid = document.getElementById('summary-container');
-        if (summaryGrid) {
-            console.log("Capturing summary grid...");
-            const canvas = await html2canvas(summaryGrid, {
-                scale: 1.5,
-                backgroundColor: '#0d1117',
-                useCORS: true
-            });
-            const imgH = contentW * (canvas.height / canvas.width);
+        const addSection = async (el, scale = 1.2) => {
+            if (!el) return;
+            const canvas = await html2canvas(el, { scale, backgroundColor: '#0d1117', useCORS: true });
+            const w = canvas.width, h = canvas.height;
+            if (w <= 0 || h <= 0) return;
+            const imgH = contentW * (h / w);
+            if (!isFinite(imgH) || imgH <= 0) return;
 
             if (yPos + imgH > pageH - 20) {
                 doc.addPage();
-                yPos = margin;
+                yPos = 20;
             }
             doc.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', margin, yPos, contentW, imgH);
             yPos += imgH + 10;
-        }
+        };
 
-        // 3. 最新の入札予定
+        // 1. インサイト
+        await addSection(document.querySelector('.insight-card'));
+
+        // 2. サマリー
+        await addSection(document.getElementById('summary-container'));
+
+        // 3. 入札予定
         const latestBid = document.getElementById('latest-bid-container');
         if (latestBid && latestBid.children.length > 0) {
-            console.log("Capturing latest bid schedule...");
             doc.addPage();
             yPos = 20;
             doc.setFontSize(14);
             doc.setTextColor(88, 166, 255);
             doc.text("🚢 今後の入札予定・供給予測", margin, yPos);
             yPos += 8;
-
-            const canvas = await html2canvas(latestBid.firstChild, {
-                scale: 1.5,
-                backgroundColor: '#0d1117',
-                useCORS: true
-            });
-            const imgH = contentW * (canvas.height / canvas.width);
-            doc.addImage(canvas.toDataURL('image/jpeg', 0.9), 'JPEG', margin, yPos, contentW, imgH);
+            await addSection(latestBid.firstChild);
         }
 
-        // 4. 主要港の推移グラフ
+        // 4. 主要港のグラフ
         for (const port of ["枕崎", "焼津"]) {
             const chartCard = document.getElementById(`chart-${port}`)?.closest('.chart-card');
             if (chartCard) {
-                console.log(`Capturing chart for ${port}...`);
                 doc.addPage();
+                yPos = 20;
                 doc.setFontSize(14);
                 doc.setTextColor(88, 166, 255);
-                doc.text(`📈 推移分析: ${port}`, margin, 20);
-
-                const canvas = await html2canvas(chartCard, {
-                    scale: 1.5,
-                    backgroundColor: '#161b22',
-                    useCORS: true
-                });
-                const imgH = contentW * (canvas.height / canvas.width);
-                doc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', margin, 30, contentW, imgH);
+                doc.text(`📈 推移分析: ${port}`, margin, yPos);
+                yPos += 10;
+                await addSection(chartCard);
             }
         }
 
-        const fileName = `鰹相場レポート_${dateStr.replace(/\//g, '')}.pdf`;
-        doc.save(fileName);
-        console.log("Report generation complete: " + fileName);
-
+        doc.save(`鰹相場レポート_${dateStr.replace(/\//g, '')}.pdf`);
     } catch (err) {
-        console.error('PDF Generation Detail Error:', err);
+        console.error('PDF Generation Error:', err);
         alert(`レポート生成に失敗しました。\n詳細: ${err.message}`);
     } finally {
         if (btn) { btn.textContent = '📄 週報PDF (高度分析)'; btn.disabled = false; }
