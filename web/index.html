@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マルチョウ専用 鰹相場データ</title>
     <meta name="apple-mobile-web-app-title" content="マルチョウ相場">
-    <link rel="stylesheet" href="index.css?v=20260219-v1">
+    <link rel="stylesheet" href="index.css?v=20260219-header-v2">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
@@ -30,21 +30,19 @@
 
     <div class="container">
         <header class="app-header">
-            <div class="header-overlay"></div>
-            <div class="header-controls">
-                <button id="btn-settings" class="btn-icon" title="設定">⚙️</button>
+            <div class="header-visual-container">
+                <img src="header_visual.png" alt="鰹相場データ" class="header-main-visual">
+                <div class="header-action-overlay">
+                    <button id="btn-settings" class="btn-icon floating" title="設定">⚙️</button>
+                    <button id="btn-refresh-floating" class="btn-icon floating" title="更新">🔄</button>
+                </div>
             </div>
-            <div class="logo-container">
-                <img src="marucyou_mark_white.png" alt="Marucyou Logo" class="header-logo">
-            </div>
-            <h1>マルチョウ専用 鰹相場データ</h1>
-            <p class="description">枕崎・焼津・山川におけるサイズ別の相場推移</p>
-
-            <div class="filter-controls">
-                <button class="btn-filter" data-range="all">全期間</button>
-                <button class="btn-filter active" data-range="30">1ヶ月</button>
-                <button class="btn-filter" data-range="7">1週間</button>
-                <button id="btn-refresh" class="btn-refresh">🔄 更新</button>
+            <div class="filter-controls-container">
+                <div class="filter-controls">
+                    <button class="btn-filter" data-range="all">全期間</button>
+                    <button class="btn-filter active" data-range="30">1ヶ月</button>
+                    <button class="btn-filter" data-range="7">1週間</button>
+                </div>
             </div>
         </header>
 

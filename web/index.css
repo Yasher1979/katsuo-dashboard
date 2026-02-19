@@ -140,25 +140,68 @@ body {
 .app-header {
     text-align: center;
     margin-bottom: 25px;
-    padding: 40px 20px;
+    padding: 0;
     position: relative;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #0d1117 0%, #161b22 100%);
+    border-radius: 20px;
+    background: #000b1d;
+    /* 深海のような紺色（画像背景に合わせる） */
     overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.theme-dark .app-header {
-    background: linear-gradient(135deg, #0d1117 0%, #1c2128 100%);
+.header-visual-container {
+    position: relative;
+    width: 100%;
+    line-height: 0;
+    /* 画像下の隙間防止 */
 }
 
-.theme-light .app-header {
-    background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+.header-main-visual {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: cover;
 }
 
+.header-action-overlay {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 12px;
+    z-index: 10;
+}
+
+.btn-icon.floating {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    width: 44px;
+    height: 44px;
+    font-size: 1.3rem;
+}
+
+.btn-icon.floating:hover {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+    transform: scale(1.1) rotate(15deg);
+}
+
+.filter-controls-container {
+    padding: 15px 20px 25px;
+    background: linear-gradient(to bottom, transparent, rgba(0, 0, 0, 0.2));
+}
+
+/* テーマごとの背景上書きを無効化 */
+.theme-dark .app-header,
+.theme-light .app-header,
 .theme-ocean .app-header {
-    background: linear-gradient(135deg, #001a33 0%, #003366 100%);
+    background: transparent;
+    box-shadow: none;
+    border: none;
 }
 
 .header-overlay {

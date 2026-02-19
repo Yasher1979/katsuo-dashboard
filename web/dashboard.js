@@ -430,7 +430,9 @@ function setupFilters() {
         document.querySelectorAll('.btn-filter').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); currentRange = btn.dataset.range; renderDashboard();
     }));
-    document.getElementById('btn-refresh')?.addEventListener('click', () => location.reload());
+    document.querySelectorAll('#btn-refresh, #btn-refresh-floating').forEach(btn => {
+        btn.addEventListener('click', () => location.reload());
+    });
     document.getElementById('btn-reload-insight')?.addEventListener('click', () => updateInsights());
 }
 

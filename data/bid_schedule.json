@@ -1,82 +1,54 @@
 [
     {
-        "id": "20260219_genpukumaru",
-        "delivery_date": "2026-02-16",
-        "vessel_name": "第八十一源福丸",
-        "bid_date": "2026-02-19",
-        "tonnage": 490.0,
+        "id": "20260210_koyomaru",
+        "delivery_date": "2026-02-06",
+        "vessel_name": "78 光洋丸",
+        "bid_date": "2026-02-10",
+        "tonnage": 640.0,
         "sea_area": {
-            "lat": "N 02°15' 〜 N 03°30'",
-            "lon": "E 150°20' 〜 E 152°45'"
+            "lat": "N 03°41' 〜 N 04°45'",
+            "lon": "E 154°30' 〜 E 145°37'"
         },
-        "port": "山川",
+        "port": "枕崎",
         "is_latest": true,
         "items": [
             {
                 "category": "B カツオ",
+                "size": "8.0 上",
+                "type": "入札",
+                "volume": 0
+            },
+            {
+                "category": "B カツオ",
+                "size": "6.0 上",
+                "type": "入札",
+                "volume": 40.0
+            },
+            {
+                "category": "B カツオ",
                 "size": "4.5 上",
                 "type": "入札",
-                "volume": 50.0
+                "volume": 40.0
             },
             {
                 "category": "B カツオ",
                 "size": "2.5 上",
                 "type": "入札",
-                "volume": 110.0
+                "volume": 150.0
             },
             {
                 "category": "B カツオ",
                 "size": "1.8 上",
                 "type": "入札",
-                "volume": 10.0
+                "volume": 20.0
             },
             {
                 "category": "B カツオ",
                 "size": "1.8 下",
                 "type": "入札",
-                "volume": 5.0
-            }
-        ],
-        "total_volume": 175.0
-    },
-    {
-        "id": "20260217_eiseimaru",
-        "delivery_date": "2026-02-17",
-        "vessel_name": "永盛丸",
-        "bid_date": "2026-02-17",
-        "tonnage": 640.0,
-        "sea_area": {
-            "lat": "N 01°40' 〜 N 02°50'",
-            "lon": "E 148°30' 〜 E 151°20'"
-        },
-        "port": "焼津",
-        "is_latest": false,
-        "items": [
-            {
-                "category": "冷凍カツオ",
-                "size": "4.5 上",
-                "type": "入札",
-                "volume": 50.0
-            },
-            {
-                "category": "冷凍カツオ",
-                "size": "2.5 上",
-                "type": "入札",
-                "volume": 290.0
-            },
-            {
-                "category": "冷凍カツオ",
-                "size": "1.8 上",
-                "type": "入札",
-                "volume": 50.0
-            },
-            {
-                "category": "冷凍カツオ",
-                "size": "1.8 下",
-                "type": "入札",
                 "volume": 10.0
             }
         ],
-        "total_volume": 400.0
+        "total_volume": 260.0
     }
 ]
