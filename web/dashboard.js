@@ -703,9 +703,11 @@ function renderNews(isLoadMore = false) {
 
         let icon = '📰';
         if (news.category === '漁況') icon = '🐟';
-        if (news.category === '燃費油') icon = '⛽';
+        if (news.category === '燃費油' || news.category === '燃油') icon = '⛽';
         if (news.category === '規制') icon = '⚖️';
         if (news.category === '市場') icon = '📈';
+        if (news.category === '食品加工') icon = '🏭';
+        if (news.category === '物流') icon = '🚚';
 
         card.innerHTML = `
             <div class="news-category">${icon} ${news.category}</div>
