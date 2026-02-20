@@ -708,6 +708,7 @@ function renderNews(isLoadMore = false) {
         if (news.category === '市場') icon = '📈';
         if (news.category === '食品加工') icon = '🏭';
         if (news.category === '物流') icon = '🚚';
+        if (news.category === '新商品') icon = '🆕';
 
         card.innerHTML = `
             <div class="news-category">${icon} ${news.category}</div>
