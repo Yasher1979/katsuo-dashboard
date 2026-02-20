@@ -214,8 +214,7 @@ function renderBidSchedule() {
     sorted.forEach((bid, i) => {
         let itemsH = '';
         (bid.items || []).forEach(item => {
-            // PSカツオは除外するが、それ以外はすべて表示（重量0も含む）
-            if (item.category === 'PS カツオ') return;
+            // 全カテゴリを表示（重量0も含む）
             itemsH += `<tr><td>${item.category}</td><td>${item.size}</td><td>${item.type}</td><td class="volume-val">${(item.volume || 0).toFixed(1)}<span class="volume-unit">t</span></td></tr>`;
         });
         // マップURLの生成

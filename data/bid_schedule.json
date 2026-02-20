@@ -78,12 +78,6 @@
         "items": [
             {
                 "category": "B カツオ",
-                "size": "8.0kg上",
-                "type": "入札",
-                "volume": 0
-            },
-            {
-                "category": "B カツオ",
                 "size": "6.0kg上",
                 "type": "入札",
                 "volume": 10.0
@@ -143,73 +137,73 @@
                 "volume": 9.0
             },
             {
-                "category": "キワ・キメ(B)",
-                "size": "10.0kg上",
+                "category": "キワ・キメ",
+                "size": "10.0kg上(B)",
                 "type": "相対",
                 "volume": 10.0
             },
             {
-                "category": "キワ・キメ(B)",
-                "size": "5.0-3.0kg上",
+                "category": "キワ・キメ",
+                "size": "5.0-3.0kg上(B)",
                 "type": "相対",
                 "volume": 42.0
             },
             {
-                "category": "キワ・キメ(B)",
-                "size": "1.5kg上",
+                "category": "キワ・キメ",
+                "size": "1.5kg上(B)",
                 "type": "入札",
                 "volume": 5.0
             },
             {
-                "category": "キワ・キメ(B)",
-                "size": "1.5kg下ダル混",
+                "category": "キワ・キメ",
+                "size": "1.5kg下ダル混(B)",
                 "type": "入札",
                 "volume": 5.0
             },
             {
-                "category": "キワ・キメ(PS)",
+                "category": "PS キワ・キメ",
                 "size": "10.0kg上",
                 "type": "相対",
                 "volume": 16.0
             },
             {
-                "category": "キワ・キメ(PS)",
+                "category": "PS キワ・キメ",
                 "size": "5.0-3.0kg上",
                 "type": "相対",
                 "volume": 41.0
             },
             {
-                "category": "キワ・キメ(PS)",
+                "category": "PS キワ・キメ",
                 "size": "1.5kg上",
                 "type": "相対",
                 "volume": 0
             },
             {
-                "category": "キワ・キメ(PS)",
+                "category": "PS キワ・キメ",
                 "size": "1.5kg下ダル混",
                 "type": "相対",
                 "volume": 1.0
             },
             {
-                "category": "ダルマ(B)",
-                "size": "10.0-3.0kg上",
+                "category": "ダルマ",
+                "size": "10.0-3.0kg上(B)",
                 "type": "相対",
                 "volume": 1.0
             },
             {
-                "category": "ダルマ(B)",
-                "size": "1.5kg上",
+                "category": "ダルマ",
+                "size": "1.5kg上(B)",
                 "type": "入札",
                 "volume": 2.0
             },
             {
-                "category": "ダルマ(PS)",
+                "category": "PS ダルマ",
                 "size": "10.0-3.0kg上",
                 "type": "相対",
                 "volume": 3.0
             },
             {
-                "category": "ダルマ(PS)",
+                "category": "PS ダルマ",
                 "size": "1.5kg上",
                 "type": "相対",
                 "volume": 1.0
