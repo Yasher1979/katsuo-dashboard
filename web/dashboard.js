@@ -460,9 +460,17 @@ function setupThemeSwitcher() {
     }));
 }
 
-function updateInsights() {
+async function updateInsights() {
     const el = document.getElementById('insight-content');
+    const btn = document.getElementById('btn-reload-insight');
     if (!currentData || !el) return;
+
+    // ローディング演出
+    if (btn) btn.classList.add('loading');
+    el.style.opacity = '0.5';
+
+    // 擬似的な計算待ち（「分析中」という実感を出すため）
+    await new Promise(r => setTimeout(r, 600));
 
     // 1. 全データの中から「真の最新日」を特定
     let latestGlobalDate = "";
@@ -478,6 +486,8 @@ function updateInsights() {
 
     if (!latestGlobalDate) {
         el.innerHTML = '<p>分析可能なデータが不足しています。</p>';
+        if (btn) btn.classList.remove('loading');
+        el.style.opacity = '1';
         return;
     }
 
@@ -488,7 +498,7 @@ function updateInsights() {
     // A. ボラティリティ分析 (急騰・急落)
     const volatilityResults = analyzeVolatility(currentData);
     volatilityResults.forEach(r => {
-        if (r.memo === latestGlobalDate) { // 最新日の動きを優先
+        if (r.memo === latestGlobalDate) {
             allInsights.push({
                 title: `⚡ 相場${r.title}`,
                 text: r.text,
@@ -510,26 +520,25 @@ function updateInsights() {
         allInsights.push({ title: "⚖️ 拠点間価格差", text: r.text, memo: `差額: ${r.memo}円`, type: "info" });
     });
 
-    // D. 全体ボリューム分析 (フォールバック)
-    if (allInsights.length < 3) {
-        let dayVolume = 0;
-        ports.forEach(p => {
-            Object.keys(currentData[p] || {}).forEach(s => {
-                const latest = currentData[p][s].find(v => v.date === latestGlobalDate);
-                if (latest) dayVolume += latest.volume;
-            });
+    // D. 全体ボリューム分析
+    let dayVolume = 0;
+    ports.forEach(p => {
+        Object.keys(currentData[p] || {}).forEach(s => {
+            const latest = currentData[p][s].find(v => v.date === latestGlobalDate);
+            if (latest) dayVolume += latest.volume;
         });
+    });
 
-        if (dayVolume > 300) {
-            allInsights.push({ title: "🌊 潤沢な供給量", text: `${latestGlobalDate}の総水揚げ量は${dayVolume.toFixed(1)}tと豊富です。`, memo: "安定調達期", type: "success" });
-        } else if (dayVolume > 0 && dayVolume < 50) {
-            allInsights.push({ title: "⚠️ 供給不足の兆候", text: `${latestGlobalDate}の総水揚げが${dayVolume.toFixed(1)}tと極少です。`, memo: "争奪戦注意", type: "danger" });
-        }
+    if (dayVolume > 300) {
+        allInsights.push({ title: "🌊 潤沢な供給量", text: `${latestGlobalDate}の総水揚げ量は${dayVolume.toFixed(1)}tと豊富です。`, memo: "安定調達期", type: "success" });
+    } else if (dayVolume > 0 && dayVolume < 50) {
+        allInsights.push({ title: "⚠️ 供給不足の兆候", text: `${latestGlobalDate}の総水揚げが${dayVolume.toFixed(1)}tと極少です。`, memo: "争奪戦注意", type: "danger" });
     }
 
-    // 表示用に最大3つ選択（最新日のものを優先的にソート）
+    // 表示用に最大3つ選択（「更新」のたびに入れ替わるようランダムにシャッフル）
     const displayInsights = allInsights
-        .sort((a, b) => (a.type === 'danger' ? -1 : 1))
+        .sort(() => Math.random() - 0.5) // シャッフル
+        .sort((a, b) => (a.type === 'danger' ? -1 : 1)) // 重要度を上に
         .slice(0, 3);
 
     if (displayInsights.length === 0) {
@@ -542,14 +551,17 @@ function updateInsights() {
     }
 
     el.innerHTML = displayInsights.map(sel => `
-        <div class="insight-item ${sel.type}" style="margin-bottom: 12px; padding: 10px; border-left: 4px solid var(--accent-color, #007bff); background: rgba(255,255,255,0.03); border-radius: 4px;">
-            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 4px;">
-                <span style="font-weight: 700; font-size: 0.9rem;">${sel.title}</span>
-                <span style="font-size: 0.75rem; background: rgba(255,255,255,0.1); padding: 1px 6px; border-radius: 10px;">${sel.memo}</span>
+        <div class="insight-item ${sel.type}" style="margin-bottom: 12px; padding: 12px; border-left: 5px solid var(--accent-color, #007bff); background: rgba(255,255,255,0.03); border-radius: 8px; animation: slideIn 0.4s easeOut;">
+            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px;">
+                <span style="font-weight: 800; font-size: 0.95rem; display: flex; align-items: center; gap: 6px;">${sel.title}</span>
+                <span style="font-size: 0.75rem; background: rgba(255,255,255,0.15); padding: 2px 8px; border-radius: 12px; font-weight: 600;">${sel.memo}</span>
             </div>
-            <p style="font-size: 0.95rem; margin: 0; line-height: 1.4; color: var(--text-color);">${sel.text}</p>
+            <p style="font-size: 1rem; margin: 0; line-height: 1.5; color: var(--text-color); font-weight: 500;">${sel.text}</p>
         </div>
     `).join('');
+
+    el.style.opacity = '1';
+    if (btn) btn.classList.remove('loading');
 }
 function analyzeVolatility(d) {
     const res = []; ports.forEach(p => Object.keys(d[p] || {}).forEach(s => {
