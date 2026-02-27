@@ -1,4 +1,4 @@
-現在from http.server import BaseHTTPRequestHandler
+from http.server import BaseHTTPRequestHandler
 import base64
 import os
 
