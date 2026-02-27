@@ -74,7 +74,7 @@
             "lon": "E 153°02' 〜 E 148°06'"
         },
         "port": "枕崎",
-        "is_latest": true,
+        "is_latest": false,
         "items": [
             {
                 "category": "B カツオ",
@@ -210,5 +210,147 @@
             }
         ],
         "total_volume": 820.0
+    },
+    {
+        "id": "20260304_wakabamaru",
+        "delivery_date": "2026-02-26",
+        "vessel_name": "7 わかば丸",
+        "bid_date": "2026-03-04",
+        "tonnage": 850.0,
+        "sea_area": {
+            "lat": "N 01°18' 〜 N 04°52'",
+            "lon": "E 147°24' 〜 E 150°58'"
+        },
+        "port": "枕崎",
+        "is_latest": true,
+        "items": [
+            {
+                "category": "B カツオ",
+                "size": "4.5kg上",
+                "type": "入札",
+                "volume": 30.0
+            },
+            {
+                "category": "B カツオ",
+                "size": "2.5kg上",
+                "type": "入札",
+                "volume": 310.0
+            },
+            {
+                "category": "B カツオ",
+                "size": "1.8kg上",
+                "type": "入札",
+                "volume": 60.0
+            },
+            {
+                "category": "B カツオ",
+                "size": "1.8kg下",
+                "type": "入札",
+                "volume": 20.0
+            },
+            {
+                "category": "PS カツオ",
+                "size": "7.0kg上",
+                "type": "相対",
+                "volume": 0
+            },
+            {
+                "category": "PS カツオ",
+                "size": "4.5kg上",
+                "type": "相対",
+                "volume": 40.0
+            },
+            {
+                "category": "PS カツオ",
+                "size": "2.5kg上",
+                "type": "相対",
+                "volume": 201.0
+            },
+            {
+                "category": "PS カツオ",
+                "size": "1.8kg上",
+                "type": "相対",
+                "volume": 66.0
+            },
+            {
+                "category": "PS カツオ",
+                "size": "1.8kg下",
+                "type": "相対",
+                "volume": 37.0
+            },
+            {
+                "category": "キワ・キメ",
+                "size": "10.0kg上(B)",
+                "type": "相対",
+                "volume": 10.0
+            },
+            {
+                "category": "キワ・キメ",
+                "size": "5.0-3.0kg上(B)",
+                "type": "相対",
+                "volume": 18.0
+            },
+            {
+                "category": "キワ・キメ",
+                "size": "1.5kg上(B)",
+                "type": "入札",
+                "volume": 5.0
+            },
+            {
+                "category": "キワ・キメ",
+                "size": "1.5kg下ダル混(B)",
+                "type": "入札",
+                "volume": 2.0
+            },
+            {
+                "category": "PS キワ・キメ",
+                "size": "10.0kg上",
+                "type": "相対",
+                "volume": 10.0
+            },
+            {
+                "category": "PS キワ・キメ",
+                "size": "5.0-3.0kg上",
+                "type": "相対",
+                "volume": 18.0
+            },
+            {
+                "category": "PS キワ・キメ",
+                "size": "1.5kg上",
+                "type": "相対",
+                "volume": 7.0
+            },
+            {
+                "category": "PS キワ・キメ",
+                "size": "1.5kg下ダル混",
+                "type": "相対",
+                "volume": 0
+            },
+            {
+                "category": "ダルマ",
+                "size": "10.0-3.0kg上(B)",
+                "type": "相対",
+                "volume": 5.0
+            },
+            {
+                "category": "ダルマ",
+                "size": "1.5kg上(B)",
+                "type": "入札",
+                "volume": 2.0
+            },
+            {
+                "category": "PS ダルマ",
+                "size": "10.0-3.0kg上",
+                "type": "相対",
+                "volume": 7.0
+            },
+            {
+                "category": "PS ダルマ",
+                "size": "1.5kg上",
+                "type": "相対",
+                "volume": 2.0
+            }
+        ],
+        "total_volume": 850.0
     }
 ]
