@@ -1554,3 +1554,137 @@ details[open] .archive-summary::before {
     margin-left: 3px;
     color: var(--text-muted);
 }
+
+/* --- 原価計算機 --- */
+.calculator-section {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 10px;
+}
+
+.calculator-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.calculator-header h3 {
+    font-size: 1.5rem;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+}
+
+.calculator-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+}
+
+.calculator-card {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 20px;
+    padding: 30px;
+    box-shadow: var(--card-shadow);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
+.calc-input-group {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.calc-input-group label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.calc-input-group input {
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 12px 15px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.theme-light .calc-input-group input {
+    background: #fff;
+    color: #1f2328;
+}
+
+.calc-input-group input:focus {
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.btn-calculate {
+    width: 100%;
+    background: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px var(--accent-glow);
+}
+
+.btn-calculate:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px var(--accent-glow);
+    filter: brightness(1.1);
+}
+
+.calc-result-box {
+    margin-top: 30px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 20px;
+    animation: slideIn 0.4s easeOut;
+}
+
+.theme-light .calc-result-box {
+    background: rgba(255, 255, 255, 0.5);
+}
+
+.calc-result-box h4 {
+    margin: 0 0 15px 0;
+    color: var(--accent-color);
+    text-align: center;
+    font-size: 1.1rem;
+}
+
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 1rem;
+    color: var(--text-color);
+}
+
+.result-divider {
+    border: 0;
+    border-top: 1px dashed var(--border-color);
+    margin: 15px 0;
+}
+
+.result-row.total {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--accent-color);
+    margin-bottom: 0;
+}
+
+.total-price-value {
+    font-size: 1.5rem;
+}

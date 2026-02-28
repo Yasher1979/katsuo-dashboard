@@ -65,6 +65,7 @@ async function initDashboard() {
         setupMemoModal();
         setupSettings(); // 設定機能の初期化
         loadAllSettings(); // 全設定の読み込み
+        setupCalculator(); // 原価計算機の初期化
 
         // 初期タブに応じたコントロール表示
         updateControlVisibility(activeTab);
@@ -798,6 +799,44 @@ function setupNewsLoadMore() {
         btn.onclick = () => renderNews(true);
     }
 }
+
+// 原価計算機セットアップ
+function setupCalculator() {
+    const btn = document.getElementById('btn-calculate');
+    const priceInput = document.getElementById('calc-price');
+    const multiplierInput = document.getElementById('calc-multiplier');
+    const overheadInput = document.getElementById('calc-overhead');
+    const resultBox = document.getElementById('calc-result-box');
+
+    const resMaterial = document.getElementById('res-material-cost');
+    const resOverhead = document.getElementById('res-overhead');
+    const resTotal = document.getElementById('res-total-price');
+
+    if (btn) {
+        btn.onclick = () => {
+            const price = parseFloat(priceInput.value);
+            const multiplier = parseFloat(multiplierInput.value);
+            const overhead = parseFloat(overheadInput.value);
+
+            if (isNaN(price) || isNaN(multiplier) || isNaN(overhead)) {
+                alert("数値を正しく入力してください。");
+                return;
+            }
+
+            // 購入単価 × 掛率
+            const materialCost = Math.round(price * multiplier);
+            // 原料費 + 諸経費 = 販売最低指標価格
+            const total = materialCost + overhead;
+
+            resMaterial.textContent = `${materialCost.toLocaleString()} 円`;
+            resOverhead.textContent = `${overhead.toLocaleString()} 円`;
+            resTotal.textContent = `${total.toLocaleString()} 円`;
+
+            resultBox.style.display = 'block';
+        };
+    }
+}
+
 
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();

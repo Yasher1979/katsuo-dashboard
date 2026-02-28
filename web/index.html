@@ -125,6 +125,7 @@
             <button class="tab-item" data-tab="charts">📈 グラフ推移</button>
             <button class="tab-item" data-tab="bid-schedule">🚢 入札予定</button>
             <button class="tab-item" data-tab="topic">📰 トピック</button>
+            <button class="tab-item" data-tab="calculator">🧮 原価計算</button>
         </nav>
 
         <!-- 最新一覧サマリービュー（初期表示） -->
@@ -148,6 +149,48 @@
                 </div>
                 <div id="news-load-more-container" class="news-load-more-container" style="display:none;">
                     <button id="btn-load-more-news" class="btn-load-more">⚓️ もっと見る</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 原価計算機ビュー -->
+        <div id="view-calculator" class="tab-view">
+            <div class="calculator-section">
+                <div class="calculator-header">
+                    <h3>🧮 鰹節原価計算オリジナル計算機</h3>
+                    <p class="calculator-subtitle">購入単価から販売の最低指標価格を算出します</p>
+                </div>
+                <div class="calculator-card">
+                    <div class="calc-input-group">
+                        <label for="calc-price">購入単価 (円/kg):</label>
+                        <input type="number" id="calc-price" placeholder="例: 220" />
+                    </div>
+                    <div class="calc-input-group">
+                        <label for="calc-multiplier">歩留まり掛率 (掛):</label>
+                        <input type="number" id="calc-multiplier" placeholder="例: 5" value="5" step="0.1" />
+                    </div>
+                    <div class="calc-input-group">
+                        <label for="calc-overhead">諸経費 (約・円):</label>
+                        <input type="number" id="calc-overhead" placeholder="例: 250" value="250" />
+                    </div>
+                    <button id="btn-calculate" class="btn-calculate">計算する</button>
+
+                    <div id="calc-result-box" class="calc-result-box" style="display:none;">
+                        <h4>📝 計算結果（販売指標）</h4>
+                        <div class="result-row">
+                            <span>原料費 (単価 × 掛率):</span>
+                            <span id="res-material-cost">--</span>
+                        </div>
+                        <div class="result-row">
+                            <span>諸経費:</span>
+                            <span id="res-overhead">--</span>
+                        </div>
+                        <hr class="result-divider">
+                        <div class="result-row total">
+                            <span>販売最低指標価格:</span>
+                            <span id="res-total-price" class="total-price-value">--</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
