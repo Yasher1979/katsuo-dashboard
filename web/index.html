@@ -40,6 +40,7 @@
                             <button class="btn-filter" data-range="7">7日間</button>
                         </div>
                         <div class="system-group">
+                            <button id="btn-species-list" class="btn-system"><span class="icon">🪵</span> 種類表</button>
                             <button id="btn-refresh" class="btn-system"><span class="icon">🔄</span> 更新</button>
                             <button id="btn-settings" class="btn-system"><span class="icon">⚙️</span> 設定</button>
                         </div>
@@ -116,6 +117,95 @@
                             </label>
                         </div>
                     </section>
+                </div>
+            </div>
+        </div>
+
+        <!-- 鰹節種類表モーダル -->
+        <div id="species-modal" class="modal-overlay">
+            <div class="modal-content species-modal-content">
+                <div class="modal-header">
+                    <h3>🪵 鰹節種別・名称ガイド</h3>
+                    <button id="species-close" class="btn-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="species-table-wrapper">
+                        <table class="species-table">
+                            <thead>
+                                <tr>
+                                    <th>分類</th>
+                                    <th>名称</th>
+                                    <th>品質・特徴</th>
+                                    <th>サイズ目安</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="group-kare">
+                                    <td rowspan="3" class="group-title">枯節<br><small>(カビ付)</small></td>
+                                    <td class="name">本節 (枯本節)</td>
+                                    <td class="desc">最高級品。脂の乗りや形で厳選。匠の技。</td>
+                                    <td class="size">4.5kg以上等 大型</td>
+                                </tr>
+                                <tr class="group-kare">
+                                    <td class="name">準本節</td>
+                                    <td class="desc">本節に次ぐランク。身質・形が良い。</td>
+                                    <td class="size">4.5kg以上等 大型</td>
+                                </tr>
+                                <tr class="group-kare">
+                                    <td class="name">荒本仕上げ</td>
+                                    <td class="desc">カビ付け工程あり。高級仕上げ。</td>
+                                    <td class="size">2.5kg以上 など</td>
+                                </tr>
+                                <tr class="divider-row">
+                                    <td colspan="4">↑ ここからはカビ無し（荒節）が主流 ↑</td>
+                                </tr>
+                                <tr class="group-ara">
+                                    <td rowspan="6" class="group-title">荒節<br><small>(カビ無)</small></td>
+                                    <td class="name">カビ付荒本節</td>
+                                    <td class="desc">表面を削らずにカビ付けを行ったもの。</td>
+                                    <td class="size">高級荒節</td>
+                                </tr>
+                                <tr class="group-ara">
+                                    <td class="name">表面削り</td>
+                                    <td class="desc">表面を削り、出汁の濁りを落としたもの。</td>
+                                    <td class="size">加工品</td>
+                                </tr>
+                                <tr class="group-ara">
+                                    <td class="name">荒本</td>
+                                    <td class="desc">標準的な品質。一般的な鰹節の原型。</td>
+                                    <td class="size">2.5kg以上</td>
+                                </tr>
+                                <tr class="group-ara">
+                                    <td class="name">割荒本</td>
+                                    <td class="desc">通常より小さいサイズ。サイズ分けあり。</td>
+                                    <td class="size">0.5〜1.8kg目安</td>
+                                </tr>
+                                <tr class="group-ara">
+                                    <td class="name">亀 (亀節)</td>
+                                    <td class="desc">三枚おろしで左右に割らずに加工。</td>
+                                    <td class="size">0.5kg前後の極小</td>
+                                </tr>
+                                <tr class="group-ara">
+                                    <td class="name">ドブ (B品)</td>
+                                    <td class="desc">規格外品。抜き折れ・身崩れ等。二次加工用。</td>
+                                    <td class="size">B級〜C級品</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="special-info">
+                        <h4>💡 特殊加工・その他</h4>
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h5>血合い抜き</h5>
+                                <p>血合いを除去し、エグみがなく澄んだ上品な出汁になる高級仕様。</p>
+                            </div>
+                            <div class="info-card">
+                                <h5>合断荒本</h5>
+                                <p>大型の個体を4つ割りにして煮熟する、伝統的な大型節の加工。</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

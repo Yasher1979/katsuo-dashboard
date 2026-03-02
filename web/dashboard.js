@@ -62,6 +62,7 @@ async function initDashboard() {
         setupThemeSwitcher();
         setupTabs();
         setupModal();
+        setupSpeciesModal(); // 種類表モーダルの初期化
         setupMemoModal();
         setupSettings(); // 設定機能の初期化
         loadAllSettings(); // 全設定の読み込み
@@ -591,6 +592,17 @@ function getLatestData(d, p, s) { const a = (d[p] || {})[s]; return a && a.lengt
 function setupModal() {
     const m = document.getElementById('detail-modal'), c = document.getElementById('modal-close');
     if (c && m) { c.onclick = () => m.classList.remove('active'); m.onclick = (e) => { if (e.target === m) m.classList.remove('active'); }; }
+}
+
+function setupSpeciesModal() {
+    const modal = document.getElementById('species-modal');
+    const btnOpen = document.getElementById('btn-species-list');
+    const btnClose = document.getElementById('species-close');
+    if (!modal || !btnOpen || !btnClose) return;
+
+    btnOpen.onclick = () => modal.classList.add('active');
+    btnClose.onclick = () => modal.classList.remove('active');
+    modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
 }
 function setupTabs() {
     document.querySelectorAll('.tab-item').forEach(btn => btn.addEventListener('click', () => {
