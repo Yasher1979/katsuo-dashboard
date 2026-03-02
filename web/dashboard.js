@@ -812,41 +812,557 @@ function setupNewsLoadMore() {
     }
 }
 
-// 原価計算機セットアップ
+// ============================================================
+//  🧮 鰹節製造原価計算機 Pro - メインロジック
+// ============================================================
 function setupCalculator() {
-    const btn = document.getElementById('btn-calculate');
-    const priceInput = document.getElementById('calc-price');
-    const multiplierInput = document.getElementById('calc-multiplier');
-    const overheadInput = document.getElementById('calc-overhead');
-    const resultBox = document.getElementById('calc-result-box');
+    // --- 状態管理 ---
+    const calcState = {
+        displayValue: '0',
+        currentTarget: 'purchase_price',  // 'purchase_price' | 'sell_price' | 'custom_overhead'
+        multiplier: 5,
+        overheadItems: [{ cost: 250, label: '基本経費' }],
+        purchasePrice: null,
+        sellPrice: null,
+        pendingOp: null,
+        pendingValue: null,
+        justCalc: false
+    };
 
-    const resMaterial = document.getElementById('res-material-cost');
-    const resOverhead = document.getElementById('res-overhead');
-    const resTotal = document.getElementById('res-total-price');
+    // --- DOM参照 ---
+    const dispMain = document.getElementById('calc-display-main');
+    const dispLabel = document.getElementById('calc-display-label');
+    const dispSub = document.getElementById('calc-display-sub');
+    const overheadDisplay = document.getElementById('current-overhead-display');
+    const overheadDetail = document.getElementById('current-overhead-detail');
 
-    if (btn) {
+    if (!dispMain) return; // 計算機タブが存在しない場合はスキップ
+
+    // --- ユーティリティ ---
+    const fmt = (n) => Math.round(n).toLocaleString('ja-JP');
+    const getOverheadTotal = () => calcState.overheadItems.reduce((s, i) => s + i.cost, 0);
+    const getManufactureCost = (price, mult, oh) => price * mult + oh;
+
+    function updateDisplay() {
+        const num = parseFloat(calcState.displayValue);
+        dispMain.textContent = isNaN(num) ? '0' : parseFloat(calcState.displayValue).toLocaleString('ja-JP');
+
+        // ラベルとサブ表示
+        const labelMap = { purchase_price: '🐟 仕入単価（円/kg）', sell_price: '💴 販売単価（円/kg）', custom_overhead: '💡 カスタム経費（円）' };
+        dispLabel.textContent = labelMap[calcState.currentTarget] || '入力中';
+
+        if (calcState.purchasePrice !== null) {
+            const oh = getOverheadTotal();
+            const mfg = getManufactureCost(calcState.purchasePrice, calcState.multiplier, oh);
+            dispSub.textContent = `仕入${fmt(calcState.purchasePrice)}円 → 製造原価 ${fmt(mfg)}円/kg`;
+        } else {
+            dispSub.textContent = calcState.pendingOp ? `計算中 (${calcState.pendingOp})` : '入力中';
+        }
+    }
+
+    function updateOverheadDisplay() {
+        const total = getOverheadTotal();
+        overheadDisplay.textContent = `${total}円`;
+        overheadDetail.textContent = `（${calcState.overheadItems.map(i => i.label).join('＋')}）`;
+    }
+
+    // --- テンキー入力処理 ---
+    function inputDigit(d) {
+        if (calcState.justCalc) { calcState.displayValue = '0'; calcState.justCalc = false; }
+        if (calcState.displayValue === '0') {
+            calcState.displayValue = d;
+        } else if (calcState.displayValue.length < 10) {
+            calcState.displayValue += d;
+        }
+        updateDisplay();
+    }
+
+    function inputDot() {
+        if (!calcState.displayValue.includes('.')) {
+            calcState.displayValue += '.';
+            updateDisplay();
+        }
+    }
+
+    function clearCurrent() {
+        calcState.displayValue = '0';
+        updateDisplay();
+    }
+
+    function clearAll() {
+        calcState.displayValue = '0';
+        calcState.pendingOp = null;
+        calcState.pendingValue = null;
+        calcState.justCalc = false;
+        updateDisplay();
+    }
+
+    function handleOp(op) {
+        const val = parseFloat(calcState.displayValue);
+        if (calcState.pendingOp && calcState.pendingValue !== null) {
+            // 連続演算
+            const result = applyOp(calcState.pendingValue, op, val);
+            calcState.displayValue = String(result);
+        }
+        calcState.pendingValue = parseFloat(calcState.displayValue);
+        calcState.pendingOp = op;
+        calcState.justCalc = true;
+        updateDisplay();
+    }
+
+    function applyOp(a, op, b) {
+        if (op === '+') return a + b;
+        if (op === '−') return a - b;
+        if (op === '×') return a * b;
+        if (op === '÷') return b !== 0 ? a / b : 0;
+        return b;
+    }
+
+    function handleEquals() {
+        const val = parseFloat(calcState.displayValue);
+        if (calcState.pendingOp && calcState.pendingValue !== null) {
+            const result = applyOp(calcState.pendingValue, calcState.pendingOp, val);
+            calcState.displayValue = String(Math.round(result * 100) / 100);
+            calcState.pendingOp = null;
+            calcState.pendingValue = null;
+        }
+        calcState.justCalc = true;
+        updateDisplay();
+    }
+
+    // --- 「今すぐ計算」メイン処理 ---
+    function runMainCalc() {
+        const val = parseFloat(calcState.displayValue);
+        if (isNaN(val) || val <= 0) {
+            dispSub.textContent = '⚠ 正しい金額を入力してください';
+            return;
+        }
+
+        if (calcState.currentTarget === 'purchase_price') {
+            calcState.purchasePrice = val;
+            dispSub.textContent = `✅ 仕入単価: ${fmt(val)}円/kg を設定しました`;
+        } else if (calcState.currentTarget === 'sell_price') {
+            calcState.sellPrice = val;
+            dispSub.textContent = `✅ 販売単価: ${fmt(val)}円/kg を設定しました`;
+        } else if (calcState.currentTarget === 'custom_overhead') {
+            calcState.overheadItems = [{ cost: Math.round(val), label: `カスタム経費` }];
+            updateOverheadDisplay();
+            dispSub.textContent = `✅ カスタム経費: ${fmt(val)}円 を設定しました`;
+        }
+
+        // 分析画面を自動更新
+        renderAnalysis(calcState);
+        updateDisplay();
+    }
+
+    // --- テンキーバインド ---
+    for (let i = 0; i <= 9; i++) {
+        const btn = document.getElementById(`key-${i}`);
+        if (btn) btn.onclick = () => inputDigit(String(i));
+    }
+    const btn00 = document.getElementById('key-00');
+    if (btn00) btn00.onclick = () => { inputDigit('0'); inputDigit('0'); };
+    const btnDot = document.getElementById('key-dot');
+    if (btnDot) btnDot.onclick = inputDot;
+    const btnCC = document.getElementById('key-cc');
+    if (btnCC) btnCC.onclick = clearCurrent;
+    const btnCA = document.getElementById('key-ca');
+    if (btnCA) btnCA.onclick = clearAll;
+    const btnEq = document.getElementById('key-eq');
+    if (btnEq) btnEq.onclick = handleEquals;
+    const btnCalcNow = document.getElementById('key-calc-now');
+    if (btnCalcNow) btnCalcNow.onclick = runMainCalc;
+
+    // 演算子
+    document.querySelectorAll('.key-op[data-op]').forEach(btn => {
+        btn.onclick = () => handleOp(btn.dataset.op);
+    });
+
+    // --- 入力項目切替 ---
+    document.querySelectorAll('.preset-target').forEach(btn => {
         btn.onclick = () => {
-            const price = parseFloat(priceInput.value);
-            const multiplier = parseFloat(multiplierInput.value);
-            const overhead = parseFloat(overheadInput.value);
+            document.querySelectorAll('.preset-target').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            calcState.currentTarget = btn.dataset.target;
+            calcState.displayValue = '0';
+            updateDisplay();
+        };
+    });
 
-            if (isNaN(price) || isNaN(multiplier) || isNaN(overhead)) {
-                alert("数値を正しく入力してください。");
-                return;
+    // --- 掛率プリセット ---
+    document.querySelectorAll('.preset-multiplier').forEach(btn => {
+        btn.onclick = () => {
+            document.querySelectorAll('.preset-multiplier').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            calcState.multiplier = parseFloat(btn.dataset.mult);
+            updateDisplay();
+            if (calcState.purchasePrice !== null) renderAnalysis(calcState);
+        };
+    });
+
+    // --- 加工コストプリセット（複数選択・積み上げ）---
+    document.querySelectorAll('.preset-cost').forEach(btn => {
+        btn.onclick = () => {
+            const cost = parseInt(btn.dataset.cost);
+            const label = btn.dataset.label;
+
+            if (cost === 0) {
+                // リセット
+                calcState.overheadItems = [];
+                document.querySelectorAll('.preset-cost').forEach(b => b.classList.remove('selected'));
+                btn.classList.remove('selected');
+            } else if (btn.classList.contains('selected')) {
+                // 解除
+                calcState.overheadItems = calcState.overheadItems.filter(i => i.label !== label);
+                btn.classList.remove('selected');
+            } else {
+                // 追加
+                calcState.overheadItems.push({ cost, label });
+                btn.classList.add('selected');
             }
 
-            // 購入単価 × 掛率
-            const materialCost = Math.round(price * multiplier);
-            // 原料費 + 諸経費 = 販売最低指標価格
-            const total = materialCost + overhead;
-
-            resMaterial.textContent = `${materialCost.toLocaleString()} 円`;
-            resOverhead.textContent = `${overhead.toLocaleString()} 円`;
-            resTotal.textContent = `${total.toLocaleString()} 円`;
-
-            resultBox.style.display = 'block';
+            updateOverheadDisplay();
+            if (calcState.purchasePrice !== null) renderAnalysis(calcState);
         };
+    });
+
+    // --- 画面切替タブ ---
+    document.querySelectorAll('.calc-screen-tab').forEach(tab => {
+        tab.onclick = () => {
+            document.querySelectorAll('.calc-screen-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            const screenId = `calc-screen-${tab.dataset.screen}`;
+            document.querySelectorAll('.calc-screen').forEach(s => s.classList.remove('active'));
+            const screen = document.getElementById(screenId);
+            if (screen) screen.classList.add('active');
+        };
+    });
+
+    // --- 原価分析ボタン ---
+    const btnAnalyze = document.getElementById('btn-analyze');
+    if (btnAnalyze) btnAnalyze.onclick = () => {
+        if (!calcState.purchasePrice) {
+            document.getElementById('analysis-result-area').innerHTML =
+                '<div class="analysis-empty"><p>⚠️ まず電卓入力タブで仕入単価を入力してください</p></div>';
+            return;
+        }
+        renderAnalysis(calcState);
+    };
+
+    // --- 価格比較ボタン ---
+    const btnCompare = document.getElementById('btn-compare-calc');
+    if (btnCompare) btnCompare.onclick = () => {
+        const priceVal = parseFloat(document.getElementById('compare-price-input').value);
+        if (isNaN(priceVal) || priceVal <= 0) return;
+        renderCompareTable(priceVal, calcState);
+    };
+
+    // --- 利益率逆算ボタン ---
+    const btnProfit = document.getElementById('btn-profit-calc');
+    if (btnProfit) btnProfit.onclick = () => {
+        const sellVal = parseFloat(document.getElementById('sell-price-input').value);
+        if (isNaN(sellVal) || sellVal <= 0 || !calcState.purchasePrice) return;
+        renderProfitCalc(sellVal, calcState);
+    };
+
+    // --- 損益シミュレーションボタン ---
+    const btnSim = document.getElementById('btn-simulate');
+    if (btnSim) btnSim.onclick = () => runSimulation(calcState);
+
+    // 仕入量から出荷量を自動計算
+    const simPurchaseKg = document.getElementById('sim-purchase-kg');
+    if (simPurchaseKg) simPurchaseKg.oninput = () => {
+        const kg = parseFloat(simPurchaseKg.value);
+        const outKg = document.getElementById('sim-sell-kg');
+        if (!isNaN(kg) && outKg && !outKg.dataset.manual) {
+            outKg.value = Math.round(kg / calcState.multiplier);
+        }
+    };
+    const simSellKg = document.getElementById('sim-sell-kg');
+    if (simSellKg) {
+        simSellKg.oninput = () => { simSellKg.dataset.manual = '1'; };
     }
+
+    updateDisplay();
+    updateOverheadDisplay();
+}
+
+// ============================================
+//  📊 原価分析レポートのレンダリング
+// ============================================
+function renderAnalysis(state) {
+    const area = document.getElementById('analysis-result-area');
+    if (!area || !state.purchasePrice) return;
+
+    const purchasePrice = state.purchasePrice;
+    const mult = state.multiplier;
+    const oh = state.overheadItems.reduce((s, i) => s + i.cost, 0);
+    const fmt = (n) => Math.round(n).toLocaleString('ja-JP');
+
+    // 製造原価（原魚単価×掛率 + 経費）
+    const materialCost = purchasePrice * mult;
+    const mfgCost = materialCost + oh;
+
+    // 利益計算（販売単価が設定されている場合）
+    const sellPrice = state.sellPrice;
+    const profit = sellPrice ? sellPrice - mfgCost : null;
+    const profitRate = sellPrice ? (profit / sellPrice * 100) : null;
+
+    // 推奨販売価格（製造原価の3段階）
+    const recommendLow = Math.ceil(mfgCost * 1.1);   // +10% 最低ライン
+    const recommendMid = Math.ceil(mfgCost * 1.2);   // +20% 標準
+    const recommendHigh = Math.ceil(mfgCost * 1.35); // +35% 高収益
+
+    // 歩留まり情報
+    const yieldRate = (1 / mult * 100).toFixed(1);
+
+    area.innerHTML = `
+        <div class="analysis-flow">
+
+            <!-- STEP 1: 仕入れ -->
+            <div class="flow-step step-purchase">
+                <div class="flow-icon">🐟</div>
+                <div class="flow-content">
+                    <div class="flow-title">STEP 1 : 原魚仕入れ</div>
+                    <div class="flow-main-value">${fmt(purchasePrice)} <span class="flow-unit">円/kg</span></div>
+                    <div class="flow-sub">歩留まり ${yieldRate}%（${mult}掛）</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <!-- STEP 2: 製造 -->
+            <div class="flow-step step-manufacture">
+                <div class="flow-icon">🏭</div>
+                <div class="flow-content">
+                    <div class="flow-title">STEP 2 : 製造（歩留まり変換）</div>
+                    <div class="flow-main-value">${fmt(materialCost)} <span class="flow-unit">円/kg</span></div>
+                    <div class="flow-sub">${fmt(purchasePrice)} × ${mult}掛 = ${fmt(materialCost)}円</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <!-- STEP 3: 加工・経費 -->
+            <div class="flow-step step-overhead">
+                <div class="flow-icon">⚙️</div>
+                <div class="flow-content">
+                    <div class="flow-title">STEP 3 : 加工・経費積み上げ</div>
+                    <div class="flow-main-value">+ ${fmt(oh)} <span class="flow-unit">円/kg</span></div>
+                    <div class="flow-sub">${state.overheadItems.map(i => `${i.label}: ${i.cost}円`).join('、')}</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <!-- STEP 4: 製造原価 -->
+            <div class="flow-step step-total highlight-step">
+                <div class="flow-icon">📦</div>
+                <div class="flow-content">
+                    <div class="flow-title">STEP 4 : 製造原価（最低ライン）</div>
+                    <div class="flow-main-value highlight-value">${fmt(mfgCost)} <span class="flow-unit">円/kg</span></div>
+                    <div class="flow-sub">これを下回ると赤字！</div>
+                </div>
+            </div>
+            <div class="flow-arrow">↓</div>
+
+            <!-- STEP 5: 推奨販売価格 -->
+            <div class="flow-step step-sell">
+                <div class="flow-icon">💴</div>
+                <div class="flow-content">
+                    <div class="flow-title">STEP 5 : 推奨販売価格</div>
+                    <div class="recommend-grid">
+                        <div class="recommend-item low">
+                            <span class="rec-label">最低ライン (+10%)</span>
+                            <span class="rec-value">${fmt(recommendLow)}円</span>
+                        </div>
+                        <div class="recommend-item mid">
+                            <span class="rec-label">標準利益 (+20%)</span>
+                            <span class="rec-value">${fmt(recommendMid)}円</span>
+                        </div>
+                        <div class="recommend-item high">
+                            <span class="rec-label">高収益目標 (+35%)</span>
+                            <span class="rec-value">${fmt(recommendHigh)}円</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            ${sellPrice ? `
+            <div class="flow-arrow">↓</div>
+            <!-- 販売価格設定済みの場合：利益分析 -->
+            <div class="flow-step ${profit >= 0 ? 'step-profit' : 'step-loss'}">
+                <div class="flow-icon">${profit >= 0 ? '✅' : '🚨'}</div>
+                <div class="flow-content">
+                    <div class="flow-title">利益分析（設定販売価格: ${fmt(sellPrice)}円/kg）</div>
+                    <div class="flow-main-value ${profit >= 0 ? '' : 'loss-value'}">
+                        ${profit >= 0 ? '+' : ''}${fmt(profit)} <span class="flow-unit">円/kg</span>
+                    </div>
+                    <div class="flow-sub">
+                        利益率: <strong>${profitRate.toFixed(1)}%</strong>
+                        ${profit >= 0 ? '（黒字）' : '（赤字・要見直し！）'}
+                    </div>
+                </div>
+            </div>
+            ` : `
+            <div class="analysis-hint">
+                💡 販売単価を入力・設定すると利益分析が表示されます
+            </div>`}
+        </div>
+    `;
+}
+
+// ============================================
+//  ⚖️ 掛率比較表のレンダリング
+// ============================================
+function renderCompareTable(price, state) {
+    const area = document.getElementById('compare-result-area');
+    if (!area) return;
+    const fmt = (n) => Math.round(n).toLocaleString('ja-JP');
+    const oh = state.overheadItems.reduce((s, i) => s + i.cost, 0);
+
+    const multList = [4.0, 4.5, 5.0, 5.5, 6.0, 6.5];
+
+    const rows = multList.map(m => {
+        const material = price * m;
+        const total = material + oh;
+        const isActive = m === state.multiplier;
+        const yp = (1 / m * 100).toFixed(1);
+        return `
+            <tr class="${isActive ? 'active-row' : ''}">
+                <td class="ct-mult">${m}掛 <small>${yp}%</small></td>
+                <td class="ct-material">${fmt(material)}円</td>
+                <td class="ct-oh">+${fmt(oh)}円</td>
+                <td class="ct-total ${isActive ? 'active-total' : ''}">${fmt(total)}円</td>
+                <td class="ct-rec">${fmt(Math.ceil(total * 1.2))}円 <small>(+20%)</small></td>
+            </tr>`;
+    }).join('');
+
+    area.innerHTML = `
+        <div class="compare-header-row">
+            <span>仕入単価: <strong>${fmt(price)}円/kg</strong></span>
+            <span>経費: <strong>${fmt(oh)}円</strong></span>
+        </div>
+        <div class="table-responsive">
+            <table class="compare-table">
+                <thead>
+                    <tr>
+                        <th>掛率</th>
+                        <th>原料費</th>
+                        <th>経費</th>
+                        <th>製造原価</th>
+                        <th>推奨販売 (+20%)</th>
+                    </tr>
+                </thead>
+                <tbody>${rows}</tbody>
+            </table>
+        </div>
+    `;
+}
+
+// ============================================
+//  💴 利益率逆算のレンダリング
+// ============================================
+function renderProfitCalc(sellPrice, state) {
+    const area = document.getElementById('profit-result-area');
+    if (!area || !state.purchasePrice) return;
+    const fmt = (n) => Math.round(n).toLocaleString('ja-JP');
+    const oh = state.overheadItems.reduce((s, i) => s + i.cost, 0);
+    const mfg = state.purchasePrice * state.multiplier + oh;
+    const profit = sellPrice - mfg;
+    const profitRate = (profit / sellPrice * 100);
+    const isBlack = profit >= 0;
+
+    area.innerHTML = `
+        <div class="profit-result ${isBlack ? 'profit-black' : 'profit-red'}">
+            <div class="profit-row">
+                <span>製造原価</span><span>${fmt(mfg)}円/kg</span>
+            </div>
+            <div class="profit-row">
+                <span>販売単価</span><span>${fmt(sellPrice)}円/kg</span>
+            </div>
+            <div class="profit-row total-row">
+                <span>${isBlack ? '💰 利益' : '🚨 損失'}</span>
+                <span class="${isBlack ? 'profit-pos' : 'profit-neg'}">
+                    ${isBlack ? '+' : ''}${fmt(profit)}円/kg（${profitRate.toFixed(1)}%）
+                </span>
+            </div>
+        </div>
+    `;
+}
+
+// ============================================
+//  📈 損益シミュレーション
+// ============================================
+function runSimulation(state) {
+    const area = document.getElementById('sim-result-area');
+    const purchaseKg = parseFloat(document.getElementById('sim-purchase-kg').value);
+    const purchasePrice = parseFloat(document.getElementById('sim-purchase-price').value);
+    const sellKgInput = document.getElementById('sim-sell-kg').value;
+    const sellPrice = parseFloat(document.getElementById('sim-sell-price').value);
+
+    if (isNaN(purchaseKg) || isNaN(purchasePrice) || isNaN(sellPrice)) {
+        area.innerHTML = '<div class="analysis-empty"><p>⚠️ すべての項目を入力してください</p></div>';
+        return;
+    }
+
+    const fmt = (n) => Math.round(n).toLocaleString('ja-JP');
+    const oh = state.overheadItems.reduce((s, i) => s + i.cost, 0);
+
+    // 出荷kg（歩留まり適用 or 手動入力）
+    const sellKg = (!isNaN(parseFloat(sellKgInput)) && parseFloat(sellKgInput) > 0)
+        ? parseFloat(sellKgInput)
+        : Math.round(purchaseKg / state.multiplier);
+
+    // 計算
+    const totalPurchaseCost = purchaseKg * purchasePrice;        // 原魚仕入れ総額
+    const totalOverhead = sellKg * oh;                           // 経費総額（製品kg換算）
+    const totalMfgCost = totalPurchaseCost + totalOverhead;      // 製造総原価
+    const totalRevenue = sellKg * sellPrice;                     // 売上総額
+    const totalProfit = totalRevenue - totalMfgCost;             // 損益
+    const profitRate = (totalProfit / totalRevenue * 100);       // 利益率
+    const costPerKg = totalMfgCost / sellKg;                     // 製品1kgあたり原価
+    const yieldRate = (sellKg / purchaseKg * 100).toFixed(1);   // 実際の歩留まり率
+
+    const isBlack = totalProfit >= 0;
+
+    area.innerHTML = `
+        <div class="sim-result-card">
+            <div class="sim-result-header ${isBlack ? 'sim-black' : 'sim-red'}">
+                ${isBlack ? '✅ 黒字予測' : '🚨 赤字予測'} &nbsp;
+                <strong>${isBlack ? '+' : ''}${fmt(totalProfit)}円</strong>
+            </div>
+
+            <div class="sim-grid">
+                <div class="sim-block">
+                    <div class="sim-block-label">📋 仕入れ概要</div>
+                    <div class="sim-row"><span>仕入量</span><span>${fmt(purchaseKg)} kg</span></div>
+                    <div class="sim-row"><span>仕入単価</span><span>${fmt(purchasePrice)} 円/kg</span></div>
+                    <div class="sim-row total"><span>仕入総額</span><span>${fmt(totalPurchaseCost)} 円</span></div>
+                </div>
+                <div class="sim-block">
+                    <div class="sim-block-label">🏭 製造・出荷</div>
+                    <div class="sim-row"><span>製品出荷量</span><span>${fmt(sellKg)} kg</span></div>
+                    <div class="sim-row"><span>歩留まり率</span><span>${yieldRate}%（${state.multiplier}掛相当）</span></div>
+                    <div class="sim-row"><span>経費合計</span><span>${fmt(totalOverhead)} 円</span></div>
+                    <div class="sim-row total"><span>製造総原価</span><span>${fmt(totalMfgCost)} 円</span></div>
+                </div>
+                <div class="sim-block">
+                    <div class="sim-block-label">💴 売上・損益</div>
+                    <div class="sim-row"><span>販売単価</span><span>${fmt(sellPrice)} 円/kg</span></div>
+                    <div class="sim-row"><span>製品1kg原価</span><span>${fmt(costPerKg)} 円/kg</span></div>
+                    <div class="sim-row"><span>売上総額</span><span>${fmt(totalRevenue)} 円</span></div>
+                    <div class="sim-row total ${isBlack ? 'profit-pos-row' : 'profit-neg-row'}">
+                        <span>${isBlack ? '💰 利益' : '🚨 損失'}</span>
+                        <span>${isBlack ? '+' : ''}${fmt(totalProfit)} 円（${profitRate.toFixed(1)}%）</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sim-breakeven">
+                <div class="sim-be-label">⚖️ 損益分岐点（BEP）分析</div>
+                <div class="sim-row"><span>BEP 販売単価</span><span>${fmt(costPerKg)} 円/kg（これ以上で黒字）</span></div>
+                <div class="sim-row"><span>現在の価格優位性</span><span>${isBlack ? fmt(sellPrice - costPerKg) + ' 円/kg の余裕' : '⚠️ ' + fmt(costPerKg - sellPrice) + ' 円/kg 不足'}</span></div>
+            </div>
+        </div>
+    `;
 }
 
 

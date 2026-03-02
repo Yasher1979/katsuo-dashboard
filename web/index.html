@@ -243,47 +243,181 @@
             </div>
         </div>
 
-        <!-- 原価計算機ビュー -->
+        <!-- 🧮 鰹節製造原価計算機 Pro -->
         <div id="view-calculator" class="tab-view">
-            <div class="calculator-section">
-                <div class="calculator-header">
-                    <h3>🧮 鰹節原価計算オリジナル計算機</h3>
-                    <p class="calculator-subtitle">購入単価から販売の最低指標価格を算出します</p>
-                </div>
-                <div class="calculator-card">
-                    <div class="calc-input-group">
-                        <label for="calc-price">購入単価 (円/kg):</label>
-                        <input type="number" id="calc-price" placeholder="例: 220" />
-                    </div>
-                    <div class="calc-input-group">
-                        <label for="calc-multiplier">歩留まり掛率 (掛):</label>
-                        <input type="number" id="calc-multiplier" placeholder="例: 5" value="5" step="0.1" />
-                    </div>
-                    <div class="calc-input-group">
-                        <label for="calc-overhead">諸経費 (約・円):</label>
-                        <input type="number" id="calc-overhead" placeholder="例: 250" value="250" />
-                    </div>
-                    <button id="btn-calculate" class="btn-calculate">計算する</button>
+            <div class="pro-calc-wrapper">
 
-                    <div id="calc-result-box" class="calc-result-box" style="display:none;">
-                        <h4>📝 計算結果（販売指標）</h4>
-                        <div class="result-row">
-                            <span>原料費 (単価 × 掛率):</span>
-                            <span id="res-material-cost">--</span>
+                <!-- ヘッダー -->
+                <div class="pro-calc-header">
+                    <h2 class="pro-calc-title">🧮 鰹節製造原価計算機 Pro</h2>
+                    <p class="pro-calc-subtitle">仕入れ → 製造 → 加工 → 販売価格を一括算出</p>
+                </div>
+
+                <!-- 画面切替タブ -->
+                <div class="calc-screen-tabs">
+                    <button class="calc-screen-tab active" data-screen="main">📱 電卓入力</button>
+                    <button class="calc-screen-tab" data-screen="analysis">📊 原価分析</button>
+                    <button class="calc-screen-tab" data-screen="compare">⚖️ 価格比較</button>
+                    <button class="calc-screen-tab" data-screen="simulation">📈 損益試算</button>
+                </div>
+
+                <!-- ====== SCREEN 1: 電卓入力 ====== -->
+                <div id="calc-screen-main" class="calc-screen active">
+                    <div class="calc-body">
+
+                        <!-- ディスプレイ -->
+                        <div class="calc-display-area">
+                            <div class="calc-display-label" id="calc-display-label">仕入単価（円/kg）を入力</div>
+                            <div class="calc-display-main" id="calc-display-main">0</div>
+                            <div class="calc-display-sub" id="calc-display-sub">入力中</div>
                         </div>
-                        <div class="result-row">
-                            <span>諸経費:</span>
-                            <span id="res-overhead">--</span>
+
+                        <!-- プリセット行1: 現在の入力対象選択 -->
+                        <div class="calc-preset-section">
+                            <div class="preset-label">入力項目選択</div>
+                            <div class="calc-preset-row">
+                                <button class="preset-target active" data-target="purchase_price">🐟 仕入単価</button>
+                                <button class="preset-target" data-target="sell_price">💴 販売単価</button>
+                                <button class="preset-target" data-target="custom_overhead">💡 経費変更</button>
+                            </div>
                         </div>
-                        <hr class="result-divider">
-                        <div class="result-row total">
-                            <span>販売最低指標価格:</span>
-                            <span id="res-total-price" class="total-price-value">--</span>
+
+                        <!-- プリセット行2: 歩留まり掛率 -->
+                        <div class="calc-preset-section">
+                            <div class="preset-label">歩留まり掛率（クリックで即セット）</div>
+                            <div class="calc-preset-row">
+                                <button class="preset-multiplier" data-mult="4.5">4.5掛 <small>22%</small></button>
+                                <button class="preset-multiplier active" data-mult="5">5掛 <small>20%</small></button>
+                                <button class="preset-multiplier" data-mult="5.5">5.5掛 <small>18%</small></button>
+                                <button class="preset-multiplier" data-mult="6">6掛 <small>17%</small></button>
+                            </div>
+                        </div>
+
+                        <!-- プリセット行3: 加工コスト -->
+                        <div class="calc-preset-section">
+                            <div class="preset-label">経費・加工コストプリセット（複数選択可）</div>
+                            <div class="calc-preset-row wrap">
+                                <button class="preset-cost active selected" data-cost="250"
+                                    data-label="基本経費">経費250</button>
+                                <button class="preset-cost" data-cost="50" data-label="表面削り">経費削り +50</button>
+                                <button class="preset-cost" data-cost="80" data-label="カビ付け">カビ付け +80</button>
+                                <button class="preset-cost" data-cost="60" data-label="血合い抜き">血合い抜き +60</button>
+                                <button class="preset-cost" data-cost="30" data-label="梱包">梱包 +30</button>
+                                <button class="preset-cost" data-cost="0" data-label="経費なし">経費リセット</button>
+                            </div>
+                        </div>
+
+                        <!-- 現在の経費合計表示 -->
+                        <div class="calc-overhead-display">
+                            <span>現在の経費合計：</span>
+                            <strong id="current-overhead-display">250円</strong>
+                            <span id="current-overhead-detail" class="overhead-detail">（基本経費）</span>
+                        </div>
+
+                        <!-- テンキー + 演算ボタン -->
+                        <div class="calc-keypad">
+                            <div class="keypad-grid">
+                                <!-- Row 1 -->
+                                <button class="key-btn key-special" id="key-cc">C/C</button>
+                                <button class="key-btn" id="key-7">7</button>
+                                <button class="key-btn" id="key-8">8</button>
+                                <button class="key-btn" id="key-9">9</button>
+                                <button class="key-btn key-op" data-op="÷">÷</button>
+                                <!-- Row 2 -->
+                                <button class="key-btn key-special" id="key-ca">CA</button>
+                                <button class="key-btn" id="key-4">4</button>
+                                <button class="key-btn" id="key-5">5</button>
+                                <button class="key-btn" id="key-6">6</button>
+                                <button class="key-btn key-op" data-op="×">×</button>
+                                <!-- Row 3 -->
+                                <button class="key-btn key-calc" id="key-calc-now">今すぐ計算</button>
+                                <button class="key-btn" id="key-1">1</button>
+                                <button class="key-btn" id="key-2">2</button>
+                                <button class="key-btn" id="key-3">3</button>
+                                <button class="key-btn key-op" data-op="−">−</button>
+                                <!-- Row 4 -->
+                                <button class="key-btn" id="key-0">0</button>
+                                <button class="key-btn key-wide" id="key-00">00</button>
+                                <button class="key-btn" id="key-dot">.</button>
+                                <button class="key-btn key-eq" id="key-eq">=</button>
+                                <button class="key-btn key-op" data-op="+">+</button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ====== SCREEN 2: 原価分析 ====== -->
+                <div id="calc-screen-analysis" class="calc-screen">
+                    <div class="analysis-header-row">
+                        <h3>📊 原価・利益分析レポート</h3>
+                        <button id="btn-analyze" class="btn-run-analysis">分析実行 🔍</button>
+                    </div>
+                    <div id="analysis-result-area">
+                        <div class="analysis-empty">
+                            <p>📱 「電卓入力」タブで仕入単価を入力し、<br>「今すぐ計算」を押してください</p>
                         </div>
                     </div>
                 </div>
+
+                <!-- ====== SCREEN 3: 価格比較 ====== -->
+                <div id="calc-screen-compare" class="calc-screen">
+                    <h3>⚖️ 歩留まり別・掛率比較表</h3>
+                    <p class="screen-desc">入力した仕入単価を元に、各掛率での製造原価を一覧比較します</p>
+                    <div class="compare-table-row">
+                        <div class="compare-input-area">
+                            <div class="compare-label">比較用仕入単価（円/kg）</div>
+                            <input type="number" id="compare-price-input" class="compare-price-input"
+                                placeholder="例: 220" />
+                            <button id="btn-compare-calc" class="btn-run-analysis">比較表を生成</button>
+                        </div>
+                    </div>
+                    <div id="compare-result-area">
+                        <div class="analysis-empty">
+                            <p>仕入単価を入力して「比較表を生成」を押してください</p>
+                        </div>
+                    </div>
+                    <div class="sell-price-section">
+                        <h4>💴 販売価格 → 利益率の逆算</h4>
+                        <div class="compare-input-row">
+                            <input type="number" id="sell-price-input" class="compare-price-input"
+                                placeholder="販売単価（円/kg）例: 1500" />
+                            <button id="btn-profit-calc" class="btn-run-analysis">利益率を計算</button>
+                        </div>
+                        <div id="profit-result-area"></div>
+                    </div>
+                </div>
+
+                <!-- ====== SCREEN 4: 損益シミュレーション ====== -->
+                <div id="calc-screen-simulation" class="calc-screen">
+                    <h3>📈 損益シミュレーション</h3>
+                    <p class="screen-desc">仕入量・販売量を入力して、実際の損益・キャッシュフローを計算します</p>
+                    <div class="sim-inputs-grid">
+                        <div class="sim-input-group">
+                            <label>🐟 仕入量（kg）</label>
+                            <input type="number" id="sim-purchase-kg" placeholder="例: 10000" />
+                        </div>
+                        <div class="sim-input-group">
+                            <label>💴 仕入単価（円/kg）</label>
+                            <input type="number" id="sim-purchase-price" placeholder="例: 220" />
+                        </div>
+                        <div class="sim-input-group">
+                            <label>📦 出荷kg（製品）</label>
+                            <input type="number" id="sim-sell-kg" placeholder="自動計算（変更可）" />
+                        </div>
+                        <div class="sim-input-group">
+                            <label>💰 販売単価（円/kg）</label>
+                            <input type="number" id="sim-sell-price" placeholder="例: 1500" />
+                        </div>
+                    </div>
+                    <button id="btn-simulate" class="btn-run-analysis" style="width:100%; margin-top: 15px;">損益を試算する
+                        📊</button>
+                    <div id="sim-result-area" style="margin-top:20px;"></div>
+                </div>
+
             </div>
         </div>
+
 
         <!-- グラフ表示ビュー -->
         <div id="view-charts" class="tab-view">
