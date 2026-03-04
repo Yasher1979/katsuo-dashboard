@@ -35,17 +35,25 @@ async function initDashboard() {
         if (!bRes.ok) bRes = await fetch(`/data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }));
         if (bRes.ok) bidScheduleData = await bRes.json();
 
-        let nRes = newsRes;
-        if (!nRes.ok) nRes = await fetch(`/data/katsuo_news.json?v=${Date.now()}`).catch(e => ({ ok: false }));
-
-        if (nRes.ok) {
-            window.katsuoNewsData = await nRes.json();
-            console.log("News data loaded:", window.katsuoNewsData);
-        } else {
-            console.warn("News data load failed.");
-        }
-
         if (!currentData) throw new Error("Market data could not be loaded.");
+
+        // デバッグ情報の表示
+        const debugInfo = document.createElement('div');
+        debugInfo.id = 'debug-version-info';
+        debugInfo.style = 'position:fixed; bottom:0; left:0; background:rgba(0,0,0,0.8); color:#0f0; font-size:10px; padding:2px 5px; z-index:9999; pointer-events:none;';
+
+        // 最新日付の特定
+        let latestDates = [];
+        ports.forEach(p => {
+            Object.keys(currentData[p] || {}).forEach(s => {
+                const arr = currentData[p][s];
+                if (arr && arr.length > 0) latestDates.push(arr[arr.length - 1].date);
+            });
+        });
+        const maxDate = latestDates.sort().reverse()[0] || "No Data";
+        debugInfo.textContent = `Build: 20260304-debug | Data: ${maxDate} | Files: ${bidScheduleData ? 'B1' : 'B0'}`;
+        document.body.appendChild(debugInfo);
+        console.log("Latest Date in Data:", maxDate);
 
         // テーマの読み込み
         const savedTheme = localStorage.getItem('katsuo_theme') || 'dark';

@@ -11,7 +11,10 @@ os.chdir(ROOT_DIR)
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
     def end_headers(self):
-        # キャッシュを無効化するヘッダーを追加（開発中のため）
+        # リクエストパスをログに出力（標準の datetime を使用）
+        from datetime import datetime
+        print(f"[{datetime.now().strftime('%H:%M:%S')}] GET: {self.path}")
+        # キャッシュを無効化するヘッダーを追加
         self.send_header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Expires', '0')

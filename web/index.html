@@ -17,6 +17,28 @@
     <!-- アイコン設定 -->
     <link rel="icon" type="image/png" href="marucyou_mark.png">
     <link rel="apple-touch-icon" href="marucyou_mark_white.png">
+    <!-- 強制リセットスクリプト (2026-03-04 更新用) -->
+    <script>
+        (function () {
+            const VERSION = "20260304-v2-debug";
+            const lastReset = localStorage.getItem('app_reset_version');
+            if (lastReset !== VERSION) {
+                console.log("Forcing settings reset for version:", VERSION);
+                localStorage.removeItem('katsuo_app_settings');
+                localStorage.setItem('app_reset_version', VERSION);
+            }
+
+            // Service Worker の強制解除（キャッシュ問題の根本解決）
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(registrations => {
+                    for (let registration of registrations) {
+                        registration.unregister();
+                        console.log("Unregistered Service Worker");
+                    }
+                });
+            }
+        })();
+    </script>
 </head>
 
 <body class="theme-dark"> <!-- デフォルトはダークモード -->
@@ -443,7 +465,7 @@
         </footer>
     </div>
 
-    <script src="dashboard.js?v=20260220-v1"></script>
+    <script src="dashboard.js?v=20260304-v2"></script>
 </body>
 
 </html>
