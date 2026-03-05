@@ -35,6 +35,16 @@ async function initDashboard() {
         if (!bRes.ok) bRes = await fetch(`/data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }));
         if (bRes.ok) bidScheduleData = await bRes.json();
 
+        // ニュースデータの処理
+        let nRes = newsRes;
+        if (!nRes.ok) nRes = await fetch(`/data/katsuo_news.json?v=${Date.now()}`).catch(e => ({ ok: false }));
+        if (nRes.ok) {
+            window.katsuoNewsData = await nRes.json();
+            console.log("News data loaded:", window.katsuoNewsData);
+        } else {
+            console.warn("News data load failed.");
+        }
+
         if (!currentData) throw new Error("Market data could not be loaded.");
 
         // デバッグ情報の表示
@@ -51,7 +61,7 @@ async function initDashboard() {
             });
         });
         const maxDate = latestDates.sort().reverse()[0] || "No Data";
-        debugInfo.textContent = `Build: 20260304-debug | Data: ${maxDate} | Files: ${bidScheduleData ? 'B1' : 'B0'}`;
+        debugInfo.textContent = `Build: 20260305-v4 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'} N${window.katsuoNewsData ? '1' : '0'}`;
         document.body.appendChild(debugInfo);
         console.log("Latest Date in Data:", maxDate);
 
