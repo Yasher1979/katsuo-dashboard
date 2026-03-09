@@ -61,7 +61,7 @@ async function initDashboard() {
             });
         });
         const maxDate = latestDates.sort().reverse()[0] || "No Data";
-        debugInfo.textContent = `Build: 20260305-v4 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'} N${window.katsuoNewsData ? '1' : '0'}`;
+        debugInfo.textContent = `Build: 20260309-v5 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'} N${window.katsuoNewsData ? '1' : '0'}`;
         document.body.appendChild(debugInfo);
         console.log("Latest Date in Data:", maxDate);
 
