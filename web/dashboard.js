@@ -271,7 +271,7 @@ function renderBidSchedule() {
             </a>
             <div class="bid-table-container">
                 <table class="bid-table"><thead><tr><th>カテゴリ</th><th>サイズ</th><th>区分</th><th style="text-align:right;">数量</th></tr></thead>
-                <tbody>${itemsH}<tr class="category-row"><td colspan="3">合計重量 (Bカツオ等)</td><td class="volume-val">${bid.total_volume.toFixed(1)}<span class="volume-unit">t</span></td></tr></tbody>
+                <tbody>${itemsH}<tr class="category-row"><td colspan="3">合計重量 (Bカツオ等)</td><td class="volume-val">${(bid.total_volume || 0).toFixed(1)}<span class="volume-unit">t</span></td></tr></tbody>
                 </table>
             </div>`;
         if (i === 0) latestC.appendChild(card); else archiveC.appendChild(card);
