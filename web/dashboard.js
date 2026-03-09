@@ -246,10 +246,15 @@ function renderBidSchedule() {
             if (dir === 'S' || dir === 'W') val = -val;
             return val;
         };
-        const lat = (bid.sea_area && bid.sea_area.lat) ? parseCoord(bid.sea_area.lat.split('〜')[0]) : null;
-        const lon = (bid.sea_area && bid.sea_area.lon) ? parseCoord(bid.sea_area.lon.split('〜')[0]) : null;
-        const mapUrl = (lat !== null && lon !== null)
-            ? `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`
+        const latCoord = (bid.sea_area && bid.sea_area.lat) ? parseCoord(bid.sea_area.lat.split('〜')[0]) : null;
+        const lonCoord = (bid.sea_area && bid.sea_area.lon) ? parseCoord(bid.sea_area.lon.split('〜')[0]) : null;
+
+        // 合計重量の自動計算（データにない場合のバックアップ）
+        const calculatedTotal = (bid.items || []).reduce((sum, item) => sum + (parseFloat(item.volume) || 0), 0);
+        const displayTotal = (bid.total_volume !== undefined && bid.total_volume !== null) ? bid.total_volume : calculatedTotal;
+
+        const mapUrl = (latCoord !== null && lonCoord !== null)
+            ? `https://www.google.com/maps/search/?api=1&query=${latCoord},${lonCoord}`
             : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((bid.sea_area?.lat || '') + ' ' + (bid.sea_area?.lon || ''))}`;
 
         const card = document.createElement('div');
@@ -267,11 +272,11 @@ function renderBidSchedule() {
             </div>
             <a href="${mapUrl}" target="_blank" class="bid-sea-area" title="Google Mapsで表示">
                 <span class="sea-area-title">📍 操業海域 (こちらをタップして地図を表示)</span>
-                <div class="sea-area-coords"><span>${bid.sea_area.lat}</span> / <span>${bid.sea_area.lon}</span></div>
+                <div class="sea-area-coords"><span>${bid.sea_area?.lat || '不明'}</span> / <span>${bid.sea_area?.lon || '不明'}</span></div>
             </a>
             <div class="bid-table-container">
                 <table class="bid-table"><thead><tr><th>カテゴリ</th><th>サイズ</th><th>区分</th><th style="text-align:right;">数量</th></tr></thead>
-                <tbody>${itemsH}<tr class="category-row"><td colspan="3">合計重量 (Bカツオ等)</td><td class="volume-val">${(bid.total_volume || 0).toFixed(1)}<span class="volume-unit">t</span></td></tr></tbody>
+                <tbody>${itemsH}<tr class="category-row"><td colspan="3">合計重量 (Bカツオ等)</td><td class="volume-val">${displayTotal.toFixed(1)}<span class="volume-unit">t</span></td></tr></tbody>
                 </table>
             </div>`;
         if (i === 0) latestC.appendChild(card); else archiveC.appendChild(card);
