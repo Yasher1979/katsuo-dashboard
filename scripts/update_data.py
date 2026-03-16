@@ -23,8 +23,8 @@ def add_market_data(port, size, date, price, volume):
         print(f"Error: Port '{port}' not found.")
         return
     if size not in data[port]:
-        print(f"Error: Size '{size}' not found in '{port}'.")
-        return
+        print(f"Info: Size '{size}' not found in '{port}'. Creating new category.")
+        data[port][size] = []
     
     new_entry = {
         "date": date,
