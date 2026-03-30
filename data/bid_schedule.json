@@ -1,5 +1,111 @@
 [
   {
+    "id": "20260401_misakimaru",
+    "delivery_date": "2026-03-28",
+    "vessel_name": "55 岬洋丸",
+    "bid_date": "2026-04-01",
+    "tonnage": 320.0,
+    "sea_area": {
+      "lat": "N 04°40' 〜 N 09°08'",
+      "lon": "E 148°18' 〜 E 146°02'"
+    },
+    "port": "枕崎",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "B カツオ",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 140.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 70.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "4.5kg上",
+        "type": "相対",
+        "volume": 4.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "2.5kg上",
+        "type": "相対",
+        "volume": 43.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg上",
+        "type": "相対",
+        "volume": 26.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg下",
+        "type": "相対",
+        "volume": 8.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "5.0-3.0kg上",
+        "type": "相対",
+        "volume": 4.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 1.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 1.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "5.0kg上",
+        "type": "相対",
+        "volume": 1.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 1.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg上",
+        "type": "相対",
+        "volume": 1.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "相対",
+        "volume": 1.0
+      }
+    ],
+    "total_volume": 321.0
+  },
+  {
     "id": "20260325_koyomaru",
     "delivery_date": "2026-03-23",
     "vessel_name": "88 光洋丸",
@@ -10,7 +116,7 @@
       "lon": "E 154°19' 〜 E 141° 34'"
     },
     "port": "枕崎",
-    "is_latest": true,
+    "is_latest": false,
     "items": [
       {
         "category": "B カツオ",
