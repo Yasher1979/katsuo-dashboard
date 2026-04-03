@@ -14,7 +14,7 @@ def save_json(path, data):
         json.dump(data, f, ensure_ascii=False, indent=2)
     print(f"Successfully saved to {path}")
 
-def add_market_data(port, size, date, price, volume):
+def add_market_data(port, size, date, price, volume, vessel=None):
     """
     相場データを追加します。
     """
@@ -31,13 +31,17 @@ def add_market_data(port, size, date, price, volume):
         "price": float(price),
         "volume": float(volume)
     }
+    if vessel:
+        new_entry["vessel"] = vessel
     
     # 重複チェック
     existing = [d for d in data[port][size] if d['date'] == date]
     if existing:
-        print(f"Warning: Entry for {date} already exists for {port} {size}. Updating price/volume.")
+        print(f"Warning: Entry for {date} already exists for {port} {size}. Updating price/volume/vessel.")
         existing[0]['price'] = float(price)
         existing[0]['volume'] = float(volume)
+        if vessel:
+            existing[0]['vessel'] = vessel
     else:
         data[port][size].append(new_entry)
         # 日付順にソート
