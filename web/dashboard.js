@@ -21,10 +21,9 @@ async function initDashboard() {
         const startTime = Date.now();
 
         // データの並列ロード
-        const [marketRes, bidRes, newsRes] = await Promise.all([
+        const [marketRes, bidRes] = await Promise.all([
             fetch(`../data/katsuo_market_data.json?v=${Date.now()}`).catch(e => ({ ok: false })),
-            fetch(`../data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false })),
-            fetch(`../data/katsuo_news.json?v=${Date.now()}`).catch(e => ({ ok: false }))
+            fetch(`../data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }))
         ]);
 
         let mRes = marketRes;
@@ -35,15 +34,6 @@ async function initDashboard() {
         if (!bRes.ok) bRes = await fetch(`/data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }));
         if (bRes.ok) bidScheduleData = await bRes.json();
 
-        // ニュースデータの処理
-        let nRes = newsRes;
-        if (!nRes.ok) nRes = await fetch(`/data/katsuo_news.json?v=${Date.now()}`).catch(e => ({ ok: false }));
-        if (nRes.ok) {
-            window.katsuoNewsData = await nRes.json();
-            console.log("News data loaded:", window.katsuoNewsData);
-        } else {
-            console.warn("News data load failed.");
-        }
 
         if (!currentData) throw new Error("Market data could not be loaded.");
 
@@ -61,7 +51,7 @@ async function initDashboard() {
             });
         });
         const maxDate = latestDates.sort().reverse()[0] || "No Data";
-        debugInfo.textContent = `Build: 20260309-v5 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'} N${window.katsuoNewsData ? '1' : '0'}`;
+        debugInfo.textContent = `Build: 20260414-v1 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'}`;
         document.body.appendChild(debugInfo);
         console.log("Latest Date in Data:", maxDate);
 
@@ -74,7 +64,6 @@ async function initDashboard() {
         renderDashboard();
         renderSummary();
         renderBidSchedule();
-        renderNews();
         updateInsights();
         setupFilters();
         setupThemeSwitcher();
@@ -1391,5 +1380,4 @@ function runSimulation(state) {
 
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
-    setupNewsLoadMore();
 });
