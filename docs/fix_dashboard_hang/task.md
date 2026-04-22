@@ -1,0 +1,7 @@
+- [x] `web/index.html` のライブラリ読み込みURLを安定版(v3)に固定
+- [x] `web/index.html` にグローバルなエラー捕捉処理（window.onerror 等）を追加
+- [x] `web/dashboard.js` の `localStorage` アクセスを try-catch で保護
+- [x] `web/dashboard.js` の `initDashboard` 内のエラー処理を強化
+- [x] `scripts/katsuo_fetcher.py` 実行時に `vessel` 情報が失われないように修正
+- [x] ローカル環境での動作確認（スプラッシュ画面が正しく消えるか検証予定）
+- [x] 修正結果の Walkthrough 作成

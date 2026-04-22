@@ -51,12 +51,13 @@ async function initDashboard() {
             });
         });
         const maxDate = latestDates.sort().reverse()[0] || "No Data";
-        debugInfo.textContent = `Build: 20260414-v1 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'}`;
+        debugInfo.textContent = `Build: 20260422-v1 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'}`;
         document.body.appendChild(debugInfo);
         console.log("Latest Date in Data:", maxDate);
 
         // テーマの読み込み
-        const savedTheme = localStorage.getItem('katsuo_theme') || 'dark';
+        let savedTheme = 'dark';
+        try { savedTheme = localStorage.getItem('katsuo_theme') || 'dark'; } catch(e) {}
         currentTheme = savedTheme;
         document.body.className = `theme-${savedTheme}`;
         document.querySelectorAll('.btn-theme').forEach(b => b.classList.toggle('active', b.dataset.theme === savedTheme));
@@ -469,7 +470,9 @@ function setupThemeSwitcher() {
     document.querySelectorAll('.btn-theme').forEach(btn => btn.addEventListener('click', () => {
         const t = btn.dataset.theme; document.querySelectorAll('.btn-theme').forEach(b => b.classList.remove('active'));
         btn.classList.add('active'); document.body.className = `theme-${t}`;
-        currentTheme = t; localStorage.setItem('katsuo_theme', t); renderDashboard(); renderSummary();
+        currentTheme = t; 
+        try { localStorage.setItem('katsuo_theme', t); } catch(e) {} 
+        renderDashboard(); renderSummary();
     }));
 }
 
@@ -733,11 +736,12 @@ function applyAppSettings() {
 }
 
 function saveAppSettings() {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings));
+    try { localStorage.setItem(SETTINGS_KEY, JSON.stringify(appSettings)); } catch(e) {}
 }
 
 function loadAllSettings() {
-    const saved = localStorage.getItem(SETTINGS_KEY);
+    let saved = null;
+    try { saved = localStorage.getItem(SETTINGS_KEY); } catch(e) {}
     if (saved) {
         try {
             const parsed = JSON.parse(saved);

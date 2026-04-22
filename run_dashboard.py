@@ -10,6 +10,14 @@ ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 os.chdir(ROOT_DIR)
 
 class MyHandler(http.server.SimpleHTTPRequestHandler):
+    def do_GET(self):
+        if self.path == '/' or self.path == '':
+            self.send_response(301)
+            self.send_header('Location', '/web/index.html')
+            self.end_headers()
+            return
+        super().do_GET()
+
     def end_headers(self):
         # リクエストパスをログに出力（標準の datetime を使用）
         from datetime import datetime

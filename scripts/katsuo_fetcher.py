@@ -20,6 +20,14 @@ class KatsuoDataFetcher:
         data/market_input.csv から実データを読み込む
         """
         csv_path = os.path.join(self.data_dir, "market_input.csv")
+        
+        # 読み込みの前にバックアップを取得（データ破損対策）
+        try:
+            from backup_manager import create_backup
+            create_backup(self.data_dir)
+        except ImportError:
+            pass
+            
         if os.path.exists(csv_path):
             try:
                 # 日本語(cp932/shift_jis)が含まれる可能性を考慮し、encodingを指定
@@ -54,7 +62,16 @@ class KatsuoDataFetcher:
                 size_data = port_data[port_data['size'] == size]
                 # 日付順にソート
                 size_data = size_data.sort_values('date')
-                output[port][size] = size_data[['date', 'price', 'volume']].to_dict(orient='records')
+                cols = ['date', 'price', 'volume']
+                if 'vessel' in size_data.columns:
+                    cols.append('vessel')
+                
+                records = size_data[cols].to_dict(orient='records')
+                # 欠損値(nan)などのクリーンアップ
+                for rec in records:
+                    if 'vessel' in rec and pd.isna(rec['vessel']):
+                        del rec['vessel']
+                output[port][size] = records
                 
         file_path = os.path.join(self.data_dir, "katsuo_market_data.json")
         with open(file_path, 'w', encoding='utf-8') as f:

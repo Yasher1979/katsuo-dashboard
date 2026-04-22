@@ -6,11 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>マルチョウ専用 鰹相場データ</title>
     <meta name="apple-mobile-web-app-title" content="マルチョウ 鰹相場データ">
-    <link rel="stylesheet" href="index.css?v=20260406-1524">
+    <link rel="stylesheet" href="index.css?v=20260422-1715">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- 安定版ライブラリへの固定（強制アップデートによる破損防止） -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment@1.0.1"></script>
+
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
@@ -18,6 +21,36 @@
     <link rel="icon" type="image/png" href="marucyou_mark.png">
     <link rel="apple-touch-icon" href="marucyou_mark_white.png">
 
+    <!-- グローバルエラー捕捉（最優先で読み込み） -->
+    <script>
+        window.addEventListener('error', function(event) {
+            console.error("Global Error Caught:", event.error);
+            const container = document.getElementById('summary-container');
+            if (container) {
+                container.innerHTML = `<div style="color:#ff7b72; padding:20px; text-align:left; background:rgba(255,0,0,0.1); border:1px solid #ff7b72; border-radius:10px; margin:20px;">
+                    <h3 style="margin-top:0;">🛑致命的なエラーが発生しました</h3>
+                    <p>システムの表示が停止しました。以下の情報を開発者にお伝えください：</p>
+                    <pre style="white-space:pre-wrap; font-size:12px; background:#0d1117; padding:10px;">${event.error ? event.error.stack : event.message}</pre>
+                </div>`;
+                const splash = document.getElementById('splash-screen');
+                if (splash) splash.classList.add('fade-out');
+            }
+        });
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error("Unhandled Promise Rejection:", event.reason);
+            const container = document.getElementById('summary-container');
+            if (container) {
+                container.innerHTML = `<div style="color:#ff7b72; padding:20px; text-align:left; background:rgba(255,0,0,0.1); border:1px solid #ff7b72; border-radius:10px; margin:20px;">
+                    <h3 style="margin-top:0;">🛑非同期通信エラーが発生しました</h3>
+                    <p>データの読み込みに失敗しました：</p>
+                    <pre style="white-space:pre-wrap; font-size:12px; background:#0d1117; padding:10px;">${event.reason}</pre>
+                </div>`;
+                const splash = document.getElementById('splash-screen');
+                if (splash) splash.classList.add('fade-out');
+            }
+        });
+    </script>
+    
     <!-- キャッシュ無効化メタタグ (スマホ対策) -->
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
@@ -26,17 +59,21 @@
     <!-- 強制リセットスクリプト (2026-03-05 最終スマホ対策) -->
     <script>
         (function () {
-            const VERSION = "20260406-1524";
-            const lastReset = localStorage.getItem('app_reset_version');
-            if (lastReset !== VERSION) {
-                console.log("Forcing settings reset for version:", VERSION);
-                localStorage.removeItem('katsuo_app_settings');
-                localStorage.setItem('app_reset_version', VERSION);
+            const VERSION = "20260422-1715";
+            try {
+                const lastReset = localStorage.getItem('app_reset_version');
+                if (lastReset !== VERSION) {
+                    console.log("Forcing settings reset for version:", VERSION);
+                    localStorage.removeItem('katsuo_app_settings');
+                    localStorage.setItem('app_reset_version', VERSION);
 
-                // 初回のみ強制リロード
-                if (!window.location.search.includes('reload=true')) {
-                    window.location.href = window.location.pathname + '?v=' + Date.now() + '&reload=true';
+                    // 初回のみ強制リロード
+                    if (!window.location.search.includes('reload=true')) {
+                        window.location.href = window.location.pathname + '?v=' + Date.now() + '&reload=true';
+                    }
                 }
+            } catch (e) {
+                console.warn("localStorage is not available.", e);
             }
 
             // Service Worker の徹底解除
@@ -460,7 +497,7 @@
         </footer>
     </div>
 
-    <script src="dashboard.js?v=20260406-1524"></script>
+    <script src="dashboard.js?v=20260422-1715"></script>
 </body>
 
 </html>

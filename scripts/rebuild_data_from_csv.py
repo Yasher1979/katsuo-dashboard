@@ -14,6 +14,10 @@ def convert_csv_to_json(csv_path, json_path):
             port = row['port']
             size = row['size']
             
+            # 価格または数量が空の場合はスキップ
+            if not row['price'] or not row['volume']:
+                continue
+                
             entry = {
                 "date": row['date'],
                 "price": float(row['price']),

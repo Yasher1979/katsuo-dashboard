@@ -18,6 +18,12 @@ def add_market_data(port, size, date, price, volume, vessel=None):
     """
     相場データを追加します。
     """
+    try:
+        from backup_manager import create_backup
+        create_backup(os.path.join(os.path.dirname(__file__), '..', 'data'))
+    except ImportError:
+        pass
+        
     data = load_json(MARKET_DATA_PATH)
     if port not in data:
         print(f"Error: Port '{port}' not found.")
@@ -53,6 +59,12 @@ def add_bid_schedule(id, vessel_name, bid_date, delivery_date, tonnage, port, it
     """
     入札予定を追加します。
     """
+    try:
+        from backup_manager import create_backup
+        create_backup(os.path.join(os.path.dirname(__file__), '..', 'data'))
+    except ImportError:
+        pass
+        
     data = load_json(BID_SCHEDULE_PATH)
     
     # 既存の is_latest をすべて解除
