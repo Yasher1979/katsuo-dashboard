@@ -14,6 +14,7 @@ let currentRange = '30';
 let currentTheme = 'dark';
 let activeTab = 'summary';
 let charts = {};
+let marketInsightData = null;
 
 async function initDashboard() {
     console.log("Initializing Dashboard...");
@@ -21,9 +22,10 @@ async function initDashboard() {
         const startTime = Date.now();
 
         // データの並列ロード
-        const [marketRes, bidRes] = await Promise.all([
+        const [marketRes, bidRes, insightRes] = await Promise.all([
             fetch(`../data/katsuo_market_data.json?v=${Date.now()}`).catch(e => ({ ok: false })),
-            fetch(`../data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }))
+            fetch(`../data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false })),
+            fetch(`../data/market_insights.json?v=${Date.now()}`).catch(e => ({ ok: false }))
         ]);
 
         let mRes = marketRes;
@@ -33,6 +35,10 @@ async function initDashboard() {
         let bRes = bidRes;
         if (!bRes.ok) bRes = await fetch(`/data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }));
         if (bRes.ok) bidScheduleData = await bRes.json();
+
+        let iRes = insightRes;
+        if (!iRes.ok) iRes = await fetch(`/data/market_insights.json?v=${Date.now()}`).catch(e => ({ ok: false }));
+        if (iRes.ok) marketInsightData = await iRes.json();
 
 
         if (!currentData) throw new Error("Market data could not be loaded.");
@@ -65,6 +71,7 @@ async function initDashboard() {
         renderDashboard();
         renderSummary();
         renderBidSchedule();
+        renderMarketInsights();
         updateInsights();
         setupFilters();
         setupThemeSwitcher();
@@ -413,7 +420,10 @@ function updateOrCreateChart(port, portData) {
             legend: {
                 labels: { color: theme.text, font: { size: 10 } }
             },
-            tooltip: { enabled: false }
+            tooltip: { enabled: false },
+            annotation: {
+                annotations: generateAnnotations()
+            }
         },
         scales: {
             x: {
@@ -1385,3 +1395,30 @@ function runSimulation(state) {
 document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
 });
+
+function generateAnnotations() {
+    if (!marketInsightData) return {};
+    const annotations = {};
+    marketInsightData.forEach((item, index) => {
+        const color = item.type === 'news' ? '#ff7b72' : (item.type === 'market' ? '#3fb950' : '#bc8cff');
+        annotations['note' + index] = {
+            type: 'line',
+            xMin: item.date,
+            xMax: item.date,
+            borderColor: color,
+            borderWidth: 2,
+            borderDash: [4, 4],
+            label: {
+                display: true,
+                content: item.is_pinned ? '🚩' : '●',
+                position: 'start',
+                backgroundColor: color,
+                color: '#fff',
+                font: { size: 12, weight: 'bold' },
+                padding: 4,
+                borderRadius: 4
+            }
+        };
+    });
+    return annotations;
+}
