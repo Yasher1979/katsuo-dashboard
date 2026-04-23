@@ -57,7 +57,7 @@ async function initDashboard() {
             });
         });
         const maxDate = latestDates.sort().reverse()[0] || "No Data";
-        debugInfo.textContent = `Build: 20260423-1400 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'}`;
+        debugInfo.textContent = `Build: 20260423-1425 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'}`;
         document.body.appendChild(debugInfo);
         console.log("Latest Date in Data:", maxDate);
 
@@ -1443,9 +1443,29 @@ function generateAnnotations() {
                 position: 'start',
                 backgroundColor: color,
                 color: '#fff',
-                font: { size: 12, weight: 'bold' },
-                padding: 4,
-                borderRadius: 4
+                font: { size: 14, weight: 'bold' },
+                padding: 6,
+                borderRadius: 6
+            },
+            enter(ctx, event) {
+                ctx.chart.canvas.style.cursor = 'pointer';
+            },
+            leave(ctx, event) {
+                ctx.chart.canvas.style.cursor = 'default';
+            },
+            click(ctx, event) {
+                const modal = document.getElementById('detail-modal');
+                const body = document.getElementById('modal-body');
+                if (modal && body) {
+                    body.innerHTML = `
+                        <h3 style="color:${color}; margin-top:0; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;">
+                            ${item.is_pinned ? '🚩' : '●'} ${item.title}
+                        </h3>
+                        <p style="font-size:0.85rem; color:#8b949e;">📅 ${item.date} の記録</p>
+                        <p style="margin-top:15px; line-height:1.6; font-size:1rem;">${item.content}</p>
+                    `;
+                    modal.classList.add('active');
+                }
             }
         };
     });
