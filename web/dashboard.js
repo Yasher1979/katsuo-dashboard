@@ -1396,6 +1396,31 @@ document.addEventListener('DOMContentLoaded', () => {
     initDashboard();
 });
 
+function renderMarketInsights() {
+    const el = document.getElementById('insight-list');
+    if (!el || !marketInsightData) return;
+
+    el.innerHTML = '';
+    
+    // 日付の降順（新しい順）にソート
+    const sorted = [...marketInsightData].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    sorted.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `insight-item type-${item.type}`;
+        
+        const icon = item.type === 'news' ? '📰' : (item.type === 'market' ? '💹' : '⚙️');
+
+        div.innerHTML = `
+            <div class="insight-date">${item.date}</div>
+            <div class="insight-title">${icon} ${item.title}</div>
+            <div class="insight-text">${item.content}</div>
+            ${item.is_pinned ? '<span class="insight-tag">重要</span>' : ''}
+        `;
+        el.appendChild(div);
+    });
+}
+
 function generateAnnotations() {
     if (!marketInsightData) return {};
     const annotations = {};
