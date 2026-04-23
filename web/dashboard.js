@@ -57,7 +57,7 @@ async function initDashboard() {
             });
         });
         const maxDate = latestDates.sort().reverse()[0] || "No Data";
-        debugInfo.textContent = `Build: 20260423-1425 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'}`;
+        debugInfo.textContent = `Build: 20260423-1435 | Data: ${maxDate} | Files: B${bidScheduleData ? '1' : '0'}`;
         document.body.appendChild(debugInfo);
         console.log("Latest Date in Data:", maxDate);
 
@@ -420,10 +420,7 @@ function updateOrCreateChart(port, portData) {
             legend: {
                 labels: { color: theme.text, font: { size: 10 } }
             },
-            tooltip: { enabled: false },
-            annotation: {
-                annotations: generateAnnotations()
-            }
+            tooltip: { enabled: false }
         },
         scales: {
             x: {
