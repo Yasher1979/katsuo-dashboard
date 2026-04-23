@@ -1428,8 +1428,8 @@ function generateAnnotations() {
         const color = item.type === 'news' ? '#ff7b72' : (item.type === 'market' ? '#3fb950' : '#bc8cff');
         annotations['note' + index] = {
             type: 'line',
-            xMin: item.date,
-            xMax: item.date,
+            scaleID: 'x',
+            value: item.date,
             borderColor: color,
             borderWidth: 2,
             borderDash: [4, 4],
