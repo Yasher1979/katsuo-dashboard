@@ -63,6 +63,29 @@
     "total_volume": 340.0
   },
   {
+    "id": "20260501_tokiwamaru38",
+    "delivery_date": "2026-05-01",
+    "vessel_name": "38 常磐丸",
+    "bid_date": "2026-05-01",
+    "tonnage": 600.0,
+    "sea_area": {
+      "lat": "",
+      "lon": ""
+    },
+    "port": "山川",
+    "is_latest": false,
+    "items": [
+      { "category": "カツオ", "size": "6.0kg上", "type": "入札", "volume": 10.0 },
+      { "category": "カツオ", "size": "4.5kg上", "type": "入札", "volume": 30.0 },
+      { "category": "カツオ", "size": "2.5kg上", "type": "入札", "volume": 400.0 },
+      { "category": "カツオ", "size": "1.8kg上", "type": "入札", "volume": 100.0 },
+      { "category": "カツオ", "size": "1.8kg下", "type": "入札", "volume": 40.0 },
+      { "category": "キメジ", "size": "3.0kg下", "type": "入札", "volume": 15.0 },
+      { "category": "キメジ", "size": "1.5kg下", "type": "入札", "volume": 5.0 }
+    ],
+    "total_volume": 600.0
+  },
+  {
     "id": "20260427_wakabamaru7",
     "delivery_date": "2026-04-27",
     "vessel_name": "7 わかば丸",
