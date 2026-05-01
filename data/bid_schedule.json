@@ -1,5 +1,68 @@
 [
   {
+    "id": "20260507_wakabamaru11",
+    "delivery_date": "2026-05-07",
+    "vessel_name": "11 わかば丸",
+    "bid_date": "2026-05-07",
+    "tonnage": 950.0,
+    "sea_area": {
+      "lat": "N 01°58' 〜 N 04°32'",
+      "lon": "E 151°33' 〜 E 157°18'"
+    },
+    "port": "枕崎",
+    "is_latest": true,
+    "items": [
+      { "category": "B カツオ", "size": "8.0kg上", "type": "入札", "volume": 0.0 },
+      { "category": "B カツオ", "size": "6.0kg上", "type": "入札", "volume": 0.0 },
+      { "category": "B カツオ", "size": "4.5kg上", "type": "入札", "volume": 20.0 },
+      { "category": "B カツオ", "size": "2.5kg上", "type": "入札", "volume": 310.0 },
+      { "category": "B カツオ", "size": "1.8kg上", "type": "入札", "volume": 80.0 },
+      { "category": "B カツオ", "size": "1.8kg下", "type": "入札", "volume": 10.0 },
+      { "category": "PS カツオ", "size": "7.0kg上", "type": "相対", "volume": 0.0 },
+      { "category": "PS カツオ", "size": "4.5kg上", "type": "相対", "volume": 18.0 },
+      { "category": "PS カツオ", "size": "2.5kg上", "type": "相対", "volume": 288.0 },
+      { "category": "PS カツオ", "size": "1.8kg上", "type": "相対", "volume": 71.0 },
+      { "category": "PS カツオ", "size": "1.8kg下", "type": "相対", "volume": 1.0 },
+      { "category": "キワ・キメ", "size": "10.0kg上", "type": "相対", "volume": 5.0 },
+      { "category": "キワ・キメ", "size": "5.0kg上", "type": "相対", "volume": 13.0 },
+      { "category": "キワ・キメ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
+      { "category": "キワ・キメ", "size": "1.5kg上", "type": "入札", "volume": 1.0 },
+      { "category": "キワ・キメ", "size": "1.5kg下ダル混", "type": "入札", "volume": 0.0 },
+      { "category": "PS キワ・キメ", "size": "10.0kg上", "type": "相対", "volume": 52.0 },
+      { "category": "PS キワ・キメ", "size": "5.0kg上", "type": "相対", "volume": 78.0 },
+      { "category": "PS キワ・キメ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
+      { "category": "PS キワ・キメ", "size": "1.5kg上", "type": "相対", "volume": 0.0 },
+      { "category": "PS キワ・キメ", "size": "1.5kg下ダル混", "type": "相対", "volume": 0.0 },
+      { "category": "ダルマ", "size": "10.0kg上", "type": "相対", "volume": 2.0 },
+      { "category": "ダルマ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
+      { "category": "ダルマ", "size": "1.5kg上", "type": "入札", "volume": 0.0 },
+      { "category": "PS ダルマ", "size": "10.0kg上", "type": "相対", "volume": 1.0 },
+      { "category": "PS ダルマ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
+      { "category": "PS ダルマ", "size": "1.5kg上", "type": "相対", "volume": 0.0 }
+    ],
+    "total_volume": 950.0
+  },
+  {
+    "id": "20260430_tokiwamaru18",
+    "delivery_date": "2026-04-30",
+    "vessel_name": "18 常磐丸",
+    "bid_date": "2026-04-30",
+    "tonnage": 340.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      { "category": "旋網", "size": "4.5kg上", "type": "入札", "volume": 60.0 },
+      { "category": "旋網", "size": "2.5kg上", "type": "入札", "volume": 240.0 },
+      { "category": "旋網", "size": "1.8kg上", "type": "入札", "volume": 30.0 },
+      { "category": "旋網", "size": "1.8kg下", "type": "入札", "volume": 10.0 }
+    ],
+    "total_volume": 340.0
+  },
+  {
     "id": "20260427_wakabamaru7",
     "delivery_date": "2026-04-27",
     "vessel_name": "7 わかば丸",
@@ -10,7 +73,7 @@
       "lon": "E 162°01' 〜 E 154°14'"
     },
     "port": "枕崎",
-    "is_latest": true,
+    "is_latest": false,
     "items": [
       {
         "category": "B カツオ",
