@@ -93,33 +93,9 @@
         "size": "1.8kg下",
         "type": "入札",
         "volume": 10.0
-      },
-      {
-        "category": "一本釣",
-        "size": "7.0kg上",
-        "type": "入札",
-        "volume": 50.0
-      },
-      {
-        "category": "一本釣",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 40.0
-      },
-      {
-        "category": "一本釣",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 60.0
-      },
-      {
-        "category": "一本釣",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 10.0
       }
     ],
-    "total_volume": 600.0
+    "total_volume": 440.0
   },
   {
     "id": "20260511_fukuichimaru88",
