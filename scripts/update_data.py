@@ -20,7 +20,7 @@ def add_market_data(port, size, date, price, volume, vessel=None):
     """
     try:
         from backup_manager import create_backup
-        create_backup(os.path.join(os.path.dirname(__file__), '..', 'data'))
+        create_backup()
     except ImportError:
         pass
         
@@ -61,7 +61,7 @@ def add_bid_schedule(id, vessel_name, bid_date, delivery_date, tonnage, port, it
     """
     try:
         from backup_manager import create_backup
-        create_backup(os.path.join(os.path.dirname(__file__), '..', 'data'))
+        create_backup()
     except ImportError:
         pass
         

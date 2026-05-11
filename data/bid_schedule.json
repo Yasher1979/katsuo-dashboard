@@ -1,5 +1,127 @@
 [
   {
+    "id": "20260511_miyamaru18",
+    "delivery_date": "2026-05-11",
+    "vessel_name": "18 宮丸",
+    "bid_date": "2026-05-11",
+    "tonnage": 385.0,
+    "sea_area": {
+      "lat": "",
+      "lon": ""
+    },
+    "port": "山川",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "カツオ",
+        "size": "6.0kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "カツオ",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "カツオ",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 240.0
+      },
+      {
+        "category": "カツオ",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 70.0
+      },
+      {
+        "category": "カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "キメジ",
+        "size": "3.0kg下",
+        "type": "入札",
+        "volume": 15.0
+      },
+      {
+        "category": "キメジ",
+        "size": "1.5kg下",
+        "type": "入札",
+        "volume": 10.0
+      }
+    ],
+    "total_volume": 385.0
+  },
+  {
+    "id": "20260509_koyomaru78",
+    "delivery_date": "2026-05-09",
+    "vessel_name": "78 光洋丸",
+    "bid_date": "2026-05-09",
+    "tonnage": 600.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "旋網",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 80.0
+      },
+      {
+        "category": "旋網",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 300.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 50.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "一本釣",
+        "size": "7.0kg上",
+        "type": "入札",
+        "volume": 50.0
+      },
+      {
+        "category": "一本釣",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 40.0
+      },
+      {
+        "category": "一本釣",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 60.0
+      },
+      {
+        "category": "一本釣",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 10.0
+      }
+    ],
+    "total_volume": 600.0
+  },
+  {
     "id": "20260511_fukuichimaru88",
     "delivery_date": "2026-05-11",
     "vessel_name": "88 福一丸",
@@ -10,35 +132,170 @@
       "lon": "E 155°50' 〜 E 153°45'"
     },
     "port": "枕崎",
-    "is_latest": true,
+    "is_latest": false,
     "items": [
-      { "category": "B カツオ", "size": "8.0kg上", "type": "入札", "volume": 0.0 },
-      { "category": "B カツオ", "size": "6.0kg上", "type": "入札", "volume": 0.0 },
-      { "category": "B カツオ", "size": "4.5kg上", "type": "入札", "volume": 10.0 },
-      { "category": "B カツオ", "size": "2.5kg上", "type": "入札", "volume": 320.0 },
-      { "category": "B カツオ", "size": "1.8kg上", "type": "入札", "volume": 110.0 },
-      { "category": "B カツオ", "size": "1.8kg下", "type": "入札", "volume": 10.0 },
-      { "category": "PS カツオ", "size": "7.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "PS カツオ", "size": "4.5kg上", "type": "相対", "volume": 16.0 },
-      { "category": "PS カツオ", "size": "2.5kg上", "type": "相対", "volume": 258.0 },
-      { "category": "PS カツオ", "size": "1.8kg上", "type": "相対", "volume": 100.0 },
-      { "category": "PS カツオ", "size": "1.8kg下", "type": "相対", "volume": 2.0 },
-      { "category": "キワ・キメ", "size": "10.0kg上", "type": "相対", "volume": 19.0 },
-      { "category": "キワ・キメ", "size": "5.0kg上", "type": "相対", "volume": 37.0 },
-      { "category": "キワ・キメ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "キワ・キメ", "size": "1.5kg上", "type": "入札", "volume": 5.0 },
-      { "category": "キワ・キメ", "size": "1.5kg下ダル混", "type": "入札", "volume": 2.0 },
-      { "category": "PS キワ・キメ", "size": "10.0kg上", "type": "相対", "volume": 18.0 },
-      { "category": "PS キワ・キメ", "size": "5.0kg上", "type": "相対", "volume": 45.0 },
-      { "category": "PS キワ・キメ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "PS キワ・キメ", "size": "1.5kg上", "type": "相対", "volume": 7.0 },
-      { "category": "PS キワ・キメ", "size": "1.5kg下ダル混", "type": "相対", "volume": 0.0 },
-      { "category": "ダルマ", "size": "10.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "ダルマ", "size": "3.0kg上", "type": "相対", "volume": 3.0 },
-      { "category": "ダルマ", "size": "1.5kg上", "type": "入札", "volume": 2.0 },
-      { "category": "PS ダルマ", "size": "10.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "PS ダルマ", "size": "3.0kg上", "type": "相対", "volume": 6.0 },
-      { "category": "PS ダルマ", "size": "1.5kg上", "type": "相対", "volume": 0.0 }
+      {
+        "category": "B カツオ",
+        "size": "8.0kg上",
+        "type": "入札",
+        "volume": 0.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "6.0kg上",
+        "type": "入札",
+        "volume": 0.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 320.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 110.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "7.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "4.5kg上",
+        "type": "相対",
+        "volume": 16.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "2.5kg上",
+        "type": "相対",
+        "volume": 258.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg上",
+        "type": "相対",
+        "volume": 100.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg下",
+        "type": "相対",
+        "volume": 2.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 19.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "5.0kg上",
+        "type": "相対",
+        "volume": 37.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 5.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "入札",
+        "volume": 2.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 18.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "5.0kg上",
+        "type": "相対",
+        "volume": 45.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg上",
+        "type": "相対",
+        "volume": 7.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 3.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 2.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 6.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "1.5kg上",
+        "type": "相対",
+        "volume": 0.0
+      }
     ],
     "total_volume": 970.0
   },
@@ -55,33 +312,168 @@
     "port": "枕崎",
     "is_latest": false,
     "items": [
-      { "category": "B カツオ", "size": "8.0kg上", "type": "入札", "volume": 0.0 },
-      { "category": "B カツオ", "size": "6.0kg上", "type": "入札", "volume": 3.0 },
-      { "category": "B カツオ", "size": "4.5kg上", "type": "入札", "volume": 15.0 },
-      { "category": "B カツオ", "size": "2.5kg上", "type": "入札", "volume": 250.0 },
-      { "category": "B カツオ", "size": "1.8kg上", "type": "入札", "volume": 140.0 },
-      { "category": "B カツオ", "size": "1.8kg下", "type": "入札", "volume": 10.0 },
-      { "category": "PS カツオ", "size": "7.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "PS カツオ", "size": "4.5kg上", "type": "相対", "volume": 18.0 },
-      { "category": "PS カツオ", "size": "2.5kg上", "type": "相対", "volume": 288.0 },
-      { "category": "PS カツオ", "size": "1.8kg上", "type": "相対", "volume": 71.0 },
-      { "category": "PS カツオ", "size": "1.8kg下", "type": "相対", "volume": 1.0 },
-      { "category": "キワ・キメ", "size": "10.0kg上", "type": "相対", "volume": 5.0 },
-      { "category": "キワ・キメ", "size": "5.0kg上", "type": "相対", "volume": 13.0 },
-      { "category": "キワ・キメ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "キワ・キメ", "size": "1.5kg上", "type": "入札", "volume": 1.0 },
-      { "category": "キワ・キメ", "size": "1.5kg下ダル混", "type": "入札", "volume": 1.0 },
-      { "category": "PS キワ・キメ", "size": "10.0kg上", "type": "相対", "volume": 52.0 },
-      { "category": "PS キワ・キメ", "size": "5.0kg上", "type": "相対", "volume": 78.0 },
-      { "category": "PS キワ・キメ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "PS キワ・キメ", "size": "1.5kg上", "type": "相対", "volume": 0.0 },
-      { "category": "PS キワ・キメ", "size": "1.5kg下ダル混", "type": "相対", "volume": 0.0 },
-      { "category": "ダルマ", "size": "10.0kg上", "type": "相対", "volume": 2.0 },
-      { "category": "ダルマ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "ダルマ", "size": "1.5kg上", "type": "入札", "volume": 0.0 },
-      { "category": "PS ダルマ", "size": "10.0kg上", "type": "相対", "volume": 1.0 },
-      { "category": "PS ダルマ", "size": "3.0kg上", "type": "相対", "volume": 0.0 },
-      { "category": "PS ダルマ", "size": "1.5kg上", "type": "相対", "volume": 0.0 }
+      {
+        "category": "B カツオ",
+        "size": "8.0kg上",
+        "type": "入札",
+        "volume": 0.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "6.0kg上",
+        "type": "入札",
+        "volume": 3.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 15.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 250.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 140.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "7.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "4.5kg上",
+        "type": "相対",
+        "volume": 18.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "2.5kg上",
+        "type": "相対",
+        "volume": 288.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg上",
+        "type": "相対",
+        "volume": 71.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg下",
+        "type": "相対",
+        "volume": 1.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 5.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "5.0kg上",
+        "type": "相対",
+        "volume": 13.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 1.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "入札",
+        "volume": 1.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 52.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "5.0kg上",
+        "type": "相対",
+        "volume": 78.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 2.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 0.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 1.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "1.5kg上",
+        "type": "相対",
+        "volume": 0.0
+      }
     ],
     "total_volume": 950.0
   },
@@ -98,10 +490,30 @@
     "port": "焼津",
     "is_latest": false,
     "items": [
-      { "category": "旋網", "size": "4.5kg上", "type": "入札", "volume": 60.0 },
-      { "category": "旋網", "size": "2.5kg上", "type": "入札", "volume": 240.0 },
-      { "category": "旋網", "size": "1.8kg上", "type": "入札", "volume": 30.0 },
-      { "category": "旋網", "size": "1.8kg下", "type": "入札", "volume": 10.0 }
+      {
+        "category": "旋網",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 60.0
+      },
+      {
+        "category": "旋網",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 240.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      }
     ],
     "total_volume": 340.0
   },
@@ -118,13 +530,48 @@
     "port": "山川",
     "is_latest": false,
     "items": [
-      { "category": "カツオ", "size": "6.0kg上", "type": "入札", "volume": 10.0 },
-      { "category": "カツオ", "size": "4.5kg上", "type": "入札", "volume": 30.0 },
-      { "category": "カツオ", "size": "2.5kg上", "type": "入札", "volume": 400.0 },
-      { "category": "カツオ", "size": "1.8kg上", "type": "入札", "volume": 100.0 },
-      { "category": "カツオ", "size": "1.8kg下", "type": "入札", "volume": 40.0 },
-      { "category": "キメジ", "size": "3.0kg下", "type": "入札", "volume": 15.0 },
-      { "category": "キメジ", "size": "1.5kg下", "type": "入札", "volume": 5.0 }
+      {
+        "category": "カツオ",
+        "size": "6.0kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "カツオ",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "カツオ",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 400.0
+      },
+      {
+        "category": "カツオ",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 100.0
+      },
+      {
+        "category": "カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 40.0
+      },
+      {
+        "category": "キメジ",
+        "size": "3.0kg下",
+        "type": "入札",
+        "volume": 15.0
+      },
+      {
+        "category": "キメジ",
+        "size": "1.5kg下",
+        "type": "入札",
+        "volume": 5.0
+      }
     ],
     "total_volume": 600.0
   },
