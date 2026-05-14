@@ -24,7 +24,7 @@ class KatsuoDataFetcher:
         # 読み込みの前にバックアップを取得（データ破損対策）
         try:
             from backup_manager import create_backup
-            create_backup(self.data_dir)
+            create_backup()
         except ImportError:
             pass
             
