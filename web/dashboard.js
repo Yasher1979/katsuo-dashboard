@@ -226,14 +226,54 @@ function renderBidSchedule() {
     const latestC = document.getElementById('latest-bid-container'), archiveC = document.getElementById('archive-bid-container');
     if (!latestC || !bidScheduleData) return;
     latestC.innerHTML = ''; archiveC.innerHTML = '';
-    const sorted = [...bidScheduleData].sort((a, b) => new Date(b.bid_date) - new Date(a.bid_date));
 
-    sorted.forEach((bid, i) => {
+    // 日本標準時 (JST/日本時間) に基づき、今日の日付を YYYY-MM-DD 形式で取得
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const todayStr = `${year}-${month}-${day}`;
+
+    // 未開催（今日以降）と過去（昨日以前）に分ける
+    const upcomingBids = [];
+    const pastBids = [];
+
+    bidScheduleData.forEach(bid => {
+        if (bid.bid_date >= todayStr) {
+            upcomingBids.push(bid);
+        } else {
+            pastBids.push(bid);
+        }
+    });
+
+    // 未開催分は日付が近い順（昇順）にソート
+    upcomingBids.sort((a, b) => new Date(a.bid_date) - new Date(b.bid_date));
+
+    // 過去分は日付が新しい順（降順）にソート
+    pastBids.sort((a, b) => new Date(b.bid_date) - new Date(a.bid_date));
+
+    let activeBids = [];
+    let archivedBids = [];
+
+    if (upcomingBids.length > 0) {
+        // 未開催が1つ以上ある場合は、未開催をすべてアクティブ表示、過去分はすべてアーカイブへ
+        activeBids = upcomingBids;
+        archivedBids = pastBids;
+    } else {
+        // 未開催がなければ、過去分のうち最新の1つだけをアクティブ表示し、残りをアーカイブへ
+        if (pastBids.length > 0) {
+            activeBids = [pastBids[0]];
+            archivedBids = pastBids.slice(1);
+        }
+    }
+
+    // カード生成用のヘルパー関数
+    const createBidCard = (bid, isArchive) => {
         let itemsH = '';
         (bid.items || []).forEach(item => {
-            // 全カテゴリを表示（重量0も含む）
             itemsH += `<tr><td>${item.category}</td><td>${item.size}</td><td>${item.type}</td><td class="volume-val">${(item.volume || 0).toFixed(1)}<span class="volume-unit">t</span></td></tr>`;
         });
+
         // マップURLの生成
         const parseCoord = (str) => {
             const parts = str.match(/([NSEW])\s*(\d+)[°°]\s*(\d+)/);
@@ -255,7 +295,7 @@ function renderBidSchedule() {
             : `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((bid.sea_area?.lat || '') + ' ' + (bid.sea_area?.lon || ''))}`;
 
         const card = document.createElement('div');
-        card.className = `bid-card ${i > 0 ? 'archive' : ''}`;
+        card.className = `bid-card ${isArchive ? 'archive' : ''}`;
         card.innerHTML = `
             <div class="bid-card-header">
                 <div class="bid-info-main">
@@ -276,10 +316,21 @@ function renderBidSchedule() {
                 <tbody>${itemsH}<tr class="category-row"><td colspan="3">合計重量 (Bカツオ等)</td><td class="volume-val">${displayTotal.toFixed(1)}<span class="volume-unit">t</span></td></tr></tbody>
                 </table>
             </div>`;
-        if (i === 0) latestC.appendChild(card); else archiveC.appendChild(card);
+        return card;
+    };
+
+    // アクティブ表示のカードを追加
+    activeBids.forEach(bid => {
+        latestC.appendChild(createBidCard(bid, false));
     });
+
+    // アーカイブ表示のカードを追加
+    archivedBids.forEach(bid => {
+        archiveC.appendChild(createBidCard(bid, true));
+    });
+
     const arcSec = document.querySelector('.archive-section');
-    if (arcSec) arcSec.style.display = sorted.length > 1 ? 'block' : 'none';
+    if (arcSec) arcSec.style.display = archivedBids.length > 0 ? 'block' : 'none';
 }
 
 function filterDataByRange(portData, range) {
