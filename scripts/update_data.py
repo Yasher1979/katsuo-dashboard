@@ -1,124 +1,131 @@
+# -*- coding: utf-8 -*-
 import json
-import os
-from datetime import datetime
 
-MARKET_DATA_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'katsuo_market_data.json')
-BID_SCHEDULE_PATH = os.path.join(os.path.dirname(__file__), '..', 'data', 'bid_schedule.json')
+# Load existing data
+with open('data/katsuo_market_data.json', 'r', encoding='utf-8') as f:
+    data = json.load(f)
 
-def load_json(path):
-    with open(path, 'r', encoding='utf-8') as f:
-        return json.load(f)
+maku = data['枕崎']
+yaizu = data['焼津']
+yamakawa = data['山川']
 
-def save_json(path, data):
-    with open(path, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-    print(f"Successfully saved to {path}")
+# =========================================
+# 枕崎相場追記
+# 5/20: 6わかば丸 670t -> 相場: 1.8上325.1/1.8下323.0/2.5上326.0/4.5上324.0
+# 5/22: 88明豊丸 710t -> 1.8上335.9/1.8下328.0/2.5上338.3/4.5上345.0/6.0上327.0
+# 5/27: 128福一丸 630t -> 1.8上328.7/2.5上318.0/4.5上332.0/6.0上332.0
+# 6/01: 7わかば丸 -> 1.8上316.3/1.8下311.0/2.5上318.8/4.5上328.2/6.0上318.3
+# =========================================
 
-def add_market_data(port, size, date, price, volume, vessel=None):
-    """
-    相場データを追加します。
-    """
-    try:
-        from backup_manager import create_backup
-        create_backup()
-    except ImportError:
-        pass
-        
-    data = load_json(MARKET_DATA_PATH)
-    if port not in data:
-        print(f"Error: Port '{port}' not found.")
-        return
-    if size not in data[port]:
-        print(f"Info: Size '{size}' not found in '{port}'. Creating new category.")
-        data[port][size] = []
-    
-    new_entry = {
-        "date": date,
-        "price": float(price),
-        "volume": float(volume)
-    }
-    if vessel:
-        new_entry["vessel"] = vessel
-    
-    # 重複チェック
-    existing = [d for d in data[port][size] if d['date'] == date]
-    if existing:
-        print(f"Warning: Entry for {date} already exists for {port} {size}. Updating price/volume/vessel.")
-        existing[0]['price'] = float(price)
-        existing[0]['volume'] = float(volume)
-        if vessel:
-            existing[0]['vessel'] = vessel
-    else:
-        data[port][size].append(new_entry)
-        # 日付順にソート
-        data[port][size].sort(key=lambda x: x['date'])
-    
-    save_json(MARKET_DATA_PATH, data)
+# 既存エントリを日付でチェックして重複を避ける
+def add_if_new(lst, date, price, volume, vessel):
+    if not any(item['date'] == date and item.get('vessel') == vessel for item in lst):
+        lst.append({'date': date, 'price': price, 'volume': volume, 'vessel': vessel})
 
-def add_bid_schedule(id, vessel_name, bid_date, delivery_date, tonnage, port, items, lat="", lon=""):
-    """
-    入札予定を追加します。
-    """
-    try:
-        from backup_manager import create_backup
-        create_backup()
-    except ImportError:
-        pass
-        
-    data = load_json(BID_SCHEDULE_PATH)
-    
-    # 既存の is_latest をすべて解除
-    for entry in data:
-        entry['is_latest'] = False
-        
-    total_vol = sum([float(item.get('volume', 0)) for item in items])
-    
-    new_entry = {
-        "id": id,
-        "delivery_date": delivery_date,
-        "vessel_name": vessel_name,
-        "bid_date": bid_date,
-        "tonnage": float(tonnage),
-        "sea_area": {
-            "lat": lat,
-            "lon": lon
-        },
-        "port": port,
-        "is_latest": True,
-        "items": items,
-        "total_volume": total_vol
-    }
-    
-    data.insert(0, new_entry)
-    save_json(BID_SCHEDULE_PATH, data)
+add_if_new(maku['1.8kg上'], '2026-05-20', 325.1, 160.0, '6わかば丸')
+add_if_new(maku['1.8kg上'], '2026-05-22', 335.9, 100.0, '88明豊丸')
+add_if_new(maku['1.8kg上'], '2026-05-27', 328.7, 30.0, '128福一丸')
+add_if_new(maku['1.8kg上'], '2026-06-01', 316.3, 50.0, '7わかば丸')
 
-def bump_version():
-    """
-    index.html の VERSION を現在の日時に更新します。
-    """
-    path = os.path.join(os.path.dirname(__file__), '..', 'web', 'index.html')
-    with open(path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    
-    new_version = datetime.now().strftime("%Y%m%d-%H%M")
-    new_lines = []
-    for line in lines:
-        if 'const VERSION =' in line:
-            new_lines.append(f'            const VERSION = "{new_version}";\n')
-        elif 'href="index.css?v=' in line:
-            import re
-            new_lines.append(re.sub(r'v=[^"]+', f'v={new_version}', line))
-        elif 'src="dashboard.js?v=' in line:
-            import re
-            new_lines.append(re.sub(r'v=[^"]+', f'v={new_version}', line))
-        else:
-            new_lines.append(line)
-            
-    with open(path, 'w', encoding='utf-8') as f:
-        f.writelines(new_lines)
-    print(f"Bumped version to {new_version} in index.html")
+add_if_new(maku['1.8kg下'], '2026-05-20', 323.0, 10.0, '6わかば丸')
+add_if_new(maku['1.8kg下'], '2026-05-22', 328.0, 20.0, '88明豊丸')
+add_if_new(maku['1.8kg下'], '2026-06-01', 311.0, 3.0, '7わかば丸')
 
-if __name__ == "__main__":
-    # 使用例
-    # bump_version()
-    print("This script provides utility functions to update katsuo data safely.")
+add_if_new(maku['2.5kg上'], '2026-05-20', 326.0, 210.0, '6わかば丸')
+add_if_new(maku['2.5kg上'], '2026-05-22', 338.3, 120.0, '88明豊丸')
+add_if_new(maku['2.5kg上'], '2026-05-27', 318.0, 240.0, '128福一丸')
+add_if_new(maku['2.5kg上'], '2026-06-01', 318.8, 320.0, '7わかば丸')
+
+add_if_new(maku['4.5kg上'], '2026-05-20', 324.0, 10.0, '6わかば丸')
+add_if_new(maku['4.5kg上'], '2026-05-22', 345.0, 50.0, '88明豊丸')
+add_if_new(maku['4.5kg上'], '2026-05-27', 332.0, 40.0, '128福一丸')
+add_if_new(maku['4.5kg上'], '2026-06-01', 328.2, 40.0, '7わかば丸')
+
+add_if_new(maku['6.0kg上'], '2026-05-22', 327.0, 10.0, '88明豊丸')
+add_if_new(maku['6.0kg上'], '2026-05-27', 332.0, 10.0, '128福一丸')
+add_if_new(maku['6.0kg上'], '2026-06-01', 318.3, 20.0, '7わかば丸')
+
+# 1.5kg上 (枕崎キワキメ)
+if '1.5kg上' not in maku:
+    maku['1.5kg上'] = []
+add_if_new(maku['1.5kg上'], '2026-06-01', 310.0, 1.0, '7わかば丸')
+
+# =========================================
+# 焼津相場追記
+# 5/22: 2たいよう丸 275t -> 旋網ブライン: 4.5上x45 300, 2.5上x180 298.5, 1.8上x50 301.5
+# 5/25: 35八幡丸 345t -> 旋網ブライン: 4.5上x40 295, 2.5上x220 297.5, 1.8上x80 298
+# 5/28: TAIYO WAAB 545t -> 旋網ブライン: 4.5上x60 307.5, 2.5上x360 296.5, 1.8上x120 295, 1.8下x5 290
+#        一本釣り南方B-1: 7.0上x7 430, 1.5上x1 410
+# =========================================
+
+add_if_new(yaizu['1.8kg上'], '2026-05-22', 301.5, 50.0, '2たいよう丸')
+add_if_new(yaizu['1.8kg上'], '2026-05-25', 298.0, 80.0, '35八幡丸')
+add_if_new(yaizu['1.8kg上'], '2026-05-28', 295.0, 120.0, 'TAIYO WAAB')
+
+add_if_new(yaizu['1.8kg下'], '2026-05-28', 290.0, 5.0, 'TAIYO WAAB')
+
+add_if_new(yaizu['2.5kg上'], '2026-05-22', 298.5, 180.0, '2たいよう丸')
+add_if_new(yaizu['2.5kg上'], '2026-05-25', 297.5, 220.0, '35八幡丸')
+add_if_new(yaizu['2.5kg上'], '2026-05-28', 296.5, 360.0, 'TAIYO WAAB')
+
+add_if_new(yaizu['4.5kg上'], '2026-05-22', 300.0, 45.0, '2たいよう丸')
+add_if_new(yaizu['4.5kg上'], '2026-05-25', 295.0, 40.0, '35八幡丸')
+add_if_new(yaizu['4.5kg上'], '2026-05-28', 307.5, 60.0, 'TAIYO WAAB')
+
+add_if_new(yaizu['7.0kg上'], '2026-05-28', 430.0, 7.0, 'やいづ')
+
+# 1.5kg上 (焼津)
+if '1.5kg上' not in yaizu:
+    yaizu['1.5kg上'] = []
+add_if_new(yaizu['1.5kg上'], '2026-05-28', 410.0, 1.0, 'やいづ')
+
+# =========================================
+# 山川相場追記
+# 5/18: 永盛丸 365t
+# カツオ: 6上5t(290.2), 4.5上20t(315.0), 2.5上250t(308.92avg), 1.8上60t(316.08avg), 1.8下10t(310.0)
+# キメジ: 3下15t(300.0), 1.5下5t(215.0)
+# 6/01: 18常磐丸 360t
+# カツオ: 6上40t(306.48), 4.5上50t(327.00), 2.5上210t(318.53), 1.8上30t(317.33), 1.8下10t(307.00)
+# キメジ: 3下10t(295.0), 1.5下5t(225.0)
+# ダルマ: 3下5t(200.0)
+# =========================================
+
+add_if_new(yamakawa['1.8kg上'], '2026-05-18', 316.08, 60.0, '永盛丸')
+add_if_new(yamakawa['1.8kg上'], '2026-06-01', 317.33, 30.0, '18常磐丸')
+
+add_if_new(yamakawa['1.8kg下'], '2026-05-18', 310.0, 10.0, '永盛丸')
+add_if_new(yamakawa['1.8kg下'], '2026-06-01', 307.00, 10.0, '18常磐丸')
+
+add_if_new(yamakawa['2.5kg上'], '2026-05-18', 308.92, 250.0, '永盛丸')
+add_if_new(yamakawa['2.5kg上'], '2026-06-01', 318.53, 210.0, '18常磐丸')
+
+add_if_new(yamakawa['4.5kg上'], '2026-05-18', 315.0, 20.0, '永盛丸')
+add_if_new(yamakawa['4.5kg上'], '2026-06-01', 327.00, 50.0, '18常磐丸')
+
+add_if_new(yamakawa['6.0kg上'], '2026-05-18', 290.2, 5.0, '永盛丸')
+add_if_new(yamakawa['6.0kg上'], '2026-06-01', 306.48, 40.0, '18常磐丸')
+
+if 'キメジ3.0kg下' not in yamakawa:
+    yamakawa['キメジ3.0kg下'] = []
+add_if_new(yamakawa['キメジ3.0kg下'], '2026-05-18', 300.0, 15.0, '永盛丸')
+add_if_new(yamakawa['キメジ3.0kg下'], '2026-06-01', 295.0, 10.0, '18常磐丸')
+
+if 'キメジ 1.5下' not in yamakawa:
+    yamakawa['キメジ 1.5下'] = []
+add_if_new(yamakawa['キメジ 1.5下'], '2026-05-18', 215.0, 5.0, '永盛丸')
+add_if_new(yamakawa['キメジ 1.5下'], '2026-06-01', 225.0, 5.0, '18常磐丸')
+
+if 'ダルマ 3.0kg下' not in yamakawa:
+    yamakawa['ダルマ 3.0kg下'] = []
+add_if_new(yamakawa['ダルマ 3.0kg下'], '2026-06-01', 200.0, 5.0, '18常磐丸')
+
+# Sort each list by date
+for port in data:
+    for size_key in data[port]:
+        data[port][size_key] = sorted(data[port][size_key], key=lambda x: x['date'])
+
+# Save
+with open('data/katsuo_market_data.json', 'w', encoding='utf-8') as f:
+    json.dump(data, f, ensure_ascii=False, indent=2)
+
+print('Market data updated successfully')

@@ -1,121 +1,5 @@
 [
   {
-    "id": "20260520_wakabamaru6",
-    "delivery_date": "2026-05-20",
-    "vessel_name": "6 わかば丸",
-    "bid_date": "2026-05-20",
-    "tonnage": 670.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "枕崎",
-    "is_latest": true,
-    "items": [
-      {
-        "category": "B カツオ",
-        "size": "6.0kg上",
-        "type": "入札",
-        "volume": 2.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 10.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 160.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 140.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 10.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 2.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg下ダル混",
-        "type": "入札",
-        "volume": 2.0
-      }
-    ],
-    "total_volume": 326.0
-  },
-  {
-    "id": "20260507_wakabamaru11",
-    "delivery_date": "2026-05-07",
-    "vessel_name": "11 わかば丸",
-    "bid_date": "2026-05-07",
-    "tonnage": 420.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "枕崎",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "B カツオ",
-        "size": "6.0kg上",
-        "type": "入札",
-        "volume": 3.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 15.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 250.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 140.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 10.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 1.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg下ダル混",
-        "type": "入札",
-        "volume": 1.0
-      }
-    ],
-    "total_volume": 420.0
-  },
-  {
     "id": "20260519_wakabamaru5",
     "delivery_date": "2026-05-19",
     "vessel_name": "5 わかば丸",
@@ -126,7 +10,7 @@
       "lon": ""
     },
     "port": "焼津",
-    "is_latest": false,
+    "is_latest": true,
     "items": [
       {
         "category": "旋網",

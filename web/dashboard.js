@@ -78,6 +78,7 @@ async function initDashboard() {
         setupTabs();
         setupModal();
         setupSpeciesModal(); // 種類表モーダルの初期化
+        setupHolidayModal(); // 定休日モーダルの初期化
         setupMemoModal();
         setupSettings(); // 設定機能の初期化
         loadAllSettings(); // 全設定の読み込み
@@ -671,6 +672,16 @@ function setupSpeciesModal() {
     const modal = document.getElementById('species-modal');
     const btnOpen = document.getElementById('btn-species-list');
     const btnClose = document.getElementById('species-close');
+    if (!modal || !btnOpen || !btnClose) return;
+
+    btnOpen.onclick = () => modal.classList.add('active');
+    btnClose.onclick = () => modal.classList.remove('active');
+    modal.onclick = (e) => { if (e.target === modal) modal.classList.remove('active'); };
+}
+function setupHolidayModal() {
+    const modal = document.getElementById('holiday-modal');
+    const btnOpen = document.getElementById('btn-holiday-list');
+    const btnClose = document.getElementById('holiday-close');
     if (!modal || !btnOpen || !btnClose) return;
 
     btnOpen.onclick = () => modal.classList.add('active');

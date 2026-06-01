@@ -111,6 +111,7 @@
                             <button class="btn-filter" data-range="7">7日間</button>
                         </div>
                         <div class="system-group">
+                            <button id="btn-holiday-list" class="btn-system"><span class="icon">📅</span> 定休日</button>
                             <button id="btn-species-list" class="btn-system"><span class="icon">🪵</span> 種類表</button>
                             <button id="btn-refresh" class="btn-system"><span class="icon">🔄</span> 更新</button>
                             <button id="btn-settings" class="btn-system"><span class="icon">⚙️</span> 設定</button>
@@ -201,6 +202,19 @@
                 </div>
                 <div class="species-img-body">
                     <img src="katsuo_species_guide.png" alt="鰹節種別リスト" class="species-guide-img">
+                </div>
+            </div>
+        </div>
+
+        <!-- 定休日カレンダーモーダル（画像表示） -->
+        <div id="holiday-modal" class="modal-overlay">
+            <div class="species-img-modal">
+                <div class="species-img-header">
+                    <span class="species-img-title">📅 令和8年度定休日表</span>
+                    <button id="holiday-close" class="btn-close">&times;</button>
+                </div>
+                <div class="species-img-body">
+                    <img src="holiday_calendar.jpg" alt="令和8年度定休日表" class="species-guide-img">
                 </div>
             </div>
         </div>
