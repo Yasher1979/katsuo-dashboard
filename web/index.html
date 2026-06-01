@@ -91,25 +91,28 @@
 </head>
 
 <body class="theme-dark"> <!-- デフォルトはダークモード -->
-    <!-- スプラッシュ画面 -->
+    <!-- スプラッシュ画面 (リングオービット) -->
     <div id="splash-screen" class="splash-screen">
         <div class="splash-content">
-            <img src="marucyou_mark_white.png" alt="Marucyou Logo" class="splash-logo">
-            <div class="loader"></div>
+            <div class="splash-orbit-wrapper">
+                <div class="splash-ring"></div>
+                <div class="splash-ring splash-ring-2"></div>
+                <img src="marucyou_mark_white.png" alt="Marucyou Logo" class="splash-logo">
+            </div>
+            <p class="splash-loading-text">読み込み中<span class="loading-dots"></span></p>
         </div>
     </div>
 
     <div class="container">
         <header class="app-header">
             <div class="header-visual-container">
-                <img src="header_visual.png" alt="鰹相場データ" class="header-main-visual">
+                <div class="header-main-title">
+                    <img src="marucyou_mark_white.png" alt="Marucyou Logo" class="header-logo-img">
+                    <h1>マルチョウ 鰹相場ダッシュボード</h1>
+                    <p class="last-updated-text">データ最終更新: <span id="last-update-time">取得中...</span></p>
+                </div>
                 <div class="filter-controls-container">
                     <div class="header-action-row">
-                        <div class="filter-group">
-                            <button class="btn-filter" data-range="all">全期間推移</button>
-                            <button class="btn-filter active" data-range="30">30日間</button>
-                            <button class="btn-filter" data-range="7">7日間</button>
-                        </div>
                         <div class="system-group">
                             <button id="btn-holiday-list" class="btn-system"><span class="icon">📅</span> 定休日</button>
                             <button id="btn-species-list" class="btn-system"><span class="icon">🪵</span> 種類表</button>
@@ -129,22 +132,13 @@
                     <button id="settings-close" class="btn-close">&times;</button>
                 </div>
                 <div class="settings-body">
-                    <!-- テーマ選択 (6色) -->
+                    <!-- テーマ選択 (3色にスリム化) -->
                     <section class="settings-section">
                         <h4>🎨 表示テーマ</h4>
                         <div class="theme-grid">
-                            <button class="theme-option" data-theme="dark"><span
-                                    class="theme-preview dark"></span>Dark</button>
-                            <button class="theme-option" data-theme="light"><span
-                                    class="theme-preview light"></span>Light</button>
-                            <button class="theme-option" data-theme="ocean"><span
-                                    class="theme-preview ocean"></span>Ocean</button>
-                            <button class="theme-option" data-theme="forest"><span
-                                    class="theme-preview forest"></span>Forest</button>
-                            <button class="theme-option" data-theme="sunset"><span
-                                    class="theme-preview sunset"></span>Sunset</button>
-                            <button class="theme-option" data-theme="graphite"><span
-                                    class="theme-preview graphite"></span>Graphite</button>
+                            <button class="theme-option" data-theme="dark"><span class="theme-preview dark"></span>Dark</button>
+                            <button class="theme-option" data-theme="light"><span class="theme-preview light"></span>Light</button>
+                            <button class="theme-option" data-theme="ocean"><span class="theme-preview ocean"></span>Ocean</button>
                         </div>
                     </section>
 
@@ -158,9 +152,9 @@
                         </div>
                     </section>
 
-                    <!-- 追加オプション (6項目) -->
+                    <!-- 追加オプション -->
                     <section class="settings-section">
-                        <h4>🚀 高度な設定</h4>
+                        <h4>🚀 表示オプション</h4>
                         <div class="option-list">
                             <label class="option-item">
                                 <span>港の表示: 枕崎</span>
@@ -173,19 +167,6 @@
                             <label class="option-item">
                                 <span>港の表示: 山川</span>
                                 <input type="checkbox" id="check-port-yamagawa" checked>
-                            </label>
-                            <hr>
-                            <label class="option-item">
-                                <span>コンパクトモード</span>
-                                <input type="checkbox" id="check-compact">
-                            </label>
-                            <label class="option-item">
-                                <span>アニメーション有効</span>
-                                <input type="checkbox" id="check-animation" checked>
-                            </label>
-                            <label class="option-item">
-                                <span>グラフ塗りつぶし</span>
-                                <input type="checkbox" id="check-chart-fill" checked>
                             </label>
                         </div>
                     </section>
@@ -220,255 +201,69 @@
         </div>
 
         <nav class="main-tabs">
-            <button class="tab-item active" data-tab="summary">📋 最新相場一覧</button>
-            <button class="tab-item" data-tab="charts">📈 グラフ推移</button>
+            <button class="tab-item active" data-tab="summary">📈 最新相場・グラフ</button>
             <button class="tab-item" data-tab="bid-schedule">🚢 入札予定</button>
-            <button class="tab-item" data-tab="calculator">🧮 原価計算</button>
         </nav>
 
-        <!-- 最新一覧サマリービュー（初期表示） -->
+        <!-- 最新相場・グラフビュー -->
         <div id="view-summary" class="tab-view active">
+            <!-- 3市場最新相場カード -->
+            <div class="dashboard-section-title">📊 主要3市場 最新相場サマリー</div>
             <div id="summary-container" class="summary-grid">
-                <!-- ここにJSでカードが生成されます -->
                 <p>最新データを分析中...</p>
             </div>
-        </div>
 
-
-        <!-- 🧮 鰹節製造原価計算機 Pro -->
-        <div id="view-calculator" class="tab-view">
-            <div class="pro-calc-wrapper">
-
-                <!-- ヘッダー -->
-                <div class="pro-calc-header">
-                    <h2 class="pro-calc-title">🧮 鰹節製造原価計算機 Pro</h2>
-                    <p class="pro-calc-subtitle">仕入れ → 製造 → 加工 → 販売価格を一括算出</p>
-                </div>
-
-                <!-- 画面切替タブ -->
-                <div class="calc-screen-tabs">
-                    <button class="calc-screen-tab active" data-screen="main">📱 電卓入力</button>
-                    <button class="calc-screen-tab" data-screen="analysis">📊 原価分析</button>
-                    <button class="calc-screen-tab" data-screen="compare">⚖️ 価格比較</button>
-                    <button class="calc-screen-tab" data-screen="simulation">📈 損益試算</button>
-                </div>
-
-                <!-- ====== SCREEN 1: 電卓入力 ====== -->
-                <div id="calc-screen-main" class="calc-screen active">
-                    <div class="calc-body">
-
-                        <!-- ディスプレイ -->
-                        <div class="calc-display-area">
-                            <div class="calc-display-label" id="calc-display-label">仕入単価（円/kg）を入力</div>
-                            <div class="calc-display-main" id="calc-display-main">0</div>
-                            <div class="calc-display-sub" id="calc-display-sub">入力中</div>
-                        </div>
-
-                        <!-- プリセット行1: 現在の入力対象選択 -->
-                        <div class="calc-preset-section">
-                            <div class="preset-label">入力項目選択</div>
-                            <div class="calc-preset-row">
-                                <button class="preset-target active" data-target="purchase_price">🐟 仕入単価</button>
-                                <button class="preset-target" data-target="sell_price">💴 販売単価</button>
-                                <button class="preset-target" data-target="custom_overhead">💡 経費変更</button>
-                            </div>
-                        </div>
-
-                        <!-- プリセット行2: 歩留まり掛率 -->
-                        <div class="calc-preset-section">
-                            <div class="preset-label">歩留まり掛率（クリックで即セット）</div>
-                            <div class="calc-preset-row">
-                                <button class="preset-multiplier" data-mult="4.5">4.5掛 <small>22%</small></button>
-                                <button class="preset-multiplier active" data-mult="5">5掛 <small>20%</small></button>
-                                <button class="preset-multiplier" data-mult="5.5">5.5掛 <small>18%</small></button>
-                                <button class="preset-multiplier" data-mult="6">6掛 <small>17%</small></button>
-                            </div>
-                        </div>
-
-                        <!-- プリセット行3: 加工コスト -->
-                        <div class="calc-preset-section">
-                            <div class="preset-label">経費・加工コストプリセット（複数選択可）</div>
-                            <div class="calc-preset-row wrap">
-                                <button class="preset-cost active selected" data-cost="250"
-                                    data-label="基本経費">経費250</button>
-                                <button class="preset-cost" data-cost="50" data-label="表面削り">経費削り +50</button>
-                                <button class="preset-cost" data-cost="80" data-label="カビ付け">カビ付け +80</button>
-                                <button class="preset-cost" data-cost="60" data-label="血合い抜き">血合い抜き +60</button>
-                                <button class="preset-cost" data-cost="30" data-label="梱包">梱包 +30</button>
-                                <button class="preset-cost" data-cost="0" data-label="経費なし">経費リセット</button>
-                            </div>
-                        </div>
-
-                        <!-- 現在の経費合計表示 -->
-                        <div class="calc-overhead-display">
-                            <span>現在の経費合計：</span>
-                            <strong id="current-overhead-display">250円</strong>
-                            <span id="current-overhead-detail" class="overhead-detail">（基本経費）</span>
-                        </div>
-
-                        <!-- テンキー + 演算ボタン -->
-                        <div class="calc-keypad">
-                            <div class="keypad-grid">
-                                <!-- Row 1 -->
-                                <button class="key-btn key-special" id="key-cc">C/C</button>
-                                <button class="key-btn" id="key-7">7</button>
-                                <button class="key-btn" id="key-8">8</button>
-                                <button class="key-btn" id="key-9">9</button>
-                                <button class="key-btn key-op" data-op="÷">÷</button>
-                                <!-- Row 2 -->
-                                <button class="key-btn key-special" id="key-ca">CA</button>
-                                <button class="key-btn" id="key-4">4</button>
-                                <button class="key-btn" id="key-5">5</button>
-                                <button class="key-btn" id="key-6">6</button>
-                                <button class="key-btn key-op" data-op="×">×</button>
-                                <!-- Row 3 -->
-                                <button class="key-btn key-calc" id="key-calc-now">今すぐ計算</button>
-                                <button class="key-btn" id="key-1">1</button>
-                                <button class="key-btn" id="key-2">2</button>
-                                <button class="key-btn" id="key-3">3</button>
-                                <button class="key-btn key-op" data-op="−">−</button>
-                                <!-- Row 4 -->
-                                <button class="key-btn" id="key-0">0</button>
-                                <button class="key-btn key-wide" id="key-00">00</button>
-                                <button class="key-btn" id="key-dot">.</button>
-                                <button class="key-btn key-eq" id="key-eq">=</button>
-                                <button class="key-btn key-op" data-op="+">+</button>
-                            </div>
-                        </div>
-
+            <!-- メイン折れ線グラフ -->
+            <div class="chart-section-wrapper">
+                <div class="chart-controls-header">
+                    <div class="chart-title-group">
+                        <span class="chart-section-icon">📈</span>
+                        <span class="chart-section-title">相場推移グラフ</span>
+                        <select id="chart-size-selector" class="chart-size-select">
+                            <option value="2.5kg上" selected>2.5kg上 (主力サイズ)</option>
+                            <option value="1.8kg上">1.8kg上</option>
+                            <option value="4.5kg上">4.5kg上</option>
+                            <option value="1.8kg下">1.8kg下</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <button class="btn-filter" data-range="7">7日間</button>
+                        <button class="btn-filter active" data-range="30">30日間</button>
+                        <button class="btn-filter" data-range="90">90日間</button>
+                        <button class="btn-filter" data-range="all">全期間</button>
                     </div>
                 </div>
-
-                <!-- ====== SCREEN 2: 原価分析 ====== -->
-                <div id="calc-screen-analysis" class="calc-screen">
-                    <div class="analysis-header-row">
-                        <h3>📊 原価・利益分析レポート</h3>
-                        <button id="btn-analyze" class="btn-run-analysis">分析実行 🔍</button>
-                    </div>
-                    <div id="analysis-result-area">
-                        <div class="analysis-empty">
-                            <p>📱 「電卓入力」タブで仕入単価を入力し、<br>「今すぐ計算」を押してください</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- ====== SCREEN 3: 価格比較 ====== -->
-                <div id="calc-screen-compare" class="calc-screen">
-                    <h3>⚖️ 歩留まり別・掛率比較表</h3>
-                    <p class="screen-desc">入力した仕入単価を元に、各掛率での製造原価を一覧比較します</p>
-                    <div class="compare-table-row">
-                        <div class="compare-input-area">
-                            <div class="compare-label">比較用仕入単価（円/kg）</div>
-                            <input type="number" id="compare-price-input" class="compare-price-input"
-                                placeholder="例: 220" />
-                            <button id="btn-compare-calc" class="btn-run-analysis">比較表を生成</button>
-                        </div>
-                    </div>
-                    <div id="compare-result-area">
-                        <div class="analysis-empty">
-                            <p>仕入単価を入力して「比較表を生成」を押してください</p>
-                        </div>
-                    </div>
-                    <div class="sell-price-section">
-                        <h4>💴 販売価格 → 利益率の逆算</h4>
-                        <div class="compare-input-row">
-                            <input type="number" id="sell-price-input" class="compare-price-input"
-                                placeholder="販売単価（円/kg）例: 1500" />
-                            <button id="btn-profit-calc" class="btn-run-analysis">利益率を計算</button>
-                        </div>
-                        <div id="profit-result-area"></div>
-                    </div>
-                </div>
-
-                <!-- ====== SCREEN 4: 損益シミュレーション ====== -->
-                <div id="calc-screen-simulation" class="calc-screen">
-                    <h3>📈 損益シミュレーション</h3>
-                    <p class="screen-desc">仕入量・販売量を入力して、実際の損益・キャッシュフローを計算します</p>
-                    <div class="sim-inputs-grid">
-                        <div class="sim-input-group">
-                            <label>🐟 仕入量（kg）</label>
-                            <input type="number" id="sim-purchase-kg" placeholder="例: 10000" />
-                        </div>
-                        <div class="sim-input-group">
-                            <label>💴 仕入単価（円/kg）</label>
-                            <input type="number" id="sim-purchase-price" placeholder="例: 220" />
-                        </div>
-                        <div class="sim-input-group">
-                            <label>📦 出荷kg（製品）</label>
-                            <input type="number" id="sim-sell-kg" placeholder="自動計算（変更可）" />
-                        </div>
-                        <div class="sim-input-group">
-                            <label>💰 販売単価（円/kg）</label>
-                            <input type="number" id="sim-sell-price" placeholder="例: 1500" />
-                        </div>
-                    </div>
-                    <button id="btn-simulate" class="btn-run-analysis" style="width:100%; margin-top: 15px;">損益を試算する
-                        📊</button>
-                    <div id="sim-result-area" style="margin-top:20px;"></div>
-                </div>
-
-            </div>
-        </div>
-
-
-        <!-- グラフ表示ビュー -->
-        <div id="view-charts" class="tab-view">
-            <!-- (既存のグラフ表示内容) -->
-            <div class="insight-section">
-                <div class="insight-card">
-                    <div class="insight-header">
-                        <h3>🔍 相場トレンド・分析</h3>
-                        <button id="btn-reload-insight" class="btn-refresh-insight">
-                            <span class="icon">🔄</span> 分析を更新
-                        </button>
-                    </div>
-                    <div id="insight-content" class="insight-content">
-                        <p>データを読み込み中...</p>
-                    </div>
+                <div class="main-chart-container">
+                    <canvas id="main-chart"></canvas>
                 </div>
             </div>
 
-            <div class="charts-main-layout">
-                <div class="charts-container" id="charts-container">
-                    <div class="dashboard-grid">
-                        <!-- ...各港のグラフ... -->
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <span class="port-title">枕崎市漁業協同組合市況</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chart-枕崎"></canvas>
-                            </div>
+            <!-- 下部エリア：全サイズ一覧 -->
+            <div class="bottom-dashboard-layout">
+                <div class="market-list-panel" style="grid-column: 1 / -1;">
+                    <details class="market-list-details">
+                        <summary class="market-list-summary">
+                            <span>📋 全サイズ最新相場一覧 (クリックして開閉)</span>
+                        </summary>
+                        <div class="table-responsive" style="margin-top: 15px;">
+                            <table class="market-all-sizes-table">
+                                <thead>
+                                    <tr>
+                                        <th>市場</th>
+                                        <th>サイズ</th>
+                                        <th>最新価格</th>
+                                        <th>前回比</th>
+                                        <th>水揚量</th>
+                                        <th>入港船</th>
+                                        <th>取引日</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="all-sizes-table-body">
+                                    <tr><td colspan="7" style="text-align:center;">データを読み込み中...</td></tr>
+                                </tbody>
+                            </table>
                         </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <span class="port-title">焼津魚市場市況</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chart-焼津"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-card">
-                            <div class="chart-header">
-                                <span class="port-title">山川町漁業協同組合市況</span>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="chart-山川"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="insight-panel" id="insight-panel">
-                    <div class="insight-header">
-                        <h3><i class="fas fa-book-open"></i> 相場日誌 & インサイト</h3>
-                        <p class="insight-subtitle">相場の変動理由と世界情勢の記録</p>
-                    </div>
-                    <div id="insight-list" class="insight-list">
-                        <!-- ここにJSで日誌が生成されます -->
-                        <p class="insight-placeholder">読み込み中...</p>
-                    </div>
+                    </details>
                 </div>
             </div>
         </div>
