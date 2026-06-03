@@ -14,6 +14,7 @@ let bidScheduleData = null;
 let currentRange = '30';
 let currentSize = '2.5kg上';
 let currentTheme = 'dark';
+let currentCompare = 'none';
 let activeTab = 'summary';
 let mainChart = null;
 
@@ -206,13 +207,16 @@ function renderMainChart() {
         '山川': { border: '#3fb950', bg: 'rgba(63, 185, 80, 0.1)' }
     };
 
+    // 日付オフセット（日数）を取得
+    const dayOffset = getComparisonDayOffset(currentCompare);
+
     ports.forEach(port => {
         if (!appSettings.ports.includes(port)) return;
 
         const portData = currentData[port] ? currentData[port][currentSize] : null;
         if (!portData || portData.length === 0) return;
 
-        // 期間フィルタリング
+        // 現在のデータ（実線）を追加
         const filteredData = filterDataByRange(portData, currentRange);
         if (filteredData.length === 0) return;
 
@@ -224,11 +228,37 @@ function renderMainChart() {
             borderColor: color.border,
             backgroundColor: color.bg,
             borderWidth: 3,
+            borderDash: [],
             tension: 0.2,
             pointRadius: 4,
             pointHoverRadius: 6,
             fill: false
         });
+
+        // 過去データ（点線）を追加（比較対象が指定されている場合）
+        if (currentCompare !== 'none' && dayOffset > 0) {
+            const historicalData = getHistoricalData(portData, dayOffset, currentRange);
+            if (historicalData.length > 0) {
+                const historicalColorValue = parseInt(color.border.substring(1), 16);
+                const r = (historicalColorValue >> 16) & 255;
+                const g = (historicalColorValue >> 8) & 255;
+                const b = historicalColorValue & 255;
+                const historicalColor = `rgba(${r}, ${g}, ${b}, 0.35)`;
+
+                datasets.push({
+                    label: `${port} (${getComparisonLabel(currentCompare)})`,
+                    data: historicalData.map(d => ({ x: d.date, y: d.price, volume: d.volume, prevPrice: d.prevPrice, isHistorical: true })),
+                    borderColor: historicalColor,
+                    backgroundColor: 'rgba(0, 0, 0, 0)',
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    tension: 0.2,
+                    pointRadius: 2,
+                    pointHoverRadius: 4,
+                    fill: false
+                });
+            }
+        }
     });
 
     const theme = themes[currentTheme] || themes.dark;
@@ -254,11 +284,22 @@ function renderMainChart() {
                 borderColor: 'rgba(255,255,255,0.1)',
                 borderWidth: 1,
                 callbacks: {
+                    title: function(context) {
+                        if (context.length > 0) {
+                            const dataPoint = context[0].raw;
+                            const isHistorical = dataPoint.isHistorical;
+                            const baseDate = new Date(context[0].label);
+                            const dayOffset = getComparisonDayOffset(currentCompare);
+                            const offsetDate = isHistorical ? new Date(baseDate.getTime() + dayOffset * 24 * 60 * 60 * 1000) : baseDate;
+                            return offsetDate.toISOString().split('T')[0];
+                        }
+                        return '';
+                    },
                     label: function(context) {
                         const dataPoint = context.raw;
-                        let label = `${context.dataset.label}: ${dataPoint.y}円`;
+                        const label = `${context.dataset.label}: ${dataPoint.y}円`;
                         if (dataPoint.volume) {
-                            label += ` (水揚: ${dataPoint.volume.toFixed(1)}t)`;
+                            return label + ` (水揚: ${dataPoint.volume.toFixed(1)}t)`;
                         }
                         return label;
                     }
@@ -298,6 +339,69 @@ function renderMainChart() {
             options: options
         });
     }
+}
+
+// 比較値から日数オフセットを取得
+function getComparisonDayOffset(compareValue) {
+    const offsets = {
+        'none': 0,
+        '1m': 30,
+        '3m': 91,
+        '6m': 182,
+        '1y': 365
+    };
+    return offsets[compareValue] || 0;
+}
+
+// 比較ラベルを取得
+function getComparisonLabel(compareValue) {
+    const labels = {
+        'none': 'なし',
+        '1m': '1ヶ月前',
+        '3m': '3ヶ月前',
+        '6m': '半年前',
+        '1y': '1年前'
+    };
+    return labels[compareValue] || 'なし';
+}
+
+// 過去データを抽出（日付をオフセットして現在のグラフX軸に合わせる）
+function getHistoricalData(portData, dayOffset, currentRange) {
+    if (!portData || dayOffset <= 0) return [];
+
+    // 現在の時間範囲の最新日を取得
+    let latestDate = null;
+    portData.forEach(d => {
+        const date = new Date(d.date);
+        if (!latestDate || date > latestDate) latestDate = date;
+    });
+    
+    if (!latestDate) return [];
+
+    // 過去のデータ期間を計算
+    const targetEndDate = new Date(latestDate.getTime() - dayOffset * 24 * 60 * 60 * 1000);
+    const rangeMs = currentRange === 'all' ? Infinity : parseInt(currentRange) * 24 * 60 * 60 * 1000;
+    const targetStartDate = new Date(targetEndDate.getTime() - rangeMs);
+
+    // 過去のデータを抽出
+    const historicalData = portData.filter(d => {
+        const date = new Date(d.date);
+        return date >= targetStartDate && date <= targetEndDate;
+    });
+
+    // 日付を現在のグラフに合わせてオフセット
+    const offsetData = historicalData.map(d => {
+        const pastDate = new Date(d.date);
+        const currentDate = new Date(pastDate.getTime() + dayOffset * 24 * 60 * 60 * 1000);
+        return {
+            date: currentDate.toISOString().split('T')[0],
+            price: d.price,
+            volume: d.volume,
+            prevPrice: d.prevPrice
+        };
+    });
+
+    return offsetData;
 }
 
 // 全サイズ最新相場一覧テーブルの描画
@@ -490,6 +594,15 @@ function setupFilters() {
     if (sizeSelector) {
         sizeSelector.addEventListener('change', (e) => {
             currentSize = e.target.value;
+            renderMainChart();
+        });
+    }
+
+    // 過去比較フィルター
+    const compareSelector = document.getElementById('chart-compare-selector');
+    if (compareSelector) {
+        compareSelector.addEventListener('change', (e) => {
+            currentCompare = e.target.value;
             renderMainChart();
         });
     }
