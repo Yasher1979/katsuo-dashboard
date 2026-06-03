@@ -338,6 +338,26 @@ function renderMainChart() {
             data: { datasets },
             options: options
         });
+
+        // グラフ外のクリック・タップ時にツールチップを非表示にする
+        const chartContainer = document.querySelector('.main-chart-container');
+        if (chartContainer) {
+            const dismissTooltip = function(event) {
+                // グラフコンテナ内のクリックは無視
+                if (chartContainer.contains(event.target)) return;
+                
+                // グラフ外がクリック/タップされた場合
+                if (mainChart) {
+                    // アクティブな要素をクリア（ツールチップを消す）
+                    mainChart.setActiveElements([]);
+                    mainChart.update('none'); // アニメーションなしで更新
+                }
+            };
+
+            // クリック・タップ両対応
+            document.addEventListener('click', dismissTooltip);
+            document.addEventListener('touchend', dismissTooltip);
+        }
     }
 }
 
