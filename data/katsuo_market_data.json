@@ -129,6 +129,12 @@
         "price": 295.0,
         "volume": 120.0,
         "vessel": "TAIYO WAAB"
+      },
+      {
+        "date": "2026-06-04",
+        "price": 307.5,
+        "volume": 30.0,
+        "vessel": "18松友丸"
       }
     ],
     "1.8kg下": [
@@ -237,6 +243,12 @@
         "price": 290.0,
         "volume": 5.0,
         "vessel": "TAIYO WAAB"
+      },
+      {
+        "date": "2026-06-04",
+        "price": 300.0,
+        "volume": 5.0,
+        "vessel": "18松友丸"
       }
     ],
     "2.5kg上": [
@@ -368,6 +380,12 @@
         "price": 296.5,
         "volume": 360.0,
         "vessel": "TAIYO WAAB"
+      },
+      {
+        "date": "2026-06-04",
+        "price": 310.5,
+        "volume": 400.0,
+        "vessel": "18松友丸"
       }
     ],
     "4.5kg上": [
@@ -499,6 +517,12 @@
         "price": 307.5,
         "volume": 60.0,
         "vessel": "TAIYO WAAB"
+      },
+      {
+        "date": "2026-06-04",
+        "price": 310.0,
+        "volume": 65.0,
+        "vessel": "18松友丸"
       }
     ],
     "1.5kg上": [

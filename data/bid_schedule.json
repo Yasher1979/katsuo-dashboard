@@ -106,6 +106,46 @@
     "total_volume": 830.0
   },
   {
+    "id": "20260604_matsutomomaru18",
+    "delivery_date": "2026-06-04",
+    "vessel_name": "18 松友丸",
+    "bid_date": "2026-06-04",
+    "tonnage": 500.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 65.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 400.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 5.0
+      }
+    ],
+    "total_volume": 500.0
+  },
+  {
     "id": "20260507_wakabamaru11",
     "delivery_date": "2026-05-07",
     "vessel_name": "11 わかば丸",
