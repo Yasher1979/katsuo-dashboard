@@ -1,8 +1,88 @@
 [
   {
-    "id": "20260608_hanyomaru7",
+    "id": "20260609_tokueimaru17",
+    "delivery_date": "2026-06-09",
+    "vessel_name": "17 徳栄丸",
+    "bid_date": "2026-06-09",
+    "tonnage": 346.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "一本釣",
+        "size": "7.0kg上",
+        "type": "入札",
+        "volume": 320.0
+      },
+      {
+        "category": "一本釣",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 20.0
+      },
+      {
+        "category": "一本釣",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 3.0
+      },
+      {
+        "category": "一本釣",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 3.0
+      }
+    ],
+    "total_volume": 346.0
+  },
+  {
+    "id": "20260609_shokimaru36",
+    "delivery_date": "2026-06-09",
+    "vessel_name": "36 昇喜丸",
+    "bid_date": "2026-06-09",
+    "tonnage": 265.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 40.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 210.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 5.0
+      }
+    ],
+    "total_volume": 265.0
+  },
+  {
+    "id": "20260608_misakimaru7",
     "delivery_date": "2026-06-08",
-    "vessel_name": "7 帆洋丸",
+    "vessel_name": "7 岬洋丸",
     "bid_date": "2026-06-08",
     "tonnage": 830.0,
     "sea_area": {
@@ -16,7 +96,7 @@
         "category": "B カツオ",
         "size": "6.0kg上",
         "type": "入札",
-        "volume": 10.0
+        "volume": 15.0
       },
       {
         "category": "B カツオ",
@@ -28,13 +108,13 @@
         "category": "B カツオ",
         "size": "2.5kg上",
         "type": "入札",
-        "volume": 80.0
+        "volume": 100.0
       },
       {
         "category": "B カツオ",
         "size": "1.8kg上",
         "type": "入札",
-        "volume": 40.0
+        "volume": 20.0
       },
       {
         "category": "PS カツオ",
@@ -101,6 +181,18 @@
         "size": "1.5kg上",
         "type": "入札",
         "volume": 0.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 2.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "0.5kg下",
+        "type": "入札",
+        "volume": 1.0
       }
     ],
     "total_volume": 830.0
