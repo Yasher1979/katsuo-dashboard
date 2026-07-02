@@ -23,10 +23,8 @@ def convert_csv_to_json(csv_path, json_path):
                 "price": float(row['price']),
                 "volume": float(row['volume'])
             }
-            
-            # 既存のJSONにある船名情報を維持したい場合はここに追加しますが、
-            # ユーザーは「お渡ししているデータ」の確認を求めているため、
-            # CSVにある情報のみを優先します。
+            if 'vessel' in row and row['vessel']:
+                entry['vessel'] = row['vessel']
             
             data[port][size].append(entry)
     
@@ -39,6 +37,9 @@ def convert_csv_to_json(csv_path, json_path):
         json.dump(data, f, ensure_ascii=False, indent=2)
 
 if __name__ == "__main__":
-    convert_csv_to_json(r'C:\Users\yabuk\OneDrive\デスクトップ\Antigravity（鰹相場グラフ）\data\market_input.csv', 
-                        r'C:\Users\yabuk\OneDrive\デスクトップ\Antigravity（鰹相場グラフ）\data\katsuo_market_data.json')
+    import os
+    ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    csv_path = os.path.join(ROOT, 'data', 'market_input.csv')
+    json_path = os.path.join(ROOT, 'data', 'katsuo_market_data.json')
+    convert_csv_to_json(csv_path, json_path)
     print("Market data JSON has been rebuilt from market_input.csv successfully.")

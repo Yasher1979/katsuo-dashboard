@@ -1,5 +1,79 @@
 [
   {
+    "id": "20260702_eiseimaru",
+    "delivery_date": "2026-07-02",
+    "vessel_name": "永盛丸",
+    "bid_date": "2026-07-02",
+    "tonnage": 370.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 90.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 220.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 40.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 20.0
+      }
+    ],
+    "total_volume": 370.0
+  },
+  {
+    "id": "20260702_yaizu_training",
+    "delivery_date": "2026-07-02",
+    "vessel_name": "実習船やいづ",
+    "bid_date": "2026-07-02",
+    "tonnage": 2.1,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "一本釣",
+        "size": "7.0kg上",
+        "type": "入札",
+        "volume": 0.5
+      },
+      {
+        "category": "一本釣",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 0.6
+      },
+      {
+        "category": "一本釣",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 1.0
+      }
+    ],
+    "total_volume": 2.1
+  },
+  {
     "id": "20260629_hakkomaru35",
     "delivery_date": "2026-06-29",
     "vessel_name": "35 八興丸",
@@ -10,7 +84,7 @@
       "lon": "E 152°59' 〜 E 146°25'"
     },
     "port": "枕崎",
-    "is_latest": true,
+    "is_latest": false,
     "items": [
       {
         "category": "B カツオ",
