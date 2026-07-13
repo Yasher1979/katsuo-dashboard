@@ -18,6 +18,42 @@ let currentCompare = 'none';
 let activeTab = 'summary';
 let mainChart = null;
 
+const YAIZU_PORT = '焼津';
+const YAIZU_ALLOWED_MARKET_SIZES = new Set(['4.5kg上', '2.5kg上', '1.8kg上', '1.8kg下']);
+const YAIZU_EXCLUDED_VESSEL_KEYWORDS = ['日光丸', '亀洋丸'];
+
+function sanitizeMarketData(rawData) {
+    if (!rawData || !rawData[YAIZU_PORT]) return rawData;
+
+    const cleanedYaizu = {};
+    Object.entries(rawData[YAIZU_PORT]).forEach(([size, records]) => {
+        if (!YAIZU_ALLOWED_MARKET_SIZES.has(size)) return;
+
+        const filteredRecords = (records || []).filter(record => {
+            const vessel = record.vessel || '';
+            return !YAIZU_EXCLUDED_VESSEL_KEYWORDS.some(keyword => vessel.includes(keyword));
+        });
+
+        if (filteredRecords.length > 0) {
+            cleanedYaizu[size] = collapseDuplicateDates(filteredRecords);
+        }
+    });
+
+    rawData[YAIZU_PORT] = cleanedYaizu;
+    return rawData;
+}
+
+function collapseDuplicateDates(records) {
+    const byDate = new Map();
+    records.forEach(record => {
+        const existing = byDate.get(record.date);
+        if (!existing || Number(record.volume || 0) > Number(existing.volume || 0)) {
+            byDate.set(record.date, record);
+        }
+    });
+    return Array.from(byDate.values()).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+}
+
 async function initDashboard() {
     console.log("Initializing Dashboard...");
     try {
@@ -31,7 +67,7 @@ async function initDashboard() {
 
         let mRes = marketRes;
         if (!mRes.ok) mRes = await fetch(`/data/katsuo_market_data.json?v=${Date.now()}`).catch(e => ({ ok: false }));
-        if (mRes.ok) currentData = await mRes.json();
+        if (mRes.ok) currentData = sanitizeMarketData(await mRes.json());
 
         let bRes = bidRes;
         if (!bRes.ok) bRes = await fetch(`/data/bid_schedule.json?v=${Date.now()}`).catch(e => ({ ok: false }));
