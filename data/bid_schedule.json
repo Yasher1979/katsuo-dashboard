@@ -1,5 +1,45 @@
 [
   {
+    "id": "20260728_koyomaru78",
+    "delivery_date": "2026-07-28",
+    "vessel_name": "78 光洋丸",
+    "bid_date": "2026-07-28",
+    "tonnage": 300.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 200.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 50.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 20.0
+      }
+    ],
+    "total_volume": 300.0
+  },
+  {
     "id": "20260727_wakabamaru11",
     "delivery_date": "2026-07-27",
     "vessel_name": "11 わかば丸",
@@ -10,7 +50,7 @@
       "lon": ""
     },
     "port": "山川",
-    "is_latest": true,
+    "is_latest": false,
     "items": [
       {
         "category": "カツオ",
