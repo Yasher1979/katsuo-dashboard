@@ -28,7 +28,11 @@
 - `AGENTS.md` を追加し、AI/開発者が最初に読むルールを作成。
 - `docs/project_constitution.md` を追加し、憲法・デグレ禁止ルールを明文化。
 - `docs/market_update_rules.md` を追加し、焼津の個別ルールを明文化。
-- `docs/token_saving_rules.md` を追加し、低トークン運用を制度化。
+### 2026-08-04 枕崎（81源福丸）入札予定・相場更新
+
+- 反映データ: 枕崎 2026-08-04「81 源福丸」（水揚量 710t）の入札予定（`data/bid_schedule.json`）および市況相場（`data/market_input.csv`）。
+- 手順: CSV更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
+- デプロイ: GitHub `main` ブランチへコミット・Pushを完了しVercelへ即時反映。
 
 ## 更新時に蓄積するもの
 
