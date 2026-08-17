@@ -34,6 +34,13 @@
 - 手順: CSV更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
 - デプロイ: GitHub `main` ブランチへコミット・Pushを完了しVercelへ即時反映。
 
+### 2026-08-17 枕崎（18源福丸）入札予定・相場更新
+
+- 反映データ: 枕崎 2026-08-17「18 源福丸」（水揚量 580t）の入札予定（`data/bid_schedule.json`）および市況相場（`data/market_input.csv`）。
+- 手順: CSV更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
+- デプロイ: GitHub `main` ブランチへコミット・Pushを実行予定。
+
+
 ## 更新時に蓄積するもの
 
 - 新しく判明した市場別ルール。
