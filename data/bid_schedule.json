@@ -1,5 +1,227 @@
 [
   {
+    "id": "20260822_fukuichimaru128",
+    "delivery_date": "2026-08-22",
+    "vessel_name": "128 福一丸",
+    "bid_date": "2026-08-22",
+    "tonnage": 650.0,
+    "sea_area": {
+      "lat": "S 04°41' 〜 N 03°01'",
+      "lon": "E 158°09' 〜 E 143°42'"
+    },
+    "port": "枕崎",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "B カツオ",
+        "size": "8.0kg上",
+        "type": "入札",
+        "volume": 0.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "6.0kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 190.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 90.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 50.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "7.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "4.5kg上",
+        "type": "相対",
+        "volume": 5.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "2.5kg上",
+        "type": "相対",
+        "volume": 62.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg上",
+        "type": "相対",
+        "volume": 54.0
+      },
+      {
+        "category": "PS カツオ",
+        "size": "1.8kg下",
+        "type": "相対",
+        "volume": 17.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 35.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "5.0-3.0kg上",
+        "type": "相対",
+        "volume": 32.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 12.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "入札",
+        "volume": 5.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "10.0kg上",
+        "type": "相対",
+        "volume": 29.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "5.0-3.0kg上",
+        "type": "相対",
+        "volume": 17.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg上",
+        "type": "相対",
+        "volume": 12.0
+      },
+      {
+        "category": "PS キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "10.0-3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 0.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "10.0-3.0kg上",
+        "type": "相対",
+        "volume": 0.0
+      },
+      {
+        "category": "PS ダルマ",
+        "size": "1.5kg上",
+        "type": "相対",
+        "volume": 0.0
+      }
+    ],
+    "total_volume": 650.0
+  },
+  {
+    "id": "20260817_tokiwamaru38",
+    "delivery_date": "2026-08-17",
+    "vessel_name": "38 常盤丸",
+    "bid_date": "2026-08-17",
+    "tonnage": 365.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 310.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 20.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 5.0
+      }
+    ],
+    "total_volume": 365.0
+  },
+  {
+    "id": "20260817_inarimaru83",
+    "delivery_date": "2026-08-17",
+    "vessel_name": "83 稲荷丸",
+    "bid_date": "2026-08-17",
+    "tonnage": 35.0,
+    "sea_area": {
+      "lat": "東沖",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "一本釣り",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 15.0
+      },
+      {
+        "category": "一本釣り",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 20.0
+      }
+    ],
+    "total_volume": 35.0
+  },
+  {
     "id": "20260817_genfukumaru18",
     "delivery_date": "2026-08-17",
     "vessel_name": "18 源福丸",
@@ -10,7 +232,7 @@
       "lon": "E 154°18' 〜 E 149°44'"
     },
     "port": "枕崎",
-    "is_latest": true,
+    "is_latest": false,
     "items": [
       {
         "category": "B カツオ",
@@ -1064,74 +1286,6 @@
     "total_volume": 600.0
   },
   {
-    "id": "20260708_fukuichimaru88",
-    "delivery_date": "2026-07-08",
-    "vessel_name": "88 福一丸",
-    "bid_date": "2026-07-08",
-    "tonnage": 485.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "海旋",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 60.0
-      },
-      {
-        "category": "海旋",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 320.0
-      },
-      {
-        "category": "海旋",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 70.0
-      },
-      {
-        "category": "海旋",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 35.0
-      }
-    ],
-    "total_volume": 485.0
-  },
-  {
-    "id": "20260708_nikkomaru51_east",
-    "delivery_date": "2026-07-08",
-    "vessel_name": "51 日光丸 (東沖)",
-    "bid_date": "2026-07-08",
-    "tonnage": 40.0,
-    "sea_area": {
-      "lat": "東沖",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "一本釣",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 10.0
-      },
-      {
-        "category": "一本釣",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 30.0
-      }
-    ],
-    "total_volume": 40.0
-  },
-  {
     "id": "20260708_nikkomaru51_south",
     "delivery_date": "2026-07-08",
     "vessel_name": "51 日光丸 (南方)",
@@ -1170,6 +1324,74 @@
       }
     ],
     "total_volume": 89.0
+  },
+  {
+    "id": "20260708_nikkomaru51_east",
+    "delivery_date": "2026-07-08",
+    "vessel_name": "51 日光丸 (東沖)",
+    "bid_date": "2026-07-08",
+    "tonnage": 40.0,
+    "sea_area": {
+      "lat": "東沖",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "一本釣",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "一本釣",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 30.0
+      }
+    ],
+    "total_volume": 40.0
+  },
+  {
+    "id": "20260708_fukuichimaru88",
+    "delivery_date": "2026-07-08",
+    "vessel_name": "88 福一丸",
+    "bid_date": "2026-07-08",
+    "tonnage": 485.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 60.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 320.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 70.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 35.0
+      }
+    ],
+    "total_volume": 485.0
   },
   {
     "id": "20260707_wakabamaru7",
@@ -1236,6 +1458,40 @@
     "total_volume": 322.0
   },
   {
+    "id": "20260702_yaizu_training",
+    "delivery_date": "2026-07-02",
+    "vessel_name": "実習船やいづ",
+    "bid_date": "2026-07-02",
+    "tonnage": 2.1,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "一本釣",
+        "size": "7.0kg上",
+        "type": "入札",
+        "volume": 0.5
+      },
+      {
+        "category": "一本釣",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 0.6
+      },
+      {
+        "category": "一本釣",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 1.0
+      }
+    ],
+    "total_volume": 2.1
+  },
+  {
     "id": "20260702_eiseimaru",
     "delivery_date": "2026-07-02",
     "vessel_name": "永盛丸",
@@ -1274,40 +1530,6 @@
       }
     ],
     "total_volume": 370.0
-  },
-  {
-    "id": "20260702_yaizu_training",
-    "delivery_date": "2026-07-02",
-    "vessel_name": "実習船やいづ",
-    "bid_date": "2026-07-02",
-    "tonnage": 2.1,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "一本釣",
-        "size": "7.0kg上",
-        "type": "入札",
-        "volume": 0.5
-      },
-      {
-        "category": "一本釣",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 0.6
-      },
-      {
-        "category": "一本釣",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 1.0
-      }
-    ],
-    "total_volume": 2.1
   },
   {
     "id": "20260629_hakkomaru35",
@@ -1618,46 +1840,6 @@
     "total_volume": 680.0
   },
   {
-    "id": "20260615_koyomaru78",
-    "delivery_date": "2026-06-15",
-    "vessel_name": "78 光洋丸",
-    "bid_date": "2026-06-15",
-    "tonnage": 220.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "海旋",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 60.0
-      },
-      {
-        "category": "海旋",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 120.0
-      },
-      {
-        "category": "海旋",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 30.0
-      },
-      {
-        "category": "海旋",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 10.0
-      }
-    ],
-    "total_volume": 220.0
-  },
-  {
     "id": "20260615_wakabamaru11",
     "delivery_date": "2026-06-15",
     "vessel_name": "11 わかば丸",
@@ -1708,6 +1890,46 @@
       }
     ],
     "total_volume": 350.0
+  },
+  {
+    "id": "20260615_koyomaru78",
+    "delivery_date": "2026-06-15",
+    "vessel_name": "78 光洋丸",
+    "bid_date": "2026-06-15",
+    "tonnage": 220.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 60.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 120.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      }
+    ],
+    "total_volume": 220.0
   },
   {
     "id": "20260608_misakimaru7",
@@ -1866,144 +2088,6 @@
       }
     ],
     "total_volume": 500.0
-  },
-  {
-    "id": "20260507_wakabamaru11",
-    "delivery_date": "2026-05-07",
-    "vessel_name": "11 わかば丸",
-    "bid_date": "2026-05-07",
-    "tonnage": 420.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "枕崎",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "B カツオ",
-        "size": "6.0kg上",
-        "type": "入札",
-        "volume": 3.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 15.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 250.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 140.0
-      },
-      {
-        "category": "B カツオ",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 10.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 1.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg下ダル混",
-        "type": "入札",
-        "volume": 1.0
-      }
-    ],
-    "total_volume": 420.0
-  },
-  {
-    "id": "20260519_wakabamaru5",
-    "delivery_date": "2026-05-19",
-    "vessel_name": "5 わかば丸",
-    "bid_date": "2026-05-19",
-    "tonnage": 120.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "旋網",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 20.0
-      },
-      {
-        "category": "旋網",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 80.0
-      },
-      {
-        "category": "旋網",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 10.0
-      },
-      {
-        "category": "旋網",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 10.0
-      }
-    ],
-    "total_volume": 120.0
-  },
-  {
-    "id": "20260519_eiseimaru8",
-    "delivery_date": "2026-05-19",
-    "vessel_name": "8 永盛丸",
-    "bid_date": "2026-05-19",
-    "tonnage": 285.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "一本釣",
-        "size": "7.0kg上",
-        "type": "入札",
-        "volume": 140.0
-      },
-      {
-        "category": "一本釣",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 90.0
-      },
-      {
-        "category": "一本釣",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 35.0
-      },
-      {
-        "category": "一本釣",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 20.0
-      }
-    ],
-    "total_volume": 285.0
   },
   {
     "id": "20260522_meihomaru88",
@@ -2338,6 +2422,86 @@
     "total_volume": 670.0
   },
   {
+    "id": "20260519_wakabamaru5",
+    "delivery_date": "2026-05-19",
+    "vessel_name": "5 わかば丸",
+    "bid_date": "2026-05-19",
+    "tonnage": 120.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "旋網",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 20.0
+      },
+      {
+        "category": "旋網",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 80.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      }
+    ],
+    "total_volume": 120.0
+  },
+  {
+    "id": "20260519_eiseimaru8",
+    "delivery_date": "2026-05-19",
+    "vessel_name": "8 永盛丸",
+    "bid_date": "2026-05-19",
+    "tonnage": 285.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "一本釣",
+        "size": "7.0kg上",
+        "type": "入札",
+        "volume": 140.0
+      },
+      {
+        "category": "一本釣",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 90.0
+      },
+      {
+        "category": "一本釣",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 35.0
+      },
+      {
+        "category": "一本釣",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 20.0
+      }
+    ],
+    "total_volume": 285.0
+  },
+  {
     "id": "20260516_koyomaru55",
     "delivery_date": "2026-05-16",
     "vessel_name": "55 岬洋丸",
@@ -2550,46 +2714,6 @@
     "total_volume": 385.0
   },
   {
-    "id": "20260509_koyomaru78",
-    "delivery_date": "2026-05-09",
-    "vessel_name": "78 光洋丸",
-    "bid_date": "2026-05-09",
-    "tonnage": 600.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "旋網",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 80.0
-      },
-      {
-        "category": "旋網",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 300.0
-      },
-      {
-        "category": "旋網",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 50.0
-      },
-      {
-        "category": "旋網",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 10.0
-      }
-    ],
-    "total_volume": 440.0
-  },
-  {
     "id": "20260511_fukuichimaru88",
     "delivery_date": "2026-05-11",
     "vessel_name": "88 福一丸",
@@ -2766,6 +2890,104 @@
       }
     ],
     "total_volume": 970.0
+  },
+  {
+    "id": "20260509_koyomaru78",
+    "delivery_date": "2026-05-09",
+    "vessel_name": "78 光洋丸",
+    "bid_date": "2026-05-09",
+    "tonnage": 600.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "旋網",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 80.0
+      },
+      {
+        "category": "旋網",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 300.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 50.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      }
+    ],
+    "total_volume": 440.0
+  },
+  {
+    "id": "20260507_wakabamaru11",
+    "delivery_date": "2026-05-07",
+    "vessel_name": "11 わかば丸",
+    "bid_date": "2026-05-07",
+    "tonnage": 420.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "枕崎",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "B カツオ",
+        "size": "6.0kg上",
+        "type": "入札",
+        "volume": 3.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 15.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 250.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 140.0
+      },
+      {
+        "category": "B カツオ",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 1.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "入札",
+        "volume": 1.0
+      }
+    ],
+    "total_volume": 420.0
   },
   {
     "id": "20260507_wakabamaru11",
@@ -2946,46 +3168,6 @@
     "total_volume": 950.0
   },
   {
-    "id": "20260430_tokiwamaru18",
-    "delivery_date": "2026-04-30",
-    "vessel_name": "18 常磐丸",
-    "bid_date": "2026-04-30",
-    "tonnage": 340.0,
-    "sea_area": {
-      "lat": "南方",
-      "lon": ""
-    },
-    "port": "焼津",
-    "is_latest": false,
-    "items": [
-      {
-        "category": "旋網",
-        "size": "4.5kg上",
-        "type": "入札",
-        "volume": 60.0
-      },
-      {
-        "category": "旋網",
-        "size": "2.5kg上",
-        "type": "入札",
-        "volume": 240.0
-      },
-      {
-        "category": "旋網",
-        "size": "1.8kg上",
-        "type": "入札",
-        "volume": 30.0
-      },
-      {
-        "category": "旋網",
-        "size": "1.8kg下",
-        "type": "入札",
-        "volume": 10.0
-      }
-    ],
-    "total_volume": 340.0
-  },
-  {
     "id": "20260501_tokiwamaru38",
     "delivery_date": "2026-05-01",
     "vessel_name": "38 常磐丸",
@@ -3042,6 +3224,46 @@
       }
     ],
     "total_volume": 600.0
+  },
+  {
+    "id": "20260430_tokiwamaru18",
+    "delivery_date": "2026-04-30",
+    "vessel_name": "18 常磐丸",
+    "bid_date": "2026-04-30",
+    "tonnage": 340.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "旋網",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 60.0
+      },
+      {
+        "category": "旋網",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 240.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 30.0
+      },
+      {
+        "category": "旋網",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 10.0
+      }
+    ],
+    "total_volume": 340.0
   },
   {
     "id": "20260427_wakabamaru7",

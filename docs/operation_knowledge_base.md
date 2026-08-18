@@ -38,7 +38,16 @@
 
 - 反映データ: 枕崎 2026-08-17「18 源福丸」（水揚量 580t）の入札予定（`data/bid_schedule.json`）および市況相場（`data/market_input.csv`）。
 - 手順: CSV更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
-- デプロイ: GitHub `main` ブランチへコミット・Pushを実行予定。
+- デプロイ: GitHub `main` ブランチへコミット・Push完了。
+
+### 2026-08-18 焼津相場（38常盤丸）および枕崎入札予定（128福一丸）更新
+
+- 反映データ: 
+  1. 焼津 2026-08-17「38 常盤丸」（海旋船 365t）の相場データ（`data/market_input.csv`）および水揚げ明細（`data/bid_schedule.json`）。※一本釣り船「83 稲荷丸」（35t）はルールに従い `market_input.csv` には含めず `bid_schedule.json` に記録。
+  2. 枕崎 2026-08-22「128 福一丸」（水揚量 650t）の最新入札予定（`data/bid_schedule.json`）。
+- 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
+- デプロイ: GitHub `main` ブランチへコミット・Pushを完了。
+
 
 
 ## 更新時に蓄積するもの
