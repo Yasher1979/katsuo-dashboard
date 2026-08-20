@@ -48,6 +48,11 @@
 - 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
 - デプロイ: GitHub `main` ブランチへコミット・Pushを完了。
 
+### 2026-08-19 山川相場（88光洋丸）更新
+
+- 反映データ: 山川 2026-08-19「88光洋丸」（水揚量 435t）の相場データ（`data/market_input.csv`）および水揚げ明細（`data/bid_schedule.json`）。
+- 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
+- デプロイ: GitHub `main` ブランチへコミット・Pushを完了。
 
 
 ## 更新時に蓄積するもの
