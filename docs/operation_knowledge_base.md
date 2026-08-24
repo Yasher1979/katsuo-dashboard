@@ -54,6 +54,13 @@
 - 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。
 - デプロイ: GitHub `main` ブランチへコミット・Pushを完了。
 
+### 2026-08-24 山川相場（35八興丸）更新
+
+- 反映データ: 山川 2026-08-24「35八興丸」（水揚量 500t）の相場データ（`data/market_input.csv`）および水揚げ明細（`data/bid_schedule.json`）。
+- 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260824-1050` に更新。
+- デプロイ: GitHub `main` ブランチへコミット・Pushを完了。
+
+
 
 ## 更新時に蓄積するもの
 
