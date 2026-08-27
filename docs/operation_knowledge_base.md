@@ -60,6 +60,13 @@
 - 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260824-1050` に更新。
 - デプロイ: GitHub `main` ブランチへコミット・Pushを完了。
 
+### 2026-08-27 枕崎相場（18宮丸）更新
+
+- 反映データ: 枕崎 2026-08-27「18宮丸」の市況相場（`data/market_input.csv`）。
+- 手順: CSV更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260827-1030` に更新。
+- デプロイ: GitHub `main` ブランチへコミット・Pushを完了。
+
+
 
 
 ## 更新時に蓄積するもの
