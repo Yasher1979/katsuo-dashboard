@@ -1,5 +1,73 @@
 [
   {
+    "id": "20260903_hakkomaru2",
+    "delivery_date": "2026-09-03",
+    "vessel_name": "2 八興丸",
+    "bid_date": "2026-09-03",
+    "tonnage": 310.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": true,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
+        "type": "入札",
+        "volume": 60.0
+      },
+      {
+        "category": "海旋",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 130.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg上",
+        "type": "入札",
+        "volume": 80.0
+      },
+      {
+        "category": "海旋",
+        "size": "1.8kg下",
+        "type": "入札",
+        "volume": 40.0
+      }
+    ],
+    "total_volume": 310.0
+  },
+  {
+    "id": "20260903_eiseimaru8",
+    "delivery_date": "2026-09-03",
+    "vessel_name": "8 永盛丸",
+    "bid_date": "2026-09-03",
+    "tonnage": 180.0,
+    "sea_area": {
+      "lat": "東沖",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "一本釣り",
+        "size": "2.5kg上",
+        "type": "入札",
+        "volume": 125.0
+      },
+      {
+        "category": "一本釣り",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 55.0
+      }
+    ],
+    "total_volume": 180.0
+  },
+  {
     "id": "20260901_fukuichimaru81",
     "delivery_date": "2026-09-01",
     "vessel_name": "81 福一丸",
@@ -10,7 +78,7 @@
       "lon": "E 157°57' 〜 E 142°13'"
     },
     "port": "枕崎",
-    "is_latest": true,
+    "is_latest": false,
     "items": [
       {
         "category": "B カツオ",

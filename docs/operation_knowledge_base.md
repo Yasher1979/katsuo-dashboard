@@ -74,6 +74,16 @@
 - 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260901-1510` に更新。
 - デプロイ: GitHub `main` ブランチへコミット・Push完了。
 
+### 2026-09-03 焼津相場（2八興丸）および一本釣り明細（8永盛丸）更新
+
+- 反映データ: 
+  1. 焼津 2026-09-03「2八興丸」（海旋船 310t）の市況相場（`data/market_input.csv`）および水揚げ明細（`data/bid_schedule.json`）。
+  2. 焼津 2026-09-03「8永盛丸」（一本釣り船 180t）の水揚げ明細（`data/bid_schedule.json`）。※焼津ルールに従い一本釣り船の価格は `market_input.csv` に含めず `bid_schedule.json` のみに記録。
+- 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260904-1320` に更新。
+- デプロイ: GitHub `main` ブランチへコミット・Push完了。
+
+
+
 
 
 
