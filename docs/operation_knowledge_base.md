@@ -82,6 +82,14 @@
 - 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260904-1320` に更新。
 - デプロイ: GitHub `main` ブランチへコミット・Push完了。
 
+### 2026-09-08 山川相場（55岬洋丸）および 枕崎入札予定（88福一丸）更新
+
+- 反映データ:
+  1. 山川 2026-09-08「55岬洋丸」（水揚量 195t）の市況相場（`data/market_input.csv`）および水揚げ明細（`data/bid_schedule.json`）。
+  2. 枕崎 2026-09-09「88 福一丸」（MSC 800t）の最新入札予定（`data/bid_schedule.json`）。
+- 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260908-1030` に更新。
+- デプロイ: GitHub `main` ブランチへコミット・Push完了。
+
 
 
 
