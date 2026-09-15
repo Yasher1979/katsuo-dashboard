@@ -95,6 +95,15 @@
 
 
 
+### 2026-09-15 枕崎相場（86明豊丸）・枕崎入札予定（5わかば丸）・山川相場（36昇喜丸）更新
+
+- 反映データ:
+  1. 枕崎 2026-09-15「86明豊丸」（MSC）の市況相場（`data/market_input.csv`）。
+  2. 枕崎 2026-09-18「5わかば丸」（水揚量 520t）の最新入札予定（`data/bid_schedule.json`）。
+  3. 山川 2026-09-15「36昇喜丸」（MSC 水揚量 325t）の市況相場（`data/market_input.csv`）および水揚げ明細（`data/bid_schedule.json`）。
+- 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260915-1130` に更新。
+- デプロイ: GitHub `main` ブランチへコミット・Push完了。
+
 ## 更新時に蓄積するもの
 
 - 新しく判明した市場別ルール。
