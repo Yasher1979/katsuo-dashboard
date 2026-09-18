@@ -104,6 +104,14 @@
 - 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260915-1130` に更新。
 - デプロイ: GitHub `main` ブランチへコミット・Push完了。
 
+### 2026-09-18 焼津相場（78光洋丸）・枕崎相場（5わかば丸）更新
+
+- 反映データ:
+  1. 焼津 2026-09-17「78光洋丸」（海旋船 180t）の市況相場（`data/market_input.csv`）および水揚げ明細（`data/bid_schedule.json`）。
+  2. 枕崎 2026-09-18「5わかば丸」（市況確定 209t）の市況相場（`data/market_input.csv`）および確定水揚げ明細（`data/bid_schedule.json`）。
+- 手順: CSVおよびJSON更新後 `rebuild_data_from_csv.py` および `validate_market_rules.py` を実行し正常検証済み。キャッシュ対策として `web/index.html` のバージョンを `20260918-0930` に更新。
+- デプロイ: GitHub `main` ブランチへコミット・Push完了。
+
 ## 更新時に蓄積するもの
 
 - 新しく判明した市場別ルール。
