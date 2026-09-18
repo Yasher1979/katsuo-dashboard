@@ -4,7 +4,7 @@
     "delivery_date": "2026-09-18",
     "vessel_name": "5わかば丸",
     "bid_date": "2026-09-18",
-    "tonnage": 520.0,
+    "tonnage": 209.0,
     "sea_area": {
       "lat": "S 01°07' 〜 N 03°34'",
       "lon": "E 153°40' 〜 E 143°32'"
@@ -14,15 +14,9 @@
     "items": [
       {
         "category": "B カツオ",
-        "size": "8.0kg上",
-        "type": "入札",
-        "volume": 0.0
-      },
-      {
-        "category": "B カツオ",
         "size": "6.0kg上",
         "type": "入札",
-        "volume": 0.0
+        "volume": 3.0
       },
       {
         "category": "B カツオ",
@@ -34,124 +28,80 @@
         "category": "B カツオ",
         "size": "2.5kg上",
         "type": "入札",
-        "volume": 50.0
+        "volume": 45.0
       },
       {
         "category": "B カツオ",
         "size": "1.8kg上",
         "type": "入札",
-        "volume": 70.0
+        "volume": 90.0
       },
       {
         "category": "B カツオ",
         "size": "1.8kg下",
+        "type": "入札",
+        "volume": 35.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 20.0
+      },
+      {
+        "category": "キワ・キメ",
+        "size": "1.5kg下ダル混",
+        "type": "入札",
+        "volume": 3.0
+      },
+      {
+        "category": "ダルマ",
+        "size": "1.5kg上",
+        "type": "入札",
+        "volume": 3.0
+      }
+    ],
+    "total_volume": 209.0
+  },
+  {
+    "id": "20260917_koyomaru78",
+    "delivery_date": "2026-09-17",
+    "vessel_name": "78光洋丸",
+    "bid_date": "2026-09-17",
+    "tonnage": 180.0,
+    "sea_area": {
+      "lat": "南方",
+      "lon": ""
+    },
+    "port": "焼津",
+    "is_latest": false,
+    "items": [
+      {
+        "category": "海旋",
+        "size": "4.5kg上",
         "type": "入札",
         "volume": 30.0
       },
       {
-        "category": "PS カツオ",
-        "size": "7.0kg上",
-        "type": "相対",
-        "volume": 0.0
-      },
-      {
-        "category": "PS カツオ",
-        "size": "4.5kg上",
-        "type": "相対",
-        "volume": 14.0
-      },
-      {
-        "category": "PS カツオ",
+        "category": "海旋",
         "size": "2.5kg上",
-        "type": "相対",
-        "volume": 87.0
+        "type": "入札",
+        "volume": 110.0
       },
       {
-        "category": "PS カツオ",
+        "category": "海旋",
         "size": "1.8kg上",
-        "type": "相対",
-        "volume": 72.0
+        "type": "入札",
+        "volume": 30.0
       },
       {
-        "category": "PS カツオ",
+        "category": "海旋",
         "size": "1.8kg下",
-        "type": "相対",
-        "volume": 34.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "10.0kg上",
-        "type": "相対",
-        "volume": 4.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "5.0-3.0kg上",
-        "type": "相対",
-        "volume": 10.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg上",
         "type": "入札",
         "volume": 10.0
-      },
-      {
-        "category": "キワ・キメ",
-        "size": "1.5kg下ダル混",
-        "type": "入札",
-        "volume": 2.0
-      },
-      {
-        "category": "PS キワ・キメ",
-        "size": "10.0kg上",
-        "type": "相対",
-        "volume": 98.0
-      },
-      {
-        "category": "PS キワ・キメ",
-        "size": "5.0-3.0kg上",
-        "type": "相対",
-        "volume": 26.0
-      },
-      {
-        "category": "PS キワ・キメ",
-        "size": "1.5kg上",
-        "type": "相対",
-        "volume": 3.0
-      },
-      {
-        "category": "PS キワ・キメ",
-        "size": "1.5kg下ダル混",
-        "type": "相対",
-        "volume": 0.0
-      },
-      {
-        "category": "ダルマ",
-        "size": "10.0-3.0kg上",
-        "type": "相対",
-        "volume": 0.0
-      },
-      {
-        "category": "ダルマ",
-        "size": "1.5kg上",
-        "type": "入札",
-        "volume": 0.0
-      },
-      {
-        "category": "PS ダルマ",
-        "size": "10.0-3.0kg上",
-        "type": "相対",
-        "volume": 0.0
-      },
-      {
-        "category": "PS ダルマ",
-        "size": "1.5kg上",
-        "type": "相対",
-        "volume": 0.0
       }
     ],
-    "total_volume": 520.0
+    "total_volume": 180.0
   },
   {
     "id": "20260915_shokimaru36",
