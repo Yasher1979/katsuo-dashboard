@@ -35,23 +35,12 @@ function sanitizeMarketData(rawData) {
         });
 
         if (filteredRecords.length > 0) {
-            cleanedYaizu[size] = collapseDuplicateDates(filteredRecords);
+            cleanedYaizu[size] = filteredRecords.sort((a, b) => String(a.date).localeCompare(String(b.date)));
         }
     });
 
     rawData[YAIZU_PORT] = cleanedYaizu;
     return rawData;
-}
-
-function collapseDuplicateDates(records) {
-    const byDate = new Map();
-    records.forEach(record => {
-        const existing = byDate.get(record.date);
-        if (!existing || Number(record.volume || 0) > Number(existing.volume || 0)) {
-            byDate.set(record.date, record);
-        }
-    });
-    return Array.from(byDate.values()).sort((a, b) => String(a.date).localeCompare(String(b.date)));
 }
 
 async function initDashboard() {
@@ -243,9 +232,6 @@ function renderMainChart() {
         '山川': { border: '#3fb950', bg: 'rgba(63, 185, 80, 0.1)' }
     };
 
-    // 日付オフセット（日数）を取得
-    const dayOffset = getComparisonDayOffset(currentCompare);
-
     ports.forEach(port => {
         if (!appSettings.ports.includes(port)) return;
 
@@ -260,7 +246,7 @@ function renderMainChart() {
 
         datasets.push({
             label: `${port} (${currentSize})`,
-            data: filteredData.map(d => ({ x: d.date, y: d.price, volume: d.volume, prevPrice: d.prevPrice })),
+            data: filteredData.map(d => ({ x: d.date, y: d.price, actualDate: d.date, volume: d.volume, prevPrice: d.prevPrice })),
             borderColor: color.border,
             backgroundColor: color.bg,
             borderWidth: 3,
@@ -272,8 +258,8 @@ function renderMainChart() {
         });
 
         // 過去データ（点線）を追加（比較対象が指定されている場合）
-        if (currentCompare !== 'none' && dayOffset > 0) {
-            const historicalData = getHistoricalData(portData, dayOffset, currentRange);
+        if (currentCompare !== 'none') {
+            const historicalData = getHistoricalData(portData, currentCompare, currentRange);
             if (historicalData.length > 0) {
                 const historicalColorValue = parseInt(color.border.substring(1), 16);
                 const r = (historicalColorValue >> 16) & 255;
@@ -283,7 +269,7 @@ function renderMainChart() {
 
                 datasets.push({
                     label: `${port} (${getComparisonLabel(currentCompare)})`,
-                    data: historicalData.map(d => ({ x: d.date, y: d.price, volume: d.volume, prevPrice: d.prevPrice, isHistorical: true })),
+                    data: historicalData.map(d => ({ x: d.date, y: d.price, actualDate: d.actualDate, volume: d.volume, prevPrice: d.prevPrice, isHistorical: true })),
                     borderColor: historicalColor,
                     backgroundColor: 'rgba(0, 0, 0, 0)',
                     borderWidth: 2,
@@ -302,7 +288,7 @@ function renderMainChart() {
         responsive: true,
         maintainAspectRatio: false,
         interaction: {
-            mode: 'index',
+            mode: 'x',
             intersect: false,
         },
         plugins: {
@@ -323,17 +309,14 @@ function renderMainChart() {
                     title: function(context) {
                         if (context.length > 0) {
                             const dataPoint = context[0].raw;
-                            const isHistorical = dataPoint.isHistorical;
-                            const baseDate = new Date(context[0].label);
-                            const dayOffset = getComparisonDayOffset(currentCompare);
-                            const offsetDate = isHistorical ? new Date(baseDate.getTime() + dayOffset * 24 * 60 * 60 * 1000) : baseDate;
-                            return offsetDate.toISOString().split('T')[0];
+                            return `表示日: ${String(dataPoint.x).slice(0, 10)}`;
                         }
                         return '';
                     },
                     label: function(context) {
                         const dataPoint = context.raw;
-                        const label = `${context.dataset.label}: ${dataPoint.y}円`;
+                        const dateLabel = dataPoint.actualDate ? ` ${dataPoint.actualDate}` : '';
+                        const label = `${context.dataset.label}${dateLabel}: ${dataPoint.y}円`;
                         if (dataPoint.volume) {
                             return label + ` (水揚: ${dataPoint.volume.toFixed(1)}t)`;
                         }
@@ -397,15 +380,8 @@ function renderMainChart() {
     }
 }
 
-// 比較値から日数オフセットを取得
-function getComparisonDayOffset(compareValue) {
-    const offsets = {
-        'none': 0,
-        '1m': 30,
-        '3m': 91,
-        '6m': 182,
-        '1y': 365
-    };
+function getComparisonMonths(compareValue) {
+    const offsets = { '1m': 1, '3m': 3, '6m': 6, '1y': 12 };
     return offsets[compareValue] || 0;
 }
 
@@ -421,43 +397,55 @@ function getComparisonLabel(compareValue) {
     return labels[compareValue] || 'なし';
 }
 
-// 過去データを抽出（日付をオフセットして現在のグラフX軸に合わせる）
-function getHistoricalData(portData, dayOffset, currentRange) {
-    if (!portData || dayOffset <= 0) return [];
+function getMarketDateKey(date = new Date()) {
+    const parts = new Intl.DateTimeFormat('en', {
+        timeZone: 'Asia/Tokyo',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+    }).formatToParts(date);
+    const dateParts = Object.fromEntries(parts.map(part => [part.type, part.value]));
+    return `${dateParts.year}-${dateParts.month}-${dateParts.day}`;
+}
 
-    // 現在の時間範囲の最新日を取得
-    let latestDate = null;
-    portData.forEach(d => {
-        const date = new Date(d.date);
-        if (!latestDate || date > latestDate) latestDate = date;
-    });
-    
-    if (!latestDate) return [];
+function addDaysToDateKey(dateKey, days) {
+    const [year, month, day] = dateKey.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day + days)).toISOString().slice(0, 10);
+}
 
-    // 過去のデータ期間を計算
-    const targetEndDate = new Date(latestDate.getTime() - dayOffset * 24 * 60 * 60 * 1000);
-    const rangeMs = currentRange === 'all' ? Infinity : parseInt(currentRange) * 24 * 60 * 60 * 1000;
-    const targetStartDate = new Date(targetEndDate.getTime() - rangeMs);
+function addMonthsToDateKey(dateKey, months) {
+    const [year, month, day] = dateKey.split('-').map(Number);
+    const targetMonth = new Date(Date.UTC(year, month - 1 + months, 1));
+    const lastDay = new Date(Date.UTC(targetMonth.getUTCFullYear(), targetMonth.getUTCMonth() + 1, 0)).getUTCDate();
+    return new Date(Date.UTC(targetMonth.getUTCFullYear(), targetMonth.getUTCMonth(), Math.min(day, lastDay))).toISOString().slice(0, 10);
+}
 
-    // 過去のデータを抽出
-    const historicalData = portData.filter(d => {
-        const date = new Date(d.date);
-        return date >= targetStartDate && date <= targetEndDate;
-    });
+function getDaysBetweenDateKeys(startDate, endDate) {
+    const start = Date.parse(`${startDate}T00:00:00Z`);
+    const end = Date.parse(`${endDate}T00:00:00Z`);
+    return Math.round((end - start) / 86400000);
+}
 
-    // 日付を現在のグラフに合わせてオフセット
-    const offsetData = historicalData.map(d => {
-        const pastDate = new Date(d.date);
-        const currentDate = new Date(pastDate.getTime() + dayOffset * 24 * 60 * 60 * 1000);
-        return {
-            date: currentDate.toISOString().split('T')[0],
+// 過去の期間を抽出し、基準日の間隔に合わせてX軸へ重ねる。
+function getHistoricalData(portData, compareValue, currentRange) {
+    const monthOffset = getComparisonMonths(compareValue);
+    if (!portData || monthOffset <= 0) return [];
+
+    const asOfDate = getMarketDateKey();
+    const targetEndDate = addMonthsToDateKey(asOfDate, -monthOffset);
+    const dayOffset = getDaysBetweenDateKeys(targetEndDate, asOfDate);
+    const rangeDays = currentRange === 'all' ? null : Number.parseInt(currentRange, 10);
+    const targetStartDate = rangeDays ? addDaysToDateKey(targetEndDate, -(rangeDays - 1)) : null;
+
+    return portData
+        .filter(d => d.date <= targetEndDate && (!targetStartDate || d.date >= targetStartDate))
+        .map(d => ({
+            date: addDaysToDateKey(d.date, dayOffset),
+            actualDate: d.date,
             price: d.price,
             volume: d.volume,
             prevPrice: d.prevPrice
-        };
-    });
-
-    return offsetData;
+        }));
 }
 
 // 全サイズ最新相場一覧テーブルの描画
@@ -534,13 +522,14 @@ function renderAllSizesTable() {
 }
 
 function filterDataByRange(data, range) {
-    if (!data || range === 'all') return data;
-    const now = typeof moment !== 'undefined' ? moment() : new Date();
-    return data.filter(d => {
-        const date = new Date(d.date);
-        const diffDays = (now - date) / (1000 * 60 * 60 * 24);
-        return diffDays <= parseInt(range);
-    });
+    if (!data) return [];
+    const endDate = getMarketDateKey();
+    if (range === 'all') return data.filter(d => d.date <= endDate);
+
+    const rangeDays = Number.parseInt(range, 10);
+    if (!Number.isInteger(rangeDays) || rangeDays <= 0) return data.filter(d => d.date <= endDate);
+    const startDate = addDaysToDateKey(endDate, -(rangeDays - 1));
+    return data.filter(d => d.date >= startDate && d.date <= endDate);
 }
 
 function showDetail(port, portData, latestDateStr) {
